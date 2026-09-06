@@ -22,8 +22,9 @@ phase 1 clone works. Publishing review.nvim (15) is on hold. The CLI tools
 moved from Homebrew to `nix/home/tools.nix` (16). CI, Renovate config, and
 the machine repos' input flip landed (13). The operations runbook (12) is
 written as `operations.md`; the doctor drift reporter is its open half.
-Next: the personal Mac bring-up (7) as the first real run of the reworked
-flow.
+Item 17 is a new open question about which out-of-store links should move
+into Nix. Next: the personal Mac bring-up (7) as the first real run of the
+reworked flow.
 
 tmux plugins stay on TPM, so plugin management is not on this roadmap.
 
@@ -51,6 +52,8 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
   7  Personal Mac (m1)       NEXT — first run of the reworked bootstrap
         │
  12  Runbook + doctor          runbook DONE (operations.md) · doctor open
+        │
+ 17  Nixify linked config      OPEN QUESTION — scopes A–D · revisits item 4
         │
   ▼  later hosts               NixOS VPS · Linux laptop (OS open)
 ```
@@ -764,3 +767,78 @@ watch the first workflow runs after pushing.
   then picks up the new core head behind its own eval CI. A core change
   reaches a machine after a push plus the machine's next lock refresh, or
   immediately with a manual `nix flake update dotfiles` there.
+
+## 17. Move some out-of-store links into Nix — not started
+
+Almost every config file is an out-of-store link to the checkout
+(`nix/home/links.nix`), so the file content is not in the generation: a
+rollback does not restore it, CI cannot see it, and a fresh clone has
+dangling links until the theme generator runs. Item 4 decided that actively
+edited configuration stays linked out-of-store, and that decision holds for
+the files that are edited daily. This item asks which of the rest are only
+linked out-of-store by default rather than by choice, and it revisits item 4
+for those.
+
+The test for each file, in order:
+
+- Does the app write the file? Then the link must stay out-of-store, or the
+  file must be copied rather than linked. Known cases:
+  `nvim/.config/nvim/lazy-lock.json` (lazy.nvim writes it back into the
+  repo), `~/.claude` and `~/.pi` (the agents write there), and Claude's
+  `settings.json`, which item 11 already handles by copying because the
+  atomic rename replaces a symlink with a regular file.
+- Is it edited often enough that a `home-manager switch` per edit is
+  annoying? A store file costs one switch per edit.
+- Does a machine repo need to change part of it? Nix attribute sets merge
+  and plain files do not, which is why the machine surface today is string
+  fragments and whole replacement files.
+
+Four scopes, each landable on its own and in rough order of cost.
+
+### A. Verbatim files into the store
+
+Move the rarely edited static files from out-of-store links to store
+sources, which is the pattern `nix/home/cli.nix` already uses for the atuin,
+direnv, and procs configs. Candidates by size:
+`aerospace/.config/aerospace/aerospace.toml` (219 lines),
+`hammerspoon/.hammerspoon/init.lua` (135), `vim/.config/vim/vimrc` (75),
+`starship/.config/starship.toml` (25), `jj/.config/jj/config.toml` (2). The
+content then lives in the generation, so a rollback restores it and a dirty
+checkout cannot change the running config. The cost is a switch per edit,
+and the aerospace file also has generated `mode-borders-*.sh` siblings that
+scope C covers.
+
+### B. Upstream `programs.*` options where they exist
+
+Home Manager has modules for most of these tools, and the core uses only
+`programs.git` and `programs.ssh` today. Converting a file to
+`programs.<tool>.settings` gives the machine repos real merge semantics, so
+a machine can override one key instead of shipping a second whole file.
+Concretely, `programs.starship.settings` would replace
+`nix/home/starship.nix`, whose `dotfiles.starship.variant` option exists
+only because two whole toml files cannot merge. The cost is that toml and
+lua become Nix attribute sets, which is a rewrite per tool and makes the
+config unreadable to anyone not running this flake. The gen-m5 per-directory
+prompt switch reads `STARSHIP_CONFIG` at runtime (item 11), so it needs a
+second built file either way and would not simplify.
+
+### C. Build the generated theme artifacts in the store
+
+`palettes/generate.lua` writes gitignored artifacts into the working tree
+and `links.nix` links them out-of-store, so a fresh clone must run
+`scripts/generate_colorscheme.sh` before the links resolve. A derivation
+running the generator with a nixpkgs luajit would build every variant, and
+the links would become store paths. Runtime theme switching still works,
+because all variants are built and switching only picks which file to read.
+This also removes the manual step in AGENTS.md's "adding a new theme"
+procedure: the per-palette links (aerospace `mode-borders-*`, the fzf
+themes, the Typora CSS) can be generated from the palette list rather than
+listed by hand. The cost is that a palette edit needs a switch before it is
+visible, and item 2 deliberately kept that loop switch-free.
+
+### D. The actively edited trees — out of scope for now
+
+The nvim lua tree, the sketchybar tree, the shell startup files, and the
+agent directories are edited many times a day and some are written by their
+app. Item 4's decision should stand for these unless the editing loop
+changes.
