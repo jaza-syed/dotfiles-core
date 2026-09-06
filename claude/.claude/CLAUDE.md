@@ -23,6 +23,14 @@ The Plain Language output style defines the rules for prose a person may read. I
 
 When you write instructions for a subagent, they MUST tell the subagent to follow the current output style.
 
+When you stop part-way through a sequence of actions because you need a decision or a go-ahead from me before you can continue, you MUST also send a desktop notification saying what you need:
+
+```sh
+terminal-notifier -title "Claude Code" -message "<the decision you need>"
+```
+
+This applies whether you ask in prose or through the AskUserQuestion tool. The sandbox blocks the notification centre and the command hangs there rather than failing, so you MUST run it with the sandbox disabled.
+
 ## Writing comments
 
 - Comments and docstrings are for human readers to understand the current state of the codebase. A comment or docstring MUST contain only context that cannot be easily inferred from the code and that is useful to a human reader.
