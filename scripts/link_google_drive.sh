@@ -42,6 +42,7 @@ link_google_drive() {
     fi
 
     if [ -L "$destination" ] && [ "$(readlink "$destination")" = "$1" ]; then
+        # shellcheck disable=SC2088 # the tilde is display text, not a path
         echo "~/drive-jaza already links to the selected account."
         exit 0
     fi

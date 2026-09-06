@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared interactive shell config — sourced by .zshrc and .bashrc
 # Aliases, functions, tool init for interactive use
 
@@ -211,6 +212,7 @@ if ! apply_shell_theme "$startup_theme"; then
 fi
 
 # Shell hooks for Home Manager-installed tools
+# shellcheck disable=SC1090 # fzf emits its integration at runtime
 source <(fzf --"$_shell")
 export FZF_CTRL_T_COMMAND='fd --type f --hidden'
 eval "$(direnv-instant hook "$_shell")"

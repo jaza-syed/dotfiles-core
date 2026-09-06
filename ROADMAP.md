@@ -8,7 +8,8 @@ its own repository holding its host composition: `m1` (personal Mac) in
 `../dotfiles-m1`, `gen-m5` (work Mac) in `../dotfiles-gen-m5`, and later a
 NixOS VPS and a Linux laptop whose OS is still undecided.
 
-Status: items 1–6, 8, 10, 11, 14, and 16 are done. The core is modules-only and
+Status: items 1–6, 8, 10, 11, 14, and 16 are done, and 13 is done except the
+Renovate app install and first workflow runs. The core is modules-only and
 free of work config; the machine repo `../dotfiles-gen-m5` imports the core,
 holds both layers and all work-specific config, has both layers
 switched (the darwin switch adopted the Homebrew prefix through
@@ -18,8 +19,9 @@ git/jj identity. `scripts/setup-secrets.sh` in the machine repo writes the
 work credentials from 1Password. The core restarted its history and is
 public at `github.com/jaza-syed/dotfiles-core`, so install.md's anonymous
 phase 1 clone works. Publishing review.nvim (15) is on hold. The CLI tools
-moved from Homebrew to `nix/home/tools.nix` (16). Next: CI and Renovate (13),
-then the personal Mac bring-up (7) as the first real run of the reworked flow.
+moved from Homebrew to `nix/home/tools.nix` (16). CI, Renovate config, and
+the machine repos' input flip landed (13). Next: the personal Mac bring-up
+(7) as the first real run of the reworked flow.
 
 tmux plugins stay on TPM, so plugin management is not on this roadmap.
 
@@ -42,9 +44,9 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
  16  Move brew CLIs to Nix     DONE — nixpkgs CLIs · GNU-first PATH · cleanup=check
         │
- 13  CI + updates              NEXT — eval-only CI · Renovate locks · nvim lock Action
+ 13  CI + updates              DONE except app install + first runs
         │
-  7  Personal Mac (m1)       first run of the reworked bootstrap
+  7  Personal Mac (m1)       NEXT — first run of the reworked bootstrap
         │
  12  Runbook + doctor          operations.md · drift report
         │
@@ -737,7 +739,24 @@ means the three phases get tested on the machine they were written for.
 - Keep README as the short setup entrypoint linked to the runbook, and keep
   implementation contracts in AGENTS.md.
 
-## 13. Add CI and automate updates — not started
+## 13. Add CI and automate updates — done except the Renovate app install and first runs
+
+What happened: `.github/workflows/ci.yml` runs the three jobs below on push
+and PR; shellcheck runs at `--severity=warning` after quoting fixes and
+targeted directives, and stylua and the nvim/setup tests pass locally as CI
+will run them (`tests/setup.sh` gained its executable bit). The weekly
+`nvim-lock-update.yml` generates the theme artifacts with a nix-shell luajit,
+points a temp `HOME`/`XDG_CONFIG_HOME` at the repo's nvim config, runs
+`Lazy! update`, and opens a PR scoped to `lazy-lock.json`; it still needs
+debugging on its first real runs. `renovate.json` (core and `dotfiles-m1`)
+enables nix, weekly lock-file maintenance with automerge, and grouped
+github-actions updates. Deviation: no branch protection — it would block
+direct pushes to main, and Renovate already waits for green checks before
+automerging its own PRs. Both machine repos flipped their `dotfiles` input to
+`github:jaza-syed/dotfiles-core` and relocked, and all four machine targets
+pass `nix build --dry-run`. Remaining user steps: install the Renovate GitHub
+App on `dotfiles-core` and `dotfiles-m1`, approve its onboarding PRs, and
+watch the first workflow runs after pushing.
 
 - CI is evaluation-only (decided), one GitHub Actions workflow on push and
   PR. Evaluation is platform-independent, so cheap Ubuntu runners force the

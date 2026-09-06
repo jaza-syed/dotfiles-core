@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v16
+      - run: nix eval --raw .#darwinConfigurations.base.system.drvPath
+      - run: nix eval --raw .#homeConfigurations.base.activationPackage.drvPath
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v16
+      - name: shellcheck
+        run: nix run nixpkgs#shellcheck -- --severity=warning scripts/*.sh shell/.config/shell/*.sh
+      - name: stylua
+        run: |
+          nix run nixpkgs#ripgrep -- --files --hidden -0 nvim -g '*.lua' \
+            | xargs -0 nix run nixpkgs#stylua -- --config-path .stylua.toml --check
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v16
+      - name: nvim unit tests
+        run: |
+          nix run nixpkgs#neovim -- --headless -u NONE -i NONE -l tests/nvim_adapters.lua
+          nix run nixpkgs#neovim -- --headless -u NONE -i NONE -l tests/nvim_string_masks.lua
+      - name: setup checks
+        run: nix shell nixpkgs#ripgrep --command ./tests/setup.sh

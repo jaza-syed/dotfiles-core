@@ -1,3 +1,4 @@
+# shellcheck shell=sh
 # Machine-local/private environment variables.
 # Copy to ~/.config/shell/env.local.sh and customize.
 

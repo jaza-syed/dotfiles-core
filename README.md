@@ -53,8 +53,7 @@ jj config get user.email
 
 Setup is rerunnable: rerun `./scripts/auth.sh` for authentication, and rerun
 the two switches from the machine repo after pulling changes. After a core
-commit, relock the machine repo with
-`nix flake update dotfiles --allow-dirty-locks`.
+push, relock the machine repo with `nix flake update dotfiles`.
 
 ### Personal post-install checklist
 

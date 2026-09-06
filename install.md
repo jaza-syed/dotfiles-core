@@ -22,11 +22,6 @@ nix run home-manager/release-26.05 -- switch --flake .#base
 ./scripts/generate_colorscheme.sh   # needs lua from the base profile
 ```
 
-While this repository is private (until ROADMAP item 9 flips visibility), the
-anonymous clone fails. Interim: authenticate first with
-`nix run nixpkgs#gh -- auth login --hostname github.com --web --git-protocol ssh`
-and clone with `nix run nixpkgs#gh -- repo clone jaza-syed/dotfiles-core dotfiles`.
-
 ## Phase 2: authenticate with the installed tools
 
 ```sh

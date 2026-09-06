@@ -55,7 +55,7 @@ auth_1password() {
 
     if ! op signin; then
         op account add
-        eval $(op signin)
+        eval "$(op signin)"
     fi
 }
 

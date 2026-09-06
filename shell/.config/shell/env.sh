@@ -1,3 +1,4 @@
+# shellcheck shell=sh
 # Shared environment — sourced by .zshenv and .profile
 # Keep lightweight: PATH and env vars only, no tool init or aliases
 
