@@ -5,6 +5,11 @@ if [ -d "$_dotfiles_completion_cache/zsh" ]; then
     fpath=("$_dotfiles_completion_cache/zsh" $fpath)
 fi
 
+# Completions shipped by nixpkgs packages.
+if [ -d "$HOME/.nix-profile/share/zsh/site-functions" ]; then
+    fpath=("$HOME/.nix-profile/share/zsh/site-functions" $fpath)
+fi
+
 autoload -Uz compinit
 if [ -d "$_dotfiles_completion_cache/zsh" ]; then
     compinit -d "$_dotfiles_completion_cache/zsh/.zcompdump"
