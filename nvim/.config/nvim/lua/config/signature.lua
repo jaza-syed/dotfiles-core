@@ -14,9 +14,13 @@ local BODY_HEIGHT = 6
 local SPLIT_HEIGHT = 12
 
 -- buf and line locate the extmark. result is the last response, which <C-g>
--- renders in full.
-local state = { buf = nil, line = nil, result = nil, split = nil }
+-- renders in full. split_label is the signature the split currently shows.
+local state = { buf = nil, line = nil, result = nil, split = nil, split_label = nil }
 local generation = 0
+
+local function split_open()
+  return state.split ~= nil and vim.api.nvim_win_is_valid(state.split)
+end
 
 local function clear()
   if state.buf and vim.api.nvim_buf_is_valid(state.buf) then
@@ -221,6 +225,11 @@ local function render(result)
     return clear()
   end
 
+  -- The split already shows this signature, so the block would repeat it.
+  if split_open() and state.split_label == signature.label then
+    return clear()
+  end
+
   local active = signature.activeParameter or result.activeParameter
   if type(active) ~= "number" then
     active = -1
@@ -330,6 +339,7 @@ function M.open_split()
     vim.list_extend(lines, vim.split(documentation, "\n", { plain = true }))
   end
 
+  state.split_label = signature.label
   invalidate()
 
   -- Outrank treesitter so markdown highlights the documentation without
