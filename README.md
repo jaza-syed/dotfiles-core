@@ -99,6 +99,7 @@ Neovim Lua files (excluding ignored generated palettes) with:
 rg --files --hidden -0 nvim -g '*.lua' | xargs -0 stylua --config-path .stylua.toml
 ```
 
-For repository layout, maintenance workflows, theme behavior, and Neovim
-architecture, see [AGENTS.md](AGENTS.md). Future work is tracked in
-[ROADMAP.md](ROADMAP.md).
+Recurring tasks (switches, updates, rollbacks, garbage collection) are in
+[operations.md](operations.md). For repository layout, maintenance workflows,
+theme behavior, and Neovim architecture, see [AGENTS.md](AGENTS.md). Future
+work is tracked in [ROADMAP.md](ROADMAP.md).

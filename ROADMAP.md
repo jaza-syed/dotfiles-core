@@ -20,8 +20,10 @@ work credentials from 1Password. The core restarted its history and is
 public at `github.com/jaza-syed/dotfiles-core`, so install.md's anonymous
 phase 1 clone works. Publishing review.nvim (15) is on hold. The CLI tools
 moved from Homebrew to `nix/home/tools.nix` (16). CI, Renovate config, and
-the machine repos' input flip landed (13). Next: the personal Mac bring-up
-(7) as the first real run of the reworked flow.
+the machine repos' input flip landed (13). The operations runbook (12) is
+written as `operations.md`; the doctor drift reporter is its open half.
+Next: the personal Mac bring-up (7) as the first real run of the reworked
+flow.
 
 tmux plugins stay on TPM, so plugin management is not on this roadmap.
 
@@ -48,53 +50,12 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
   7  Personal Mac (m1)       NEXT — first run of the reworked bootstrap
         │
- 12  Runbook + doctor          operations.md · drift report
+ 12  Runbook + doctor          runbook DONE (operations.md) · doctor open
         │
   ▼  later hosts               NixOS VPS · Linux laptop (OS open)
 ```
 
-Common management commands at the end state (exact flags land in
-`operations.md`, item 12):
-
-```sh
-# Personal Mac: both layers from the machine repo
-home-manager switch --flake ~/code/jaza-syed/dotfiles-m1#jsyed@m1
-sudo darwin-rebuild switch --flake ~/code/jaza-syed/dotfiles-m1#m1
-
-# Work Mac: both layers from the machine repo
-home-manager switch --flake ~/code/jaza-syed/dotfiles-gen-m5#jsyed@gen-m5
-sudo darwin-rebuild switch --flake ~/code/jaza-syed/dotfiles-gen-m5#gen-m5
-
-# VPS
-nixos-rebuild switch --flake .#<vps-host>
-
-# Non-NixOS Linux (e.g. an Ubuntu laptop): user layer only, like the work Mac;
-# apt owns the system layer, and GUI apps come from apt rather than nixpkgs
-home-manager switch --flake ~/code/jaza-syed/dotfiles-<host>#jsyed@<host>
-
-# Add/remove software: edit the module or host file, then switch.
-# Try something without declaring it
-nix shell nixpkgs#<pkg>
-
-# Update pinned inputs, then switch and tag a release for consumers
-nix flake update
-
-# Roll back to the previous generation
-sudo darwin-rebuild switch --rollback                # system layer
-home-manager generations                             # user layer: pick + activate
-
-# Report drift without changing anything (item 12)
-doctor
-
-# Regenerate themes (unchanged)
-./scripts/generate_colorscheme.sh
-
-# Reclaim disk from old generations
-nix-collect-garbage --delete-older-than 30d
-```
-
-Editing tracked-but-out-of-store files (nvim, shell startup, Claude, themes)
-needs no switch at all; a switch is only for package or link changes.
+The common management commands live in [operations.md](operations.md).
 
 ## 1. Remove small configuration duplication — done
 
@@ -705,15 +666,17 @@ means the three phases get tested on the machine they were written for.
   corrections back into `install.md`, the modules, or the machine repo before
   treating the laptop as reproducible.
 
-## 12. Write the operations runbook — not started
+## 12. Operations runbook and doctor — runbook done, doctor not started
 
-- Write `operations.md` as the practical reference for recurring tasks:
-  bootstrapping, adding and removing packages, temporary package trials,
-  upgrades, cleanup preview and apply, rollbacks, theme regeneration, and
-  adding a host.
-- The lifecycle is nix-darwin and Home Manager generations plus
-  `homebrew.onActivation` cleanup. Document evaluation, build, switch,
-  generation rollback, and garbage collection for each layer.
+The runbook landed as `operations.md`: it points at install.md for
+bootstrapping and covers the switch commands per layer (with the sudo
+absolute-path and Full Disk Access caveats), relocking a machine repo after a
+core push, software ownership and the `cleanup = "uninstall"` consequence,
+temporary package trials, upgrades, rollbacks per layer, theme and completion
+regeneration, garbage collection, and stale shell state after a switch. The
+machine READMEs carry the machine-specific commands and the local-core
+override, and both link back to the runbook. The doctor is the open half:
+
 - Provide a read-only `doctor` command that reports drift between the
   declared state and the mutable surfaces macOS keeps, with exit status by
   severity. Reconciliation stays in `darwin-rebuild switch` and the Homebrew
