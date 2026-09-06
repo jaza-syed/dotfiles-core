@@ -36,6 +36,7 @@
     pkgs.basedpyright
     pkgs.elmPackages.elm-language-server
     pkgs.lua-language-server
+    pkgs.vtsls
 
     # GNU userland, unprefixed, so GNU sed/awk/grep/tar/make/ls win on PATH.
     pkgs.coreutils
