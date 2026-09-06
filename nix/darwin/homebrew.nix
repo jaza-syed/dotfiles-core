@@ -72,7 +72,6 @@
       "betterdisplay"
       "figma"
       "google-drive"
-      "homerow"
 
       # Media & audio
       "vlc"
