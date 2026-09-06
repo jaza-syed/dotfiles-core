@@ -21,6 +21,8 @@ Generating code costs you nothing, so you have a natural bias towards over-engin
 
 The Plain Language output style defines the rules for prose a person may read. If your system prompt has no Output Style section and you are about to write such prose, e.g. a document, commit message, comment, or a CLAUDE.md, skill or memory file, you MUST first read and follow `~/.claude/output-styles/plain-language.md`.
 
+When you write instructions for a subagent, they MUST tell the subagent to follow the current output style.
+
 ## Writing comments
 
 - Comments and docstrings are for human readers to understand the current state of the codebase. A comment or docstring MUST contain only context that cannot be easily inferred from the code and that is useful to a human reader.
