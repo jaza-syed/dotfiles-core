@@ -624,8 +624,12 @@ ownership.
 - Move to `nix/home/tools.nix`: coreutils, gnu-sed, gnu-tar, grep, gawk,
   make, tree, watch, wget, rsync, rlwrap, jj, rip2, difftastic, urlview,
   websocat, graphviz, gnuplot, pandoc, tectonic, btop, glances, procs, uv,
-  awscli2, kubectl, k9s, kubelogin, s3cmd, rclone, ffmpeg, imagemagick, and
-  terminal-notifier. All are cached on aarch64-darwin, and PATH already
+  awscli2, kubectl, k9s, kubelogin, s3cmd, rclone, ffmpeg, imagemagick,
+  terminal-notifier, and mise. The mise decision was about config (no global
+  mise config, project-local use only), not the installer, and that stands;
+  the caveat is that the stable nixpkgs pin can lag brew's rolling mise, so
+  revert to brew if a project ever needs a newer mise than the pin carries.
+  Update the AGENTS.md "mise stays Homebrew-installed" wording. All are cached on aarch64-darwin, and PATH already
   prefers the Nix profile.
 - Completions must not regress: every tool that has completions today keeps
   them after the move. For each moved tool, check whether the nixpkgs
@@ -641,7 +645,7 @@ ownership.
   `lazydocker` comes from nixpkgs. AeroSpace can follow if the nixpkgs
   package proves equivalent to the cask.
 - Keep on Homebrew: the casks and masApps, `mas` (nix-darwin's homebrew
-  module shells out to it), `mise` (recorded decision: project-local use),
+  module shells out to it),
   `wezterm@nightly` and `claude-code@latest` (the pinned channels are the
   point), `temurin@25`, `xcodegen`, `mplayer` (patchy in nixpkgs on darwin),
   the fonts, and the auth trio `gh`/`1password`/`1password-cli` that
