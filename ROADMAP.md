@@ -358,10 +358,13 @@ The docs confirm the permission lists, hooks, and sandbox path arrays merge
 across the settings layers (managed, user, project), but `settings.json` has
 no import mechanism, project settings are not read from ancestor directories,
 and Claude Code writes to the user file itself (`/model` does), so the user
-file must stay a plain writable file. Each machine repo therefore owns
-`~/.claude/settings.json` as a checked-in file seeded from the core's base
-copy — gen-m5's adds the work entries — and drift is handled by diffing
-against the base. For `CLAUDE.md`, the core file imports
+file must stay a plain writable file — its writes are atomic (write a temp
+file, rename over the target), which replaces a symlink with a regular file
+holding only the last-written key, so linking it can never work. Each machine
+repo therefore keeps `~/.claude/settings.json` as a checked-in copy — gen-m5's
+adds the work entries — and a Home Manager activation entry copies it into
+place only when the live file is missing; drift is handled by diffing the
+live file against the repo copy in both directions. For `CLAUDE.md`, the core file imports
 `@~/.claude/machine.md` and every machine repo links a fragment there (empty
 is fine), which sidesteps the undocumented missing-import behavior.
 
