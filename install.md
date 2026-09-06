@@ -51,7 +51,7 @@ The machine generation replaces the base one, and Home Manager removes the
 links it dropped.
 
 gen-m5 keeps an authentication-first order because its machine repo is on the
-work GitLab: only the core clone is anonymous there, and phase 3 clones
-`gitlab.com/jazasyed-gen/dotfiles-gen-m5` after a GitLab sign-in.
+work GitLab: only the core clone is anonymous there, and phase 3 clones the
+machine repo after a GitLab sign-in.
 
 The post-install manual checklist is in [README.md](README.md).
