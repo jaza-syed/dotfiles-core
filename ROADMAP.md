@@ -668,18 +668,39 @@ means the three phases get tested on the machine they were written for.
 
 ## 13. Add CI and automate updates — not started
 
-- CI is evaluation-only (decided): evaluate the host closures and a sample
-  home against the pinned Home Manager release on Linux runners, plus shell
-  syntax checks, StyLua, and the policy tests under `tests/`. Building the
-  darwin closure needs macOS runners; add such a job only if evaluation
-  misses real breakage.
-- Automate `flake.lock` updates (nixpkgs, home-manager, nix-darwin), GitHub
-  Actions pins, and the Neovim plugin lock with Renovate. Renovate's nix
-  manager updates all flake inputs but is beta and off by default, so set
-  `"nix": { "enabled": true }`; Dependabot has no Nix support. Group
-  updates on a low-noise schedule, handle security updates separately, and
-  auto-merge only what CI covers.
-- Tag a core release after lock bumps that consumers should pick up; the
-  work-side Renovate bumps the tag.
-- Work-side dependencies and their updater configuration live in the
-  work repositories.
+- CI is evaluation-only (decided), one GitHub Actions workflow on push and
+  PR. Evaluation is platform-independent, so cheap Ubuntu runners force the
+  full module system through
+  `nix eval .#darwinConfigurations.base.system.drvPath` and the
+  `homeConfigurations.base` activation package, catching option typos,
+  missing files, and broken imports without building anything mac-specific.
+  A lint job runs shellcheck over `scripts/` and the shell tree plus
+  `stylua --check` over the nvim lua, and a tests job runs the `tests/*.lua`
+  checks through a headless nixpkgs neovim and `tests/setup.sh`. The repo is
+  public now, so `macos-14` arm64 runners are free and a real `nix build` of
+  the base darwin closure is affordable if evaluation ever misses breakage.
+- Renovate through its GitHub App with `"nix": { "enabled": true }` (beta,
+  off by default; Dependabot has no Nix support) for `flake.lock`, plus the
+  built-in github-actions manager for workflow pins. `lazy-lock.json` has no
+  native manager: either a custom regex manager mapping each plugin's
+  `commit` field to the git-refs datasource, or a scheduled Action that runs
+  `Lazy! update` headlessly and opens a PR, which is less Renovate-pure but
+  much less config. Group updates on a low-noise schedule and automerge only
+  when the CI workflow is green, enforced by branch protection.
+- Tag a release after lock bumps land, by hand or with a small workflow
+  that tags green main on a schedule (calver reads well for config). The
+  tag is the consumer contract.
+- Machine repos: flip the `dotfiles` input from `git+file` to
+  `github:jaza-syed/dotfiles-core?ref=<tag>`, which ends the
+  `--allow-dirty-locks` relocking. `dotfiles-m1` gets the same Renovate app,
+  bumping the core tag and its own inputs, and an Ubuntu eval job over its
+  two targets, which works because all of the private repo's inputs are
+  publicly fetchable. `gen-m5`'s updater and CI live on the work side; its
+  base-flake input needs the work netrc, so the core setup never has to
+  know about it.
+- The steady-state loop: Renovate bumps the core lock, eval CI gates it,
+  automerge lands it, a tag cuts, each machine repo's Renovate bumps the
+  tag behind its own eval CI, and the next switch picks it up. After the
+  input flip a core change reaches a machine only after a push and a tag,
+  unless the machine pins `ref=main` for a looser contract; tags are the
+  decided default.
