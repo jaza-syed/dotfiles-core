@@ -1,0 +1,25 @@
+return {
+  name = "dark",
+  bg       = "#171717",
+  fg       = "#d8d8d8",
+  bg_cur   = "#282828",
+  bg_float = "#252525",
+  bg_vis   = "#2a2a2a",
+  comment  = "#d68c67",
+  red      = "#de6e7c",
+  green    = "#819b69",
+  blue     = "#6099c0",
+  teal     = "#66a5ad",
+  wood     = "#b77e64",
+  magenta  = "#b279a7",
+  gray     = "#3d3839",
+  dim      = "#a0a0a0",
+
+  -- Bright variants (terminal emulators)
+  bright_red     = "#e8838f",
+  bright_green   = "#8bae68",
+  bright_yellow  = "#d68c67",
+  bright_blue    = "#61abda",
+  bright_magenta = "#cf86c1",
+  bright_cyan    = "#65b8c1",
+}

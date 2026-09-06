@@ -1,0 +1,219 @@
+# Place a copy of this config to ~/.aerospace.toml
+# After that, you can edit ~/.aerospace.toml to your liking
+
+# Config version for compatibility and deprecations
+# Fallback value (if you omit the key): config-version = 1
+config-version = 2
+
+# You can use it to add commands that run after AeroSpace startup.
+# Available commands : https://nikitabobko.github.io/AeroSpace/commands
+after-startup-command = [
+    "exec-and-forget /bin/bash -lc '$HOME/.config/aerospace/mode-borders.sh'",
+    "exec-and-forget /bin/bash -lc '$HOME/.config/sketchybar/plugins/aerospace_trigger.sh bootstrap'",
+]
+
+# Notify SketchyBar when AeroSpace focus changes.
+exec-on-workspace-change = ['/bin/bash', '-c',
+    '$HOME/.config/sketchybar/plugins/aerospace_trigger.sh trigger aerospace_workspace_change workspace_change_hook'
+]
+
+# Start AeroSpace at login
+start-at-login = true
+
+# Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# See: https://nikitabobko.github.io/AeroSpace/guide#layouts
+# The 'accordion-padding' specifies the size of accordion padding
+# You can set 0 to disable the padding feature
+accordion-padding = 0
+
+# Possible values: tiles|accordion
+default-root-container-layout = 'tiles'
+
+# Possible values: horizontal|vertical|auto
+# 'auto' means: wide monitor (anything wider than high) gets horizontal orientation,
+#               tall monitor (anything higher than wide) gets vertical orientation
+default-root-container-orientation = 'auto'
+
+# Mouse follows focus when focused monitor changes
+# Drop it from your config, if you don't like this behavior
+# See https://nikitabobko.github.io/AeroSpace/guide#on-focus-changed-callbacks
+# See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
+# Fallback value (if you omit the key): on-focused-monitor-changed = []
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+on-focus-changed = ["exec-and-forget /bin/bash -lc '$HOME/.config/sketchybar/plugins/aerospace_trigger.sh trigger aerospace_window_focus_change window_focus_hook'"]
+
+# You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
+# Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
+# Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
+automatically-unhide-macos-hidden-apps = true
+
+# List of workspaces that should stay alive even when they contain no windows,
+# even when they are invisible.
+# This config version is only available since 'config-version = 2'
+# Fallback value (if you omit the key): persistent-workspaces = []
+persistent-workspaces = ["A", "B", "C", "D", "E", "F", "G", "1", "2", "3", "4", "5"]
+
+[workspace-to-monitor-force-assignment]
+A = 'LG ULTRAFINE'
+
+# Mode transitions invoke mode-borders.sh with an explicit target mode. AeroSpace
+# callbacks don't expose the new mode, so querying it asynchronously can be stale.
+# See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
+# See: https://nikitabobko.github.io/AeroSpace/commands#mode
+on-mode-changed = []
+
+# Possible values: (qwerty|dvorak|colemak)
+# See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
+[key-mapping]
+    preset = 'qwerty'
+
+# Gaps between windows (inner-*) and between monitor edges (outer-*).
+# Possible values:
+# - Constant:     gaps.outer.top = 8
+# - Per monitor:  gaps.outer.top = [{ monitor.main = 16 }, { monitor."some-pattern" = 32 }, 24]
+#                 In this example, 24 is a default value when there is no match.
+#                 Monitor pattern is the same as for 'workspace-to-monitor-force-assignment'.
+#                 See:
+#                 https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
+[gaps]
+    inner.horizontal = 5
+    inner.vertical =   5
+    outer.left =       39
+    outer.bottom =     5
+    outer.top =        5
+    outer.right =      5
+
+# 'main' binding mode must be always presented
+# Fallback value (if you omit the key): mode.main.binding = {}
+[mode.main.binding]
+
+    # All possible keys:
+    # - Letters.        a, b, c, ..., z
+    # - Numbers.        0, 1, 2, ..., 9
+    # - Keypad numbers. keypad0, keypad1, keypad2, ..., keypad9
+    # - F-keys.         f1, f2, ..., f20
+    # - Special keys.   minus, equal, period, comma, slash, backslash, quote, semicolon,
+    #                   backtick, leftSquareBracket, rightSquareBracket, space, enter, esc,
+    #                   backspace, tab, pageUp, pageDown, home, end, forwardDelete,
+    #                   sectionSign (ISO keyboards only, european keyboards only)
+    # - Keypad special. keypadClear, keypadDecimalMark, keypadDivide, keypadEnter, keypadEqual,
+    #                   keypadMinus, keypadMultiply, keypadPlus
+    # - Arrows.         left, down, up, right
+
+    # All possible modifiers: cmd, alt, ctrl, shift
+
+    # All possible commands: https://nikitabobko.github.io/AeroSpace/commands
+
+    # cmd-; is the leader: it's the only main-mode binding. Everything else
+    # lives in 'select' mode, which stays active (chainable) until esc.
+    # See: https://nikitabobko.github.io/AeroSpace/commands#mode
+    cmd-semicolon = ['mode select', "exec-and-forget /bin/bash -lc '$HOME/.config/aerospace/mode-borders.sh select'"]
+
+    # Disable macOS "hide window" shortcut
+    cmd-h = []
+    alt-cmd-h = []
+
+# 'select' binding mode declaration.
+# Entered via cmd-; from main. Stays active across actions (not one-shot) so
+# you can chain commands; esc reloads config and returns to main.
+[mode.select.binding]
+    esc = ['reload-config', 'mode main', "exec-and-forget /bin/bash -lc '$HOME/.config/aerospace/mode-borders.sh main'"]
+    cmd-space = ['reload-config', 'mode main', "exec-and-forget /bin/bash -lc '$HOME/.config/aerospace/mode-borders.sh main'"]
+    m = ['mode move', "exec-and-forget /bin/bash -lc '$HOME/.config/aerospace/mode-borders.sh move'"]
+
+    # See: https://nikitabobko.github.io/AeroSpace/commands#focus
+    # Change focus within the workspace
+    h = 'focus left'
+    j = 'focus down'
+    k = 'focus up'
+    l = 'focus right'
+    # Cycling
+    backtick = 'focus --boundaries-action wrap-around-the-workspace dfs-next'
+    ctrl-backtick = 'focus --boundaries-action wrap-around-the-workspace dfs-prev'
+
+    # See: https://nikitabobko.github.io/AeroSpace/commands#resize
+    minus = 'resize smart -50'
+    equal = 'resize smart +50'
+
+    ## Moving between workspaces
+    # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
+    1 = 'workspace 1'
+    2 = 'workspace 2'
+    3 = 'workspace 3'
+    4 = 'workspace 4'
+    5 = 'workspace 5'
+    6 = 'workspace 6'
+    7 = 'workspace 7'
+    8 = 'workspace 8'
+    9 = 'workspace 9'
+    a = 'workspace A'
+    b = 'workspace B'
+    c = 'workspace C'
+    d = 'workspace D'
+    e = 'workspace E'
+
+    # switch with previous workspace (like tapping cmd-tab but for workspaces)
+    # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
+    tab = 'workspace-back-and-forth'
+    leftSquareBracket = 'list-workspaces --monitor focused --empty no | workspace --stdin next --wrap-around'
+    rightSquareBracket = 'list-workspaces --monitor focused --empty no | workspace --stdin prev --wrap-around'
+
+# 'move' binding mode declaration. Entered via 'm' from 'select'.
+# For moving nodes and workspaces. Commands can be changed, but moving a node to another workspace 
+# without following immediately exits this mode
+[mode.move.binding]
+    esc = ['mode select', "exec-and-forget /bin/bash -lc '$HOME/.config/aerospace/mode-borders.sh select'"]
+    cmd-space = ['reload-config', 'mode main', "exec-and-forget /bin/bash -lc '$HOME/.config/aerospace/mode-borders.sh main'"]
+
+    # See: https://nikitabobko.github.io/AeroSpace/commands#layout
+    # Switch layouts
+    slash = 'layout tiles horizontal vertical'
+    period = 'layout accordion'
+    comma = 'layout floating tiling'
+
+    # Unshifted bindings move the node and follow it to the destination workspace.
+    1 = ['move-node-to-workspace --focus-follows-window 1', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    2 = ['move-node-to-workspace --focus-follows-window 2', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    3 = ['move-node-to-workspace --focus-follows-window 3', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    4 = ['move-node-to-workspace --focus-follows-window 4', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    5 = ['move-node-to-workspace --focus-follows-window 5', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    a = ['move-node-to-workspace --focus-follows-window A', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    b = ['move-node-to-workspace --focus-follows-window B', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    c = ['move-node-to-workspace --focus-follows-window C', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    d = ['move-node-to-workspace --focus-follows-window D', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    e = ['move-node-to-workspace --focus-follows-window E', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    f = ['move-node-to-workspace --focus-follows-window F', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    g = ['move-node-to-workspace --focus-follows-window G', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+
+    # Shifted bindings send the node while keeping focus on this workspace.
+    shift-1 = ['move-node-to-workspace 1', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-2 = ['move-node-to-workspace 2', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-3 = ['move-node-to-workspace 3', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-4 = ['move-node-to-workspace 4', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-5 = ['move-node-to-workspace 5', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-a = ['move-node-to-workspace A', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-b = ['move-node-to-workspace B', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-c = ['move-node-to-workspace C', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-d = ['move-node-to-workspace D', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-e = ['move-node-to-workspace E', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-f = ['move-node-to-workspace F', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-g = ['move-node-to-workspace G', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+
+    # Move node within workspace
+    h = ['move left']
+    j = ['move down']
+    k = ['move up']
+    l = ['move right']
+
+    # Merge / split nodes within workspace
+    shift-h = 'join-with left'
+    shift-j = 'join-with down'
+    shift-k = 'join-with up'
+    shift-l = 'join-with right'
+
+    # Move a window to the next monitor and follow it. Moving a workspace always follows it.
+    tab = ['move-node-to-monitor --focus-follows-window --wrap-around next', 'exec-and-forget ~/.config/aerospace/workspace-refresh']
+    shift-tab = ['move-workspace-to-monitor --wrap-around next', 'exec-and-forget ~/.config/aerospace/workspace-refresh']

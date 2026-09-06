@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+exec "$HOME/.config/sketchybar/plugins/aerospace_trigger.sh" trigger \
+  aerospace_workspace_refresh \
+  move_node_to_workspace

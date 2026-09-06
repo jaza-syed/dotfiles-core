@@ -1,0 +1,351 @@
+:root {
+  --bg-color: ${bg};
+  --side-bar-bg-color: ${code_bg};
+  --text-color: ${fg};
+  --control-text-color: ${dim};
+  --control-text-hover-color: ${fg};
+  --primary-color: ${blue};
+  --active-file-bg-color: ${active_file_bg};
+  --active-file-text-color: ${active_file_fg};
+  --active-file-border-color: ${blue_or_fg};
+  --item-hover-bg-color: ${item_hover_bg};
+  --item-hover-text-color: ${fg};
+  --select-text-bg-color: ${select_bg};
+  --select-text-font-color: ${fg};
+  --search-select-bg-color: ${blue_or_fg};
+  --rawblock-edit-panel-bd: ${border};
+  --window-border: 1px solid ${border};
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body {
+  background: var(--bg-color);
+}
+
+body {
+  font-family: "IBM Plex Sans", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --monospace: "Liga SFMono Nerd Font", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-color);
+  background: var(--bg-color);
+}
+
+#write {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2.75rem 3rem 6rem;
+}
+
+@media only screen and (min-width: 1400px) {
+  #write {
+    max-width: 50rem;
+  }
+}
+
+@media only screen and (max-width: 48rem) {
+  #write {
+    padding: 1.75rem 1.5rem 4rem;
+  }
+}
+
+#write > h1:first-child,
+#write > h2:first-child,
+#write > h3:first-child,
+#write > h4:first-child {
+  margin-top: 0;
+}
+
+p,
+blockquote,
+ul,
+ol,
+dl,
+table,
+pre.md-fences {
+  margin: 1.25rem 0;
+}
+
+ul,
+ol {
+  padding-left: 1.5rem;
+}
+
+li > ul,
+li > ol {
+  margin: 0.4rem 0;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-color);
+}
+
+h1 {
+  font-size: 2.4rem;
+  border-bottom: 1px solid ${border};
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+  margin-top: 2.25rem;
+  margin-bottom: 0.9rem;
+}
+
+h3 {
+  font-size: 1.35rem;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+h4 {
+  font-size: 1.1rem;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+h5,
+h6 {
+  font-size: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.6rem;
+}
+
+h6 {
+  color: var(--control-text-color);
+}
+
+blockquote {
+  background: ${blockquote_bg};
+  border-left: 0.25rem solid ${comment};
+  color: var(--control-text-color);
+  margin-left: 0.75rem;
+  padding: 0.9rem 1rem;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid ${border};
+  margin: 2.5rem 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+thead {
+  background: ${item_hover_bg};
+}
+
+tbody tr:nth-child(even) {
+  background: ${code_bg};
+}
+
+th,
+td {
+  border: 1px solid ${border};
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+code,
+tt,
+var,
+kbd,
+samp,
+pre.md-fences,
+.md-fences,
+.CodeMirror,
+.CodeMirror pre {
+  font-family: var(--monospace);
+}
+
+code,
+tt,
+var,
+kbd,
+samp {
+  background: ${code_bg};
+  border: 1px solid ${border};
+  border-radius: 0.3rem;
+  font-size: 0.92rem;
+  padding: 0.15rem 0.35rem;
+}
+
+pre.md-fences {
+  background: ${code_bg};
+  border: 1px solid ${border};
+  border-left: 0.3rem solid ${blue};
+  border-radius: 0.45rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  padding: 1rem 1.1rem 1rem 1.25rem;
+}
+
+pre.md-fences code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.CodeMirror-gutters {
+  background: ${code_bg};
+  border-right: 1px solid ${border};
+}
+
+#write pre.md-meta-block,
+.md-image > .md-meta {
+  background: ${meta_bg};
+  color: var(--control-text-color);
+  font-family: var(--monospace);
+  font-size: 0.9rem;
+}
+
+#write pre.md-meta-block {
+  border-radius: 0.4rem;
+  padding: 0.75rem 1rem;
+}
+
+mark {
+  background: ${string_bg};
+  color: var(--text-color);
+}
+
+.md-task-list-item {
+  padding-left: 1.5rem;
+}
+
+.md-task-list-item > input:before {
+  background: ${bg};
+  color: ${comment};
+}
+
+#typora-source {
+  color: var(--text-color);
+  font-family: var(--monospace);
+  font-size: inherit;
+  --monospace: "Liga SFMono Nerd Font", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+}
+
+#typora-source .CodeMirror-linenumber {
+  visibility: visible !important;
+}
+
+.cm-s-typora-default .cm-comment {
+  color: ${comment};
+}
+
+.cm-s-typora-default .cm-string,
+.cm-s-typora-default .cm-link {
+  color: ${green};
+}
+
+.cm-s-typora-default .cm-atom,
+.cm-s-typora-default .cm-number {
+  color: ${magenta};
+}
+
+.cm-s-typora-default .cm-header,
+.cm-s-typora-default .cm-property,
+.CodeMirror.cm-s-typora-default div.CodeMirror-cursor {
+  color: ${blue};
+}
+
+.cm-s-typora-default .cm-quote {
+  color: ${wood};
+}
+
+.cm-s-typora-default .cm-tag {
+  color: ${red};
+}
+
+.cm-s-typora-default .cm-variable-2,
+.cm-s-typora-default .cm-def {
+  color: ${teal};
+}
+
+#typora-sidebar,
+.megamenu-menu,
+.megamenu-content,
+.modal-content,
+header,
+footer,
+.context-menu {
+  background: ${code_bg};
+  color: var(--text-color);
+}
+
+#typora-sidebar {
+  border-right: 1px solid ${border};
+  box-shadow: none;
+}
+
+.file-list-item.active,
+.outline-item.active,
+.typora-node .file-list-item.active {
+  background-color: var(--active-file-bg-color);
+  color: var(--active-file-text-color);
+}
+
+.file-list-item:hover,
+.outline-item:hover,
+.typora-node .file-list-item:hover,
+.megamenu-menu-list li a:hover,
+.megamenu-menu-list li a.active,
+.long-btn:hover {
+  background-color: var(--item-hover-bg-color);
+  color: var(--item-hover-text-color);
+}
+
+#md-searchpanel {
+  border-bottom: 1px solid ${border};
+}
+
+.dropdown-menu .divider {
+  border-color: ${border};
+}
+
+.md-toc-item,
+.md-toc-content:empty:before {
+  color: var(--primary-color);
+}
+
+#write div.md-toc-tooltip {
+  background-color: ${bg};
+}
+
+.md-inline-math {
+  background: ${const_bg};
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.25rem;
+}

@@ -1,0 +1,75 @@
+" Plugin-free Vim config for local and remote sessions.
+
+set nocompatible
+let mapleader = ","
+
+" Core behavior
+set autoread
+set title
+set encoding=utf-8
+set showcmd
+set mouse=a
+set backspace=indent,eol,start
+set tabpagemax=100
+set wildignorecase
+set number
+set cursorline
+set updatetime=1000
+set hidden
+set laststatus=2
+
+" Syntax and filetype support
+syntax on
+filetype plugin indent on
+
+" Search
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+nnoremap <silent> <leader>c :nohlsearch<CR>
+
+" Indentation
+set copyindent
+set smarttab
+set autoindent
+set smartindent
+set shiftwidth=4
+set expandtab
+set tabstop=8
+set softtabstop=0
+
+" Filetype tweaks
+augroup dotfiles_filetypes
+  autocmd!
+  autocmd BufNewFile,BufRead *.json setlocal filetype=json syntax=javascript
+  autocmd FileType markdown syntax region markdownCode matchgroup=markdownCodeDelimiter start="`" end="`" keepend contains=markdownLineStart
+  autocmd FileType markdown syntax region markdownCodeBlock matchgroup=markdownCodeDelimiter start="^\s*```.*$" end="^\s*```\s*$" keepend
+augroup END
+
+highlight default link markdownCode Special
+highlight default link markdownCodeBlock String
+highlight default link markdownCodeDelimiter Delimiter
+
+" Statusline
+set statusline=%f
+set statusline+=%m
+set statusline+=%r
+set statusline+=%h
+set statusline+=%w
+set statusline+=%=
+set statusline+=%y
+set statusline+=\ [%{&fileencoding?&fileencoding:&encoding}]
+set statusline+=\ [%{&fileformat}]
+set statusline+=\ %p%%
+set statusline+=\ %l:%c
+
+" Window and buffer shortcuts
+nnoremap <leader>zo :tab split<CR>
+nnoremap <leader>zc :tabclose<CR>
+nnoremap <leader>nn :set number!<CR>
+nnoremap <leader>wv <C-w>v<C-w>l
+nnoremap <leader>ws <C-w>s<C-w>j
+nnoremap <leader>wd <C-w>q
+nnoremap <leader>w= <C-w>=
+nnoremap <leader>bb :buffers<CR>

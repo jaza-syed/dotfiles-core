@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CONFIG_DIR="${CONFIG_DIR:-$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)}"
+
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/lib/runtime.sh"
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/lib/settings.sh"
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/lib/state.sh"
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/lib/topology.sh"
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/lib/bars.sh"
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/items/workspaces.sh"
+# shellcheck source=/dev/null
+source "$CONFIG_DIR/items/status.sh"
+
+CONFIG_STARTED_AT="$(date +%s)"
+
+on_exit() {
+  local status=$?
+
+  if (( status != 0 )); then
+    printf 'error %s\n' "$status" > "$CONFIG_STATE_FILE"
+    log_msg "sketchybarrc" "error status=$status"
+  fi
+}
+
+trap on_exit EXIT
+
+state_mark_loading "$CONFIG_STARTED_AT"
+log_msg "sketchybarrc" "start bar=$BAR_NAME_CURRENT"
+
+# Set this directly; SketchyBar reloads do not reliably preserve shell env vars.
+BAR_VARIANT=vertical
+apply_bar_variant_settings
+
+ALL_TOPOLOGY="$(discover_topology)"
+WORKSPACES="$(discover_workspaces)"
+
+prepare_current_bar_topology "$ALL_TOPOLOGY"
+
+MONITORS="$(topology_monitor_ids "$CURRENT_TOPOLOGY")"
+ALL_MONITORS="$(topology_monitor_ids "$ALL_TOPOLOGY")"
+BAR_DISPLAY_LIST="$(topology_display_list "$CURRENT_TOPOLOGY")"
+BAR_HIDDEN=off
+
+if [[ -z "$CURRENT_TOPOLOGY" || -z "$BAR_DISPLAY_LIST" ]]; then
+  BAR_HIDDEN=on
+fi
+
+write_text_file "$BAR_VARIANT_FILE" "$BAR_VARIANT"
+write_words_file "$MONITORS_FILE" $MONITORS
+write_words_file "$ALL_MONITORS_FILE" $ALL_MONITORS
+write_words_file "$WORKSPACES_FILE" $WORKSPACES
+printf '%s\n' "$CURRENT_TOPOLOGY" | atomic_write "$CURRENT_TOPOLOGY_FILE"
+printf '%s\n' "$ALL_TOPOLOGY" | atomic_write "$ALL_TOPOLOGY_FILE"
+
+configure_bar "$BAR_DISPLAY_LIST" "$BAR_HIDDEN"
+configure_defaults
+
+if [[ "$BAR_HIDDEN" != "on" ]]; then
+  if [[ "$BAR_VARIANT" != "vertical" ]]; then
+    create_left_spacer
+  fi
+
+  create_workspace_items "$CURRENT_TOPOLOGY" "$WORKSPACES"
+
+  if [[ "$BAR_VARIANT" != "vertical" ]]; then
+    create_focused_window_item
+  fi
+fi
+
+create_workspace_observer
+
+if [[ "$BAR_HIDDEN" != "on" && "$BAR_VARIANT" != "vertical" ]]; then
+  create_status_items
+fi
+
+CONFIG_FINISHED_AT="$(date +%s)"
+state_mark_ready "$CONFIG_FINISHED_AT"
+log_msg "sketchybarrc" "ready duration=$((CONFIG_FINISHED_AT - CONFIG_STARTED_AT))s bar=$BAR_NAME_CURRENT group=$BAR_GEOMETRY_GROUP monitors=$(printf '%s' "$MONITORS" | tr '\n' ',') workspaces=$(printf '%s' "$WORKSPACES" | wc -w | tr -d ' ') variant=$BAR_VARIANT hidden=$BAR_HIDDEN"
+
+sb --update

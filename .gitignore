@@ -1,0 +1,23 @@
+.nvimlog
+nvim.log
+.DS_Store
+claude/.claude/hooks/.notify.pid
+shell/.config/shell/env.local.sh
+git/.config/git/identity
+ssh/.ssh/config.local
+plan-*.md
+/plans/
+
+# Generated theme artifacts
+/palettes/manifest.txt
+nvim/.config/nvim/colors/colors_*.lua
+nvim/.config/nvim/lua/colors/*.lua
+!nvim/.config/nvim/lua/colors/init.lua
+!nvim/.config/nvim/lua/colors/util.lua
+!nvim/.config/nvim/lua/colors/windows.lua
+wezterm/.config/wezterm/colors_*.lua
+tmux/.config/tmux/colors-*.conf
+shell/.config/shell/fzf-theme-*.sh
+aerospace/.config/aerospace/mode-borders-*.sh
+pi/.pi/agent/themes/*.json
+typora/Library/Application Support/abnerworks.Typora/themes/*.css

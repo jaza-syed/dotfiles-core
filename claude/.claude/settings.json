@@ -1,0 +1,87 @@
+{
+  "cleanupPeriodDays": 99999,
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(git *)",
+      "Bash(jj *)",
+      "Bash(rip *)",
+      "Bash(rg *)",
+      "Bash(fd *)",
+      "Bash(nix develop *)",
+      "Read(/tmp/claude*/**)",
+      "Read(/private/tmp/claude*/**)",
+      "Edit(/tmp/claude*/**)",
+      "Edit(/private/tmp/claude*/**)",
+      "Read(/Users/jsyed/.claude/projects/**)"
+    ],
+    "deny": [
+      "Edit(//tmp/claude/**)",
+      "Edit(//private/tmp/claude/**)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "claude-fable-5",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt|elicitation_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/jsyed/.claude/hooks/notify.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/jsyed/.claude/hooks/cancel-notify.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "zsh ~/.claude/statusline-command.sh"
+  },
+  "outputStyle": "Plain Language",
+  "sandbox": {
+    "filesystem": {
+      "allowWrite": [
+        "/tmp/claude*/**",
+        "/private/tmp/claude*/**",
+        "/Users/jsyed/.cache/**"
+      ],
+      "denyWrite": [
+        "/tmp/claude/**",
+        "/private/tmp/claude/**"
+      ],
+      "allowRead": [
+        "/nix/store/**",
+        "/tmp/claude*/**",
+        "/private/tmp/claude*/**"
+      ]
+    },
+    "excludedCommands": [
+      "docker *",
+      "git *",
+      "jj *",
+      "nix *"
+    ]
+  },
+  "effortLevel": "medium",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "skipWorkflowUsageWarning": true,
+  "theme": "light-daltonized",
+  "verbose": false,
+  "voiceEnabled": true
+}

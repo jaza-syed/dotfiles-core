@@ -1,0 +1,25 @@
+return {
+  name = "flexoki_dark",
+  bg       = "#100F0F",
+  fg       = "#CECDC3",
+  bg_cur   = "#282726",
+  bg_float = "#1C1B1A",
+  bg_vis   = "#343331",
+  comment  = "#6F6E69",
+  red      = "#D14D41",
+  green    = "#879A39",
+  blue     = "#4385BE",
+  teal     = "#3AA99F",
+  wood     = "#DA702C",
+  magenta  = "#8B7EC8",
+  gray     = "#575653",
+  dim      = "#878580",
+
+  -- Bright variants (terminal emulators)
+  bright_red     = "#E8705F",
+  bright_green   = "#A0AF54",
+  bright_yellow  = "#EC8B49",
+  bright_blue    = "#66A0C8",
+  bright_magenta = "#A699D0",
+  bright_cyan    = "#5ABDAC",
+}

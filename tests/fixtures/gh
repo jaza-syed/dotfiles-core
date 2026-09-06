@@ -1,0 +1,7 @@
+#!/bin/sh
+printf '%s\n' "$*" >> "$TEST_AUTH_LOG"
+case "$1 $2" in
+    'auth status') [ "$TEST_GH_AUTHENTICATED" = 1 ] ;;
+    'auth login') exit 0 ;;
+    *) echo "Unexpected GitHub CLI mutation: $*" >&2; exit 1 ;;
+esac

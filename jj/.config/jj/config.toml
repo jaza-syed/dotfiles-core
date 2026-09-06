@@ -1,0 +1,2 @@
+#:schema https://docs.jj-vcs.dev/latest/config-schema.json
+# Identity lives in the uncommitted ~/.config/jj/conf.d/identity.toml.
