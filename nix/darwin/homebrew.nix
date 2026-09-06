@@ -88,6 +88,7 @@
 
     masApps = {
       "1Password for Safari" = 1569813296;
+      "Amphetamine" = 937984704;
       "Free Ruler" = 1483172210;
       "Ghostery AdBlocker for Privacy" = 6504861501;
       "Keynote" = 409183694;
