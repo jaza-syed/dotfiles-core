@@ -9,8 +9,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@v16
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v22
       # The nvim config requires the gitignored generated theme modules.
       - name: Generate theme artifacts
         run: nix shell nixpkgs#luajit --command ./scripts/generate_colorscheme.sh
@@ -21,7 +21,7 @@ jobs:
           mkdir -p "$XDG_CONFIG_HOME"
           ln -s "$GITHUB_WORKSPACE/nvim/.config/nvim" "$XDG_CONFIG_HOME/nvim"
           nix run nixpkgs#neovim -- --headless "+Lazy! update" "+qa"
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@v8
         with:
           add-paths: nvim/.config/nvim/lazy-lock.json
           branch: nvim-lock-update
