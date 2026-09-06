@@ -44,7 +44,7 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
  15  Publish review.nvim       ON HOLD — ownership · author rewrite · license
         │
- 16  Move brew CLIs to Nix     DONE — nixpkgs CLIs · GNU-first PATH · cleanup=check
+ 16  Move brew CLIs to Nix     DONE — nixpkgs CLIs · GNU-first PATH · cleanup=uninstall
         │
  13  CI + updates              DONE except app install + first runs
         │

@@ -35,7 +35,7 @@ Push the core, then relock and switch in the machine repo:
 cd ~/code/jaza-syed/dotfiles-gen-m5   # or dotfiles-m1
 nix flake update dotfiles
 git add flake.lock
-git commit -m "chore: bump the dotfiles core"
+git commit -m "relock onto the pushed core"
 git push
 home-manager switch --flake .#jsyed@gen-m5
 ```
