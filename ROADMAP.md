@@ -17,9 +17,8 @@ nix-homebrew), and is pushed to the work GitLab. The personal machine repo
 git/jj identity. `scripts/setup-secrets.sh` in the machine repo writes the
 work credentials from 1Password. The core restarted its history and is
 public at `github.com/jaza-syed/dotfiles-core`, so install.md's anonymous
-phase 1 clone works once `main` is pushed. Publishing review.nvim (15) is
-next, and the personal Mac bring-up (item 7) is the first real run of the
-reworked flow.
+phase 1 clone works. Publishing review.nvim (15) is on hold; the personal
+Mac bring-up (7) is next and is the first real run of the reworked flow.
 
 tmux plugins stay on TPM, so plugin management is not on this roadmap.
 
@@ -38,9 +37,9 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
   9  Publish the core          DONE — public dotfiles-core · fresh history
         │
- 15  Publish review.nvim       NEXT — ownership · author rewrite · license · github spec
+ 15  Publish review.nvim       ON HOLD — ownership · author rewrite · license
         │
-  7  Personal Mac (m1)       first run of the reworked bootstrap
+  7  Personal Mac (m1)       NEXT — first run of the reworked bootstrap
         │
  12  Runbook + doctor          operations.md · drift report
         │
@@ -456,7 +455,7 @@ stale identity files are deleted.
 - Make setup a one-command, idempotent, testable path with and without the
   work-side repositories.
 
-## 15. Publish review.nvim — not started
+## 15. Publish review.nvim — on hold
 
 `../review.nvim` is a GitLab merge-request review plugin for Neovim, 84
 commits, currently pushed to a personal namespace on the work GitLab. The core's
