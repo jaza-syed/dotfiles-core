@@ -17,8 +17,9 @@ nix-homebrew), and is pushed to the work GitLab. The personal machine repo
 git/jj identity. `scripts/setup-secrets.sh` in the machine repo writes the
 work credentials from 1Password. The core restarted its history and is
 public at `github.com/jaza-syed/dotfiles-core`, so install.md's anonymous
-phase 1 clone works. Publishing review.nvim (15) is on hold; the personal
-Mac bring-up (7) is next and is the first real run of the reworked flow.
+phase 1 clone works. Publishing review.nvim (15) is on hold. Next: move the
+Homebrew CLI tools to Nix (16), then CI and Renovate (13), then the personal
+Mac bring-up (7) as the first real run of the reworked flow.
 
 tmux plugins stay on TPM, so plugin management is not on this roadmap.
 
@@ -39,11 +40,13 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
  15  Publish review.nvim       ON HOLD — ownership · author rewrite · license
         │
-  7  Personal Mac (m1)       NEXT — first run of the reworked bootstrap
-        │
- 12  Runbook + doctor          operations.md · drift report
+ 16  Move brew CLIs to Nix     NEXT — delete · dedup · move · drop the taps
         │
  13  CI + updates              eval-only CI · Renovate · tagged releases
+        │
+  7  Personal Mac (m1)       first run of the reworked bootstrap
+        │
+ 12  Runbook + doctor          operations.md · drift report
         │
   ▼  later hosts               NixOS VPS · Linux laptop (OS open)
 ```
@@ -602,6 +605,45 @@ Caveats:
   were replaced, keeping the Cellar and Caskroom) and the bundle reconciled
   all 104 dependencies without reinstalling. m1 adopts its prefix the same
   way at the item 7 bring-up.
+
+## 16. Move the Homebrew CLI tools to Nix — not started
+
+Everything that moves gains the flake lock, Renovate, CI, and generation
+rollback (item 13); brew formulae float unpinned. Homebrew remains the GUI
+layer: casks and masApps stay. Decided to land this and item 13 before the
+m1 bring-up (7), so the laptop's first install exercises the final tool
+ownership.
+
+- Delete rather than move: `stow` (the last Stow package retired with
+  `machines/`) and `llvm` unless something actually consumes it — nothing in
+  the repo references either.
+- Collapse duplicates: `lua` (Home Manager ships `lua5_4`, and install.md
+  runs the theme generator after both phase 1 switches, so the bootstrap
+  rationale is gone) and `git-lfs` (`programs.git.lfs.enable` already
+  installs it).
+- Move to `nix/home/tools.nix`: coreutils, gnu-sed, gnu-tar, grep, gawk,
+  make, tree, watch, wget, rsync, rlwrap, jj, rip2, difftastic, urlview,
+  websocat, graphviz, gnuplot, pandoc, tectonic, btop, glances, procs, uv,
+  awscli2, kubectl, k9s, kubelogin, s3cmd, rclone, ffmpeg, imagemagick, and
+  terminal-notifier. All are cached on aarch64-darwin, and PATH already
+  prefers the Nix profile. Trim the moved tools from
+  `scripts/generate_completions.sh`, which exists only for
+  Homebrew-installed tools.
+- Drop all three taps: `sketchybar` and `borders` come from nixpkgs with
+  nix-darwin's `services.sketchybar` replacing `brew services`, and
+  `lazydocker` comes from nixpkgs. AeroSpace can follow if the nixpkgs
+  package proves equivalent to the cask.
+- Keep on Homebrew: the casks and masApps, `mas` (nix-darwin's homebrew
+  module shells out to it), `mise` (recorded decision: project-local use),
+  `wezterm@nightly` and `claude-code@latest` (the pinned channels are the
+  point), `temurin@25`, `xcodegen`, `mplayer` (patchy in nixpkgs on darwin),
+  the fonts, and the auth trio `gh`/`1password`/`1password-cli` that
+  install.md phase 1 depends on. `gemini-cli` and `llama.cpp` also stay for
+  release pace and the known-good Metal build; revisit later.
+- Reaping: removing a brew entry does not uninstall it while
+  `onActivation.cleanup = "none"`, so step cleanup to `check`, review the
+  plan, then move to `uninstall` as part of this item (the item 6 plan),
+  keeping the doctor's future owner-shadowing check quiet.
 
 ## 7. Bring up the personal Mac on its machine repo — not started
 
