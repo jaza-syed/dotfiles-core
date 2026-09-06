@@ -42,7 +42,7 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
  16  Move brew CLIs to Nix     NEXT — delete · dedup · move · drop the taps
         │
- 13  CI + updates              eval-only CI · Renovate · tagged releases
+ 13  CI + updates              eval-only CI · Renovate locks · nvim lock Action
         │
   7  Personal Mac (m1)       first run of the reworked bootstrap
         │
@@ -147,8 +147,9 @@ decisions in AGENTS.md as implementation starts.
   fits.
 - Pins match the work base flake: nixpkgs `nixos-26.05`, Home Manager
   `release-26.05`, and the nix-darwin release branch for the same nixpkgs
-  release. Upgrade when the work base flake moves. Tag core releases so
-  consumers pin a tag and Renovate bumps it.
+  release. Upgrade when the work base flake moves. Consumers track the
+  core's main branch and move by lock refresh; core releases are not
+  tagged (revised in item 13).
 - flake-parts and the dendritic pattern are not adopted here. The extra layer
   adds no composition ability this repository uses. Revisit only if the flake
   output layer grows past a screen of per-system boilerplate.
@@ -734,26 +735,30 @@ means the three phases get tested on the machine they were written for.
   the base darwin closure is affordable if evaluation ever misses breakage.
 - Renovate through its GitHub App with `"nix": { "enabled": true }` (beta,
   off by default; Dependabot has no Nix support) for `flake.lock`, plus the
-  built-in github-actions manager for workflow pins. `lazy-lock.json` has no
-  native manager: either a custom regex manager mapping each plugin's
-  `commit` field to the git-refs datasource, or a scheduled Action that runs
-  `Lazy! update` headlessly and opens a PR, which is less Renovate-pure but
-  much less config. Group updates on a low-noise schedule and automerge only
-  when the CI workflow is green, enforced by branch protection.
-- Tag a release after lock bumps land, by hand or with a small workflow
-  that tags green main on a schedule (calver reads well for config). The
-  tag is the consumer contract.
+  built-in github-actions manager for workflow pins. Group updates on a
+  low-noise schedule and automerge only when the CI workflow is green,
+  enforced by branch protection.
+- `lazy-lock.json` updates through a scheduled Action, not Renovate
+  (decided): a weekly workflow checks out the repo, runs the config's own
+  `nvim --headless "+Lazy! update"` with nvim from nixpkgs, and opens a PR
+  from the changed lock, gated by the same CI. Running the real config
+  sidesteps the plugin-name-to-repo mapping table a Renovate regex manager
+  would need and keep stale forever; the expected one-time cost is making
+  the config boot headless on a Linux runner.
+- No release tags (decided): the machine repos track the core's main
+  branch, so a lock refresh is the whole consumer contract and nothing
+  bumps tags.
 - Machine repos: flip the `dotfiles` input from `git+file` to
-  `github:jaza-syed/dotfiles-core?ref=<tag>`, which ends the
-  `--allow-dirty-locks` relocking. `dotfiles-m1` gets the same Renovate app,
-  bumping the core tag and its own inputs, and an Ubuntu eval job over its
-  two targets, which works because all of the private repo's inputs are
+  `github:jaza-syed/dotfiles-core`, which follows the default branch and
+  ends the `--allow-dirty-locks` relocking. `dotfiles-m1` gets the same
+  Renovate app doing lock maintenance — that is what moves it onto new core
+  commits, alongside its other inputs — and an Ubuntu eval job over its two
+  targets, which works because all of the private repo's inputs are
   publicly fetchable. `gen-m5`'s updater and CI live on the work side; its
   base-flake input needs the work netrc, so the core setup never has to
   know about it.
-- The steady-state loop: Renovate bumps the core lock, eval CI gates it,
-  automerge lands it, a tag cuts, each machine repo's Renovate bumps the
-  tag behind its own eval CI, and the next switch picks it up. After the
-  input flip a core change reaches a machine only after a push and a tag,
-  unless the machine pins `ref=main` for a looser contract; tags are the
-  decided default.
+- The steady-state loop: Renovate refreshes the core lock, eval CI gates
+  it, automerge lands it, and each machine repo's Renovate lock maintenance
+  then picks up the new core head behind its own eval CI. A core change
+  reaches a machine after a push plus the machine's next lock refresh, or
+  immediately with a manual `nix flake update dotfiles` there.

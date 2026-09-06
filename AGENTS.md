@@ -121,8 +121,8 @@ ordinary primitives (functions, overlays, modules).
   Define `dotfiles.*` options only where no upstream option fits.
 - Pins match the work base flake: nixpkgs `nixos-26.05`, Home Manager
   `release-26.05`, and the nix-darwin release branch for the same nixpkgs
-  release. Upgrade when the work base flake moves. Tag core releases so
-  consumers pin a tag.
+  release. Upgrade when the work base flake moves. Consumers track the
+  core's main branch and move by lock refresh; releases are not tagged.
 - flake-parts and the dendritic pattern are not adopted here. Revisit only if
   the flake output layer grows past a screen of per-system boilerplate.
 - Modules never fetch at evaluation time. Pinned dependencies enter through
