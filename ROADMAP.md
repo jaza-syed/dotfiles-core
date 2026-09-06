@@ -631,10 +631,10 @@ so sed, awk, grep, tar, make, ls, and date are now GNU-first on PATH in
 every shell, where before only the work devshells provided GNU tools, and
 that change is accepted. Every `generate_completions.sh` entry stayed, and
 `.zshrc` adds `~/.nix-profile/share/zsh/site-functions` to fpath so
-nixpkgs-shipped completions load. `onActivation.cleanup` sits at `check`,
-which only reports the now-undeclared formulae, and reaping waits for the
-move to `uninstall`. The m1 `services.sketchybar` decision stays with
-item 7.
+nixpkgs-shipped completions load. `onActivation.cleanup` moved through
+`check` to `uninstall` after the check report was reviewed, so the darwin
+switch now removes undeclared formulae and casks. The m1
+`services.sketchybar` decision stays with item 7.
 
 - Delete rather than move: `stow` (the last Stow package retired with
   `machines/`) and `llvm` unless something actually consumes it — nothing in

@@ -4,8 +4,8 @@
 {
   homebrew = {
     enable = true;
-    # "check" reports undeclared packages; move to "uninstall" to reap them.
-    onActivation.cleanup = "check";
+    # The darwin switch uninstalls undeclared formulae and casks.
+    onActivation.cleanup = "uninstall";
 
     brews = [
       # Authentication prerequisites (install.md phase 2 uses these)
