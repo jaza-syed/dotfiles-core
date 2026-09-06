@@ -28,6 +28,8 @@ local function place_cmp_floats()
   window._dotfiles_open = window._dotfiles_open or window.open
 
   local open = window._dotfiles_open
+  -- cmp opens the menu before the docs, so the docs can line up under it.
+  local menu_col = nil
   window.open = function(self, style)
     if style and style.relative == "editor" and style.width and style.col then
       local pos = vim.api.nvim_win_get_position(0)
@@ -45,10 +47,20 @@ local function place_cmp_floats()
         local below = cursor_row + 2
         style.height = math.max(1, math.min(style.height, vim.o.lines - below - 2))
         style.row = below
-      elseif ft == "cmp_menu" and style.row < cursor_row then
-        -- cmp ends the menu on the cursor line when it opens above it.
-        style.height = math.max(1, math.min(style.height, cursor_row))
-        style.row = cursor_row - style.height
+
+        -- cmp puts the docs beside the menu, which a wide window pushes far
+        -- to the right.
+        if menu_col then
+          style.col = menu_col
+          style.width = math.max(1, math.min(style.width, right - style.col - 1))
+        end
+      elseif ft == "cmp_menu" then
+        menu_col = style.col
+        if style.row < cursor_row then
+          -- cmp ends the menu on the cursor line when it opens above it.
+          style.height = math.max(1, math.min(style.height, cursor_row))
+          style.row = cursor_row - style.height
+        end
       end
     end
     return open(self, style)
