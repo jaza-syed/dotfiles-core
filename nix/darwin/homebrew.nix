@@ -15,14 +15,12 @@
       "mas"
 
       # AI
-      "gemini-cli"
       "llama.cpp"
 
       # Dev
       "bash"
       "bash-completion@2"
       "xcodegen"
-      "fzf-tab"
 
       # Media
       "mplayer"

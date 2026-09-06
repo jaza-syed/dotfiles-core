@@ -34,6 +34,7 @@ setopt globdots
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 zstyle ':fzf-tab:*' fzf-flags --height=40% --layout=reverse --border
 for _fzf_tab_plugin in \
+    "$HOME/.nix-profile/share/fzf-tab/fzf-tab.zsh" \
     "${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf-tab/share/fzf-tab/fzf-tab.zsh" \
     /usr/local/opt/fzf-tab/share/fzf-tab/fzf-tab.zsh; do
     if [[ -r "$_fzf_tab_plugin" ]]; then

@@ -52,6 +52,7 @@
     pkgs.ripgrep
     pkgs.zoxide
     pkgs.fzf
+    pkgs.zsh-fzf-tab
     pkgs.jq
     pkgs.glab
     pkgs.direnv
