@@ -9,8 +9,8 @@ its own repository holding its host composition: `m1` (personal Mac) in
 NixOS VPS and a Linux laptop whose OS is still undecided.
 
 Status: items 1–6, 8, 10, 11, and 14 are done. The core is modules-only and
-generative-free; the machine repo `../dotfiles-gen-m5` imports the core,
-holds both layers and all generative-specific config, has both layers
+free of work config; the machine repo `../dotfiles-gen-m5` imports the core,
+holds both layers and all work-specific config, has both layers
 switched (the darwin switch adopted the Homebrew prefix through
 nix-homebrew), and is pushed to the work GitLab. The personal machine repo
 `../dotfiles-m1` exists (unpushed) and owns the personal Claude settings and
@@ -30,7 +30,7 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
  10  Work machine (gen-m5)     DONE — ../dotfiles-gen-m5 imports the core
         │
- 11  Finish generative split   DONE — the core is generative-free
+ 11  Finish the work split     DONE — the core is free of work config
         │
  14  Rework the bootstrap      DONE — install.md · base profiles · nix-homebrew
         │
@@ -145,7 +145,7 @@ decisions in AGENTS.md as implementation starts.
   fits.
 - Pins match the work base flake: nixpkgs `nixos-26.05`, Home Manager
   `release-26.05`, and the nix-darwin release branch for the same nixpkgs
-  release. Upgrade when work's infra/nix moves. Tag core releases so
+  release. Upgrade when the work base flake moves. Tag core releases so
   consumers pin a tag and Renovate bumps it.
 - flake-parts and the dendritic pattern are not adopted here. The extra layer
   adds no composition ability this repository uses. Revisit only if the flake
@@ -162,8 +162,8 @@ decisions in AGENTS.md as implementation starts.
 - Work integration: one machine repository, `../dotfiles-gen-m5` (pushed to
   the work GitLab), imports the core and holds both the `jsyed@gen-m5`
   standalone Home Manager layer and `darwinConfigurations.gen-m5`. It owns
-  all generative-specific configuration; the core owns ergonomics and stays
-  generative-free.
+  all work-specific configuration; the core owns ergonomics and stays free
+  of work config.
 
 ## 5. Build the public core skeleton — done
 
@@ -267,12 +267,11 @@ never imports or names the machine repo.
 
 Done: the machine repo `../dotfiles-gen-m5` imports the core and holds the
 `jsyed@gen-m5` home layer and `darwinConfigurations.gen-m5`; it is pushed to
-`gitlab.com/jazasyed-gen/dotfiles-gen-m5`. The work facts left the public
-tree (`TICKETS_DIR` via `dotfiles.shell.extraEnv`,
-`dotfiles.starship.variant = "generative"`, the work Brewfile entries, and
-the `dgx` SSH block), the interim `jsyed@gen-m5` target and `machines/gen-m5/`
-are retired, and the darwin system layer is activated (`InitialKeyRepeat`
-reads 10).
+the work GitLab. The work facts left the public tree (`TICKETS_DIR` via
+`dotfiles.shell.extraEnv`, the work starship variant, the work Brewfile
+entries, and a private SSH host block), the interim `jsyed@gen-m5` target and
+`machines/gen-m5/` are retired, and the darwin system layer is activated
+(`InitialKeyRepeat` reads 10).
 
 Remaining:
 
@@ -288,12 +287,12 @@ Remaining:
   `~/.config/jj/conf.d/identity.toml` files are unused and can be deleted
   after the next home switch.
 
-## 11. Move the remaining generative config out of the core — done
+## 11. Move the remaining work config out of the core — done
 
 Item 10 moved the machine facts (env, prompt variant, Brewfile, SSH host) to
-`../dotfiles-gen-m5`. This stage moved the generative-specific behavior that
-was still embedded in the public core, so the core evaluates and runs with no
-generative content. Every injection point below defaults to a no-op when no
+`../dotfiles-gen-m5`. This stage moved the work-specific behavior that was
+still embedded in the public core, so the core evaluates and runs with no
+work content. Every injection point below defaults to a no-op when no
 machine repo is layered on. This stage also retired the core's host layer
 (`nix/hosts/`, `machines/`, `darwinConfigurations.m1`,
 `homeConfigurations."jsyed@m1"`, `install.sh`, `macos.sh`, and the common
@@ -305,15 +304,15 @@ Each surface got its own injection mechanism.
 Shell. The three interactive entries moved from
 `shell/.config/shell/interactive.sh` to the machine repo's
 `shell/interactive.sh`, sourced through `dotfiles.shell.extraInteractive`:
-the `glab_mr` alias (`--assignee jazasyed-gen`), the `mkmr` function (the
-`glab mr` scaffold), and the `journal` alias. The `checklist` and `status`
+the `glab_mr` alias (which pins the work username as assignee), the `mkmr`
+function (the `glab mr` scaffold), and the `journal` alias. The `checklist` and `status`
 aliases point at the personal `~/drive-jaza` and stay in the core. The
 `machine.env.sh` / `machine.interactive.sh` hooks are gone; the
 `extraEnv`/`extraInteractive` fragments are the machine surface.
 
-Starship. `starship.generative.toml` moved to the machine repo, which links
-it into `~/.config/` through its own `xdg.configFile` and keeps
-`dotfiles.starship.variant = "generative"`. The per-directory switch
+Starship. The work variant toml moved to the machine repo, which links it
+into `~/.config/` through its own `xdg.configFile` and keeps its
+`dotfiles.starship.variant`. The per-directory switch
 (`update_starship_config_for_pwd`) moved whole into the machine fragment,
 and the core keeps no path-prefix mechanism.
 
@@ -329,11 +328,11 @@ environment variable is involved, so the behavior is the same however nvim
 is launched:
 
 - `config/projects.lua`: kept the generic helpers (`normalize`, `is_under`,
-  `workspace_root`, `env_root`); `generative_root` and `is_generative` are
-  gone, and `direnv_wrap` gates on the machine module's is-managed predicate.
-- `config/generative.lua`: moved whole to the machine module (the
-  rust-analyzer sysroot for `platform/project-service`, the elmls paths for
-  `uis/redback`, and the RooterChDir `lcd`).
+  `workspace_root`, `env_root`); the hard-coded workspace root and its
+  predicate are gone, and `direnv_wrap` gates on the machine module's
+  is-managed predicate.
+- The work policy module moved whole to the machine module (a rust-analyzer
+  sysroot and elmls paths for two work sub-repos, and the RooterChDir `lcd`).
 - `config/lsp/init.lua`, `config/lint.lua`, `config/dropbar.lua`: gate
   through the hook surface — an is-managed predicate, a `before_init` hook,
   and two dropbar hooks for the project title and path abbreviation; the
@@ -346,13 +345,12 @@ is launched:
 - `tests/nvim_policies.lua`: moved to the machine repo with the policy it
   tests.
 
-Claude. The work-specific Claude config moved out of `claude/.claude/`. From
-`CLAUDE.md`, the "Generative-specific stuff" and "Sandbox and corporate
-permissions system" sections. From `settings.json`, the generative `allow`
-entries (the `~/code/generative` `cd`/`Edit`/`Read` rules), the generative
-sandbox `allowWrite`/`allowRead` paths, the `dev@internal-plugins` and
-`beta@internal-plugins` entries, and both PreToolUse hooks (they only
-pre-empt the corporate ask rules, which exist only on the work machine).
+Claude. The work-specific Claude config moved out of `claude/.claude/`: the
+work and corporate-permissions sections of `CLAUDE.md`, and from
+`settings.json` the work-workspace `allow` entries and sandbox
+`allowWrite`/`allowRead` paths, the internal-plugin entries, and both
+PreToolUse hooks (they only pre-empt the corporate ask rules, which exist
+only on the work machine).
 The docs confirm the permission lists, hooks, and sandbox path arrays merge
 across the settings layers (managed, user, project), but `settings.json` has
 no import mechanism, project settings are not read from ancestor directories,
@@ -375,9 +373,10 @@ Verified: the four machine-repo targets (`jsyed@gen-m5`, `gen-m5`,
 moved policies test passes; headless `nvim` loads clean with no machine
 module and, with the module linked, reports the workspace root, the
 is-managed predicate, the machine autocmds, and the colorcolumn; and the
-generative term grep (`generative`, `jazasyed-gen`, `drive-gen`, `mani.yaml`,
-the dgx IP) finds nothing outside `ROADMAP.md` and `AGENTS.md`, with `glab`
-kept in the core as a generic tool.
+work term grep (the company name, work usernames and paths, and the private
+host IP) finds nothing outside `ROADMAP.md` and `AGENTS.md`, with `glab` kept
+in the core as a generic tool. Item 9's publish then scrubbed the remaining
+prose references from these two files.
 
 The gen-m5 home layer has since switched onto the machine-repo links, and the
 stale identity files are deleted.
@@ -400,8 +399,8 @@ stale identity files are deleted.
     every credential file, and no 1Password shell plugins are used.
     Some of these files have to exist at rest anyway, because the nix-daemon
     reads them and cannot call `op`. The netrc at `/etc/nix/netrc` needs a
-    `machine gitlab.com` line and a `machine generative.cachix.org` line. The
-    gitlab line authenticates both the base-flake `git+https` fetch and the
+    `machine gitlab.com` line and a `machine` line for the work Cachix cache.
+    The gitlab line authenticates both the base-flake `git+https` fetch and the
     private PyPI index, which is also served from `gitlab.com`
     (`/api/v4/groups/<id>/-/packages/pypi/simple`); netrc keys on host, so one
     line covers both, and the PAT needs `api` scope as well as
@@ -413,7 +412,7 @@ stale identity files are deleted.
     `glab auth login --hostname gitlab.com --stdin`. The same GitLab PAT as
     the netrc line, so one rotation updates both.
   - Cachix needs two files, both written by the script: the daemon pull
-    authenticates through the netrc `generative.cachix.org` line (above), and
+    authenticates through the netrc work-cache line (above), and
     the `cachix` CLI reads its token from `~/.config/cachix/cachix.dhall`
     (what `cachix authtoken` writes). The gen-m5 home layer installs `cachix`,
     so switch the home layer before the first script run.
@@ -425,7 +424,7 @@ stale identity files are deleted.
     `scripts/auth.sh` unsets `GITHUB_TOKEN` around `gh auth`, since an
     environment token overrides the keyring login it manages. Non-secret
     variables are committed directly: the gen-m5 `extraEnv` exports
-    `GITLAB_USER=jazasyed-gen`.
+    `GITLAB_USER`.
 - Use separate passphrase-protected, per-machine SSH keys for personal and
   work access. Keep private keys local, use the macOS Keychain-backed agent,
   and register and revoke each device independently. Do not sync SSH private
@@ -460,22 +459,22 @@ stale identity files are deleted.
 ## 15. Publish review.nvim — not started
 
 `../review.nvim` is a GitLab merge-request review plugin for Neovim, 84
-commits, currently pushed to `gitlab.com/jazasyed-gen/review.nvim`. The core's
+commits, currently pushed to a personal namespace on the work GitLab. The core's
 plugin spec in `nvim/.config/nvim/lua/init.lua` points at the local checkout
 with `dir = ~/code/jaza-syed/review.nvim` and `enabled` gated on that directory
 existing, so the plugin is absent on a fresh machine. Publishing it removes
 that gap and makes the core's nvim config work standalone.
 
-Settle first: every commit is authored `jaza.syed@generative.vision` and the
+Settle first: every commit is authored with the work address and the
 remote is the work-associated GitLab namespace, so confirm the plugin is
 personal work and that nothing in the employment agreement claims it before
 publishing anything.
 
 - Audit the tree and history the same way as item 9: a secret scanner plus a
   term list. The current tree looks clean of employer content; the only
-  work-shaped string is `allowed_project = "jazasyed-gen/review.nvim"` in
-  `tests/live_gitlab.lua`, which names the plugin's own repository as a guard
-  and follows the repository move. The `mani` dependency is a public tool, so
+  work-shaped string is the `allowed_project` guard in
+  `tests/live_gitlab.lua`, which names the plugin's own repository and
+  follows the repository move. The `mani` dependency is a public tool, so
   it stays.
 - Rewrite the author and committer email across all 84 commits to the personal
   address, matching the identity the core now uses.

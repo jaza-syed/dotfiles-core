@@ -121,7 +121,7 @@ ordinary primitives (functions, overlays, modules).
   Define `dotfiles.*` options only where no upstream option fits.
 - Pins match the work base flake: nixpkgs `nixos-26.05`, Home Manager
   `release-26.05`, and the nix-darwin release branch for the same nixpkgs
-  release. Upgrade when work's infra/nix moves. Tag core releases so
+  release. Upgrade when the work base flake moves. Tag core releases so
   consumers pin a tag.
 - flake-parts and the dendritic pattern are not adopted here. Revisit only if
   the flake output layer grows past a screen of per-system boilerplate.
@@ -140,8 +140,8 @@ ordinary primitives (functions, overlays, modules).
   packages.
 - Work integration: `../dotfiles-gen-m5` (pushed to the work GitLab) holds
   both the `jsyed@gen-m5` standalone Home Manager layer and
-  `darwinConfigurations.gen-m5`. It owns all generative-specific
-  configuration; the core owns ergonomics and stays generative-free.
+  `darwinConfigurations.gen-m5`. It owns all work-specific configuration;
+  the core owns ergonomics and stays free of work config.
 
 ## Repository layout
 
