@@ -8,7 +8,7 @@ its own repository holding its host composition: `m1` (personal Mac) in
 `../dotfiles-m1`, `gen-m5` (work Mac) in `../dotfiles-gen-m5`, and later a
 NixOS VPS and a Linux laptop whose OS is still undecided.
 
-Status: items 1–6, 8, 10, 11, and 14 are done. The core is modules-only and
+Status: items 1–6, 8, 10, 11, 14, and 16 are done. The core is modules-only and
 free of work config; the machine repo `../dotfiles-gen-m5` imports the core,
 holds both layers and all work-specific config, has both layers
 switched (the darwin switch adopted the Homebrew prefix through
@@ -17,9 +17,9 @@ nix-homebrew), and is pushed to the work GitLab. The personal machine repo
 git/jj identity. `scripts/setup-secrets.sh` in the machine repo writes the
 work credentials from 1Password. The core restarted its history and is
 public at `github.com/jaza-syed/dotfiles-core`, so install.md's anonymous
-phase 1 clone works. Publishing review.nvim (15) is on hold. Next: move the
-Homebrew CLI tools to Nix (16), then CI and Renovate (13), then the personal
-Mac bring-up (7) as the first real run of the reworked flow.
+phase 1 clone works. Publishing review.nvim (15) is on hold. The CLI tools
+moved from Homebrew to `nix/home/tools.nix` (16). Next: CI and Renovate (13),
+then the personal Mac bring-up (7) as the first real run of the reworked flow.
 
 tmux plugins stay on TPM, so plugin management is not on this roadmap.
 
@@ -40,9 +40,9 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
  15  Publish review.nvim       ON HOLD — ownership · author rewrite · license
         │
- 16  Move brew CLIs to Nix     NEXT — delete · dedup · move · drop the taps
+ 16  Move brew CLIs to Nix     DONE — nixpkgs CLIs · GNU-first PATH · cleanup=check
         │
- 13  CI + updates              eval-only CI · Renovate locks · nvim lock Action
+ 13  CI + updates              NEXT — eval-only CI · Renovate locks · nvim lock Action
         │
   7  Personal Mac (m1)       first run of the reworked bootstrap
         │
@@ -610,13 +610,27 @@ Caveats:
   all 104 dependencies without reinstalling. m1 adopts its prefix the same
   way at the item 7 bring-up.
 
-## 16. Move the Homebrew CLI tools to Nix — not started
+## 16. Move the Homebrew CLI tools to Nix — done
 
 Everything that moves gains the flake lock, Renovate, CI, and generation
 rollback (item 13); brew formulae float unpinned. Homebrew remains the GUI
 layer: casks and masApps stay. Decided to land this and item 13 before the
 m1 bring-up (7), so the laptop's first install exercises the final tool
 ownership.
+
+What happened: the listed formulae moved to `nix/home/tools.nix`; `stow`,
+`llvm`, `lua`, and `git-lfs` were deleted outright; and all three taps are
+gone (`sketchybar`, `borders` as `jankyborders`, and `lazydocker` now come
+from nixpkgs, and the AeroSpace cask keeps its fully-qualified tap name,
+which brew resolves by auto-tapping). This nixpkgs pin has no `urlview`, so
+`urlscan` replaces it. The nixpkgs GNU packages install unprefixed binaries,
+so sed, awk, grep, tar, make, ls, and date are GNU-first on PATH everywhere,
+not just inside work devshells — accepted. Every `generate_completions.sh`
+entry stayed, and `.zshrc` adds `~/.nix-profile/share/zsh/site-functions` to
+fpath so nixpkgs-shipped completions load. `onActivation.cleanup` sits at
+`check`, which only reports the now-undeclared formulae; reaping waits until
+the step to `uninstall`. The m1 `services.sketchybar` decision stays with
+item 7.
 
 - Delete rather than move: `stow` (the last Stow package retired with
   `machines/`) and `llvm` unless something actually consumes it — nothing in

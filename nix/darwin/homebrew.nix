@@ -4,22 +4,12 @@
 {
   homebrew = {
     enable = true;
-    # Move to "check", then "uninstall", once the declared set is verified.
-    onActivation.cleanup = "none";
-
-    taps = [
-      "FelixKratz/formulae"
-      "nikitabobko/tap"
-      "jesseduffield/lazydocker"
-    ];
+    # "check" reports undeclared packages; move to "uninstall" to reap them.
+    onActivation.cleanup = "check";
 
     brews = [
       # Authentication prerequisites (install.md phase 2 uses these)
       "gh"
-
-      # Core MacOs tools
-      "FelixKratz/formulae/sketchybar"
-      "FelixKratz/formulae/borders"
 
       # Mac App Store
       "mas"
@@ -29,63 +19,13 @@
       "llama.cpp"
 
       # Dev
-      "llvm"
       "bash"
       "bash-completion@2"
       "xcodegen"
-      # Bootstrap Lua runs the theme generator before Home Manager switches.
-      "lua"
-
-      # Core CLI tools
-      "coreutils"
-      "gnu-sed"
-      "gnu-tar"
-      "grep"
-      "make"
-      "rlwrap"
-      "mise"
-      "awk"
-      "tree"
-      "watch"
-      "wget"
-      "rsync"
-      "stow"
-      "git-lfs"
-      "jj"
-      "rip2"
-      "difftastic"
-      "urlview"
       "fzf-tab"
-      "terminal-notifier"
 
       # Media
-      "ffmpeg"
-      "imagemagick"
       "mplayer"
-
-      # Monitoring
-      "btop"
-      "glances"
-      "procs"
-
-      # Misc
-      "websocat"
-      "graphviz"
-      "gnuplot"
-      "pandoc"
-      "tectonic"
-
-      # DevOps / infra
-      "awscli"
-      "kubernetes-cli"
-      "k9s"
-      "kubelogin"
-      "s3cmd"
-      "rclone"
-
-      # Dev
-      "uv"
-      "jesseduffield/lazydocker/lazydocker"
     ];
 
     casks = [

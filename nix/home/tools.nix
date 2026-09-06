@@ -37,6 +37,14 @@
     pkgs.elmPackages.elm-language-server
     pkgs.lua-language-server
 
+    # GNU userland, unprefixed, so GNU sed/awk/grep/tar/make/ls win on PATH.
+    pkgs.coreutils
+    pkgs.gnused
+    pkgs.gnutar
+    pkgs.gnugrep
+    pkgs.gawk
+    pkgs.gnumake
+
     # CLI tools
     pkgs.bat
     pkgs.eza
@@ -54,6 +62,48 @@
     pkgs.stylua
     pkgs.just
     pkgs.mani
+    pkgs.tree
+    pkgs.watch
+    pkgs.wget
+    pkgs.rsync
+    pkgs.rlwrap
+    pkgs.jujutsu
+    pkgs.rip2
+    pkgs.difftastic
+    # nixpkgs dropped urlview; urlscan is its maintained equivalent.
+    pkgs.urlscan
+    pkgs.websocat
+    pkgs.mise
+    pkgs.uv
+    pkgs.lazydocker
+
+    # Documents and plotting
+    pkgs.graphviz
+    pkgs.gnuplot
+    pkgs.pandoc
+    pkgs.tectonic
+
+    # Media
+    pkgs.ffmpeg
+    pkgs.imagemagick
+
+    # Monitoring
+    pkgs.btop
+    pkgs.glances
+    pkgs.procs
+
+    # DevOps / infra
+    pkgs.awscli2
+    pkgs.kubectl
+    pkgs.k9s
+    pkgs.kubelogin
+    pkgs.s3cmd
+    pkgs.rclone
+
+    # macOS desktop
+    pkgs.terminal-notifier
+    pkgs.sketchybar
+    pkgs.jankyborders
 
     # Editors and terminal
     pkgs.neovim

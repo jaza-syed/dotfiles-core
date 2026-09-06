@@ -58,12 +58,9 @@ Package ownership is deliberate:
 
 - `gh`, `1password`, and `1password-cli` are in the shared darwin module so
   the phase 1 base switch installs them before phase 2 authenticates.
-- Global tools and toolchains belong to Home Manager (`nix/home/tools.nix`).
-  mise stays Homebrew-installed for project-local use only; there is no global
-  mise config.
-- Homebrew Lua is the bootstrap interpreter for theme generation, which may run
-  before the Home Manager switch; Home Manager supplies the day-to-day Lua
-  runtime.
+- Global tools and toolchains belong to Home Manager (`nix/home/tools.nix`),
+  including mise, which stays project-local in use: there is no global mise
+  config.
 - Common applications, including Discord and Zulip, belong only to the shared
   darwin module; machine repos declare only machine-specific additions.
 
@@ -184,7 +181,9 @@ removing, or upgrading supported tools:
 exec zsh # or: exec bash
 ```
 
-Add new completion generators to `scripts/generate_completions.sh`.
+Add a generator to `scripts/generate_completions.sh` for any tool whose
+package ships no completion, whatever the owner; nixpkgs-shipped completions
+load from `~/.nix-profile/share/zsh/site-functions` on fpath.
 
 Home Manager is flake-based and owns the Nix-specific package set, including
 tmux with sixel support. The package set lives in `nix/home/tools.nix`, and

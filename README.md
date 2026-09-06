@@ -81,11 +81,9 @@ commit, relock the machine repo with
    - disable the Control-Space input-source shortcut.
 5. Review notification permissions for Mimestream, Calendar, WhatsApp, and
    other communication apps.
-6. Start sketchybar if wanted:
-
-   ```sh
-   brew services start sketchybar
-   ```
+6. sketchybar comes from nixpkgs; run it via nix-darwin's
+   `services.sketchybar` in the machine repo's `darwin.nix`, or start it
+   manually.
 
 A Home Manager activation script clones TPM and plugins declared in
 `tmux.conf` when missing, without starting a tmux server. Existing plugin
