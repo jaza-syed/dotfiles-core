@@ -360,13 +360,14 @@ The docs confirm the permission lists, hooks, and sandbox path arrays merge
 across the settings layers (managed, user, project), but `settings.json` has
 no import mechanism, project settings are not read from ancestor directories,
 and Claude Code writes to the user file itself (`/model` does), so the user
-file must stay a plain writable file — its writes are atomic (write a temp
-file, rename over the target), which replaces a symlink with a regular file
-holding only the last-written key, so linking it can never work. Each machine
-repo therefore keeps `~/.claude/settings.json` as a checked-in copy — gen-m5's
-adds the work entries — and a Home Manager activation entry copies it into
-place only when the live file is missing; drift is handled by diffing the
-live file against the repo copy in both directions. For `CLAUDE.md`, the core file imports
+file must stay a plain writable file, because Claude Code writes it
+atomically (a temp file renamed over the target), and that rename replaces a
+symlink with a regular file holding only what Claude wrote, so linking the
+file cannot work. Each machine repo therefore keeps `~/.claude/settings.json`
+as a checked-in copy (gen-m5's adds the work entries), and a Home Manager
+activation entry copies it into place only when the live file is missing.
+Drift is handled by diffing the live file against the repo copy in both
+directions. For `CLAUDE.md`, the core file imports
 `@~/.claude/machine.md` and every machine repo links a fragment there (empty
 is fine), which sidesteps the undocumented missing-import behavior.
 
@@ -626,12 +627,13 @@ gone (`sketchybar`, `borders` as `jankyborders`, and `lazydocker` now come
 from nixpkgs, and the AeroSpace cask keeps its fully-qualified tap name,
 which brew resolves by auto-tapping). This nixpkgs pin has no `urlview`, so
 `urlscan` replaces it. The nixpkgs GNU packages install unprefixed binaries,
-so sed, awk, grep, tar, make, ls, and date are GNU-first on PATH everywhere,
-not just inside work devshells — accepted. Every `generate_completions.sh`
-entry stayed, and `.zshrc` adds `~/.nix-profile/share/zsh/site-functions` to
-fpath so nixpkgs-shipped completions load. `onActivation.cleanup` sits at
-`check`, which only reports the now-undeclared formulae; reaping waits until
-the step to `uninstall`. The m1 `services.sketchybar` decision stays with
+so sed, awk, grep, tar, make, ls, and date are now GNU-first on PATH in
+every shell, where before only the work devshells provided GNU tools, and
+that change is accepted. Every `generate_completions.sh` entry stayed, and
+`.zshrc` adds `~/.nix-profile/share/zsh/site-functions` to fpath so
+nixpkgs-shipped completions load. `onActivation.cleanup` sits at `check`,
+which only reports the now-undeclared formulae, and reaping waits for the
+move to `uninstall`. The m1 `services.sketchybar` decision stays with
 item 7.
 
 - Delete rather than move: `stow` (the last Stow package retired with
@@ -750,9 +752,10 @@ points a temp `HOME`/`XDG_CONFIG_HOME` at the repo's nvim config, runs
 `Lazy! update`, and opens a PR scoped to `lazy-lock.json`; it still needs
 debugging on its first real runs. `renovate.json` (core and `dotfiles-m1`)
 enables nix, weekly lock-file maintenance with automerge, and grouped
-github-actions updates. Deviation: no branch protection — it would block
-direct pushes to main, and Renovate already waits for green checks before
-automerging its own PRs. Both machine repos flipped their `dotfiles` input to
+github-actions updates. One deviation from the plan below: there is no
+branch protection, since protection would block direct pushes to main, and
+Renovate waits for green checks before automerging its own PRs anyway.
+Both machine repos flipped their `dotfiles` input to
 `github:jaza-syed/dotfiles-core` and relocked, and all four machine targets
 pass `nix build --dry-run`. Remaining user steps: install the Renovate GitHub
 App on `dotfiles-core` and `dotfiles-m1`, approve its onboarding PRs, and
