@@ -55,6 +55,10 @@
           enable = true;
           # Adopt a curl-installed prefix, keeping its installed packages.
           autoMigrate = true;
+          # env.sh runs brew shellenv with the Nix profile ordered first; the
+          # integration would rerun it from /etc/zshrc and put brew first.
+          enableZshIntegration = false;
+          enableBashIntegration = false;
         };
       };
       # Base bootstrap profiles (install.md phase 1): no machine facts beyond
