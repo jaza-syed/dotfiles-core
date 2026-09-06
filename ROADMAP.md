@@ -626,9 +626,16 @@ ownership.
   websocat, graphviz, gnuplot, pandoc, tectonic, btop, glances, procs, uv,
   awscli2, kubectl, k9s, kubelogin, s3cmd, rclone, ffmpeg, imagemagick, and
   terminal-notifier. All are cached on aarch64-darwin, and PATH already
-  prefers the Nix profile. Trim the moved tools from
-  `scripts/generate_completions.sh`, which exists only for
-  Homebrew-installed tools.
+  prefers the Nix profile.
+- Completions must not regress: every tool that has completions today keeps
+  them after the move. For each moved tool, check whether the nixpkgs
+  package ships completions and that they resolve (fpath for zsh,
+  bash-completion's path for bash) from the Home Manager profile; keep its
+  `generate_completions.sh` entry when the package ships none. That changes
+  the script's rule from "Homebrew-installed tools only" to "tools whose
+  package ships no completion, whatever the owner" — update AGENTS.md to
+  match. Verify by diffing the loaded completion set before and after the
+  move.
 - Drop all three taps: `sketchybar` and `borders` come from nixpkgs with
   nix-darwin's `services.sketchybar` replacing `brew services`, and
   `lazydocker` comes from nixpkgs. AeroSpace can follow if the nixpkgs
