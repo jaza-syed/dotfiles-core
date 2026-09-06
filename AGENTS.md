@@ -40,10 +40,8 @@ switches to the machine profiles. Two scripts remain:
 If you change the flow, keep `install.md`, `scripts/auth.sh`, and `README.md`
 in sync.
 
-While this repository is private, phase 1's anonymous clone fails, so
-install.md carries interim authenticated-clone commands using
-`nix run nixpkgs#gh`. The public authentication Gist that predates the
-three-phase flow stays published and should point at install.md.
+The public authentication Gist that predates the three-phase flow should point
+at install.md if it is still published.
 
 Selecting SSH through `gh auth login` is deliberate: GitHub CLI finds or creates
 a key and uploads the selected public key as part of that login flow. Do not set
@@ -87,12 +85,43 @@ metadata.
 
 This repo is intended to be public. Do not commit host-specific SSH entries, private hostnames, IPs, usernames, ports, proxy rules, tokens, or other secrets.
 
+Secrets stay out of every repository and out of the Nix store. They live in
+uncommitted local files that committed config sources
+(`~/.config/shell/env.local.sh`, `~/.ssh/config.local`), and 1Password is the
+source of truth, resolved by a machine repo's `scripts/setup-secrets.sh`
+rather than by sops. SSH private keys are per-machine and
+passphrase-protected, are held by the macOS Keychain-backed agent, and are
+never synced through 1Password.
+
 The SSH config in `nix/home/ssh.nix` should stay limited to public defaults,
 the `github.com` host block, and the `Include ~/.ssh/config.local` directive.
 Put private hosts in that ignored local include. The common Git config in
 `nix/home/git.nix` carries no identity; each machine repo sets
 `programs.git.settings.user` and the jj `conf.d` fragment, so no identity is
 committed here.
+
+## CI and updates
+
+`.github/workflows/ci.yml` runs on push and PR and is evaluation-only, since
+evaluation is platform-independent: Ubuntu runners force the module system
+through `nix eval .#darwinConfigurations.base.system.drvPath` and the
+`homeConfigurations.base` activation package, a lint job runs shellcheck over
+`scripts/` and the shell tree plus `stylua --check` over the nvim lua, and a
+tests job runs the `tests/*.lua` checks through a headless nixpkgs neovim and
+`tests/setup.sh`. Nothing mac-specific is built, though `macos-14` arm64
+runners are free on a public repo if evaluation ever misses breakage.
+
+Renovate's GitHub App keeps `flake.lock` and the workflow pins current here
+and in `../dotfiles-m1`, and automerges only on green CI. There is no branch
+protection, because it would block direct pushes to main and Renovate waits
+for green checks anyway. `lazy-lock.json` updates through the weekly
+`.github/workflows/nvim-lock-update.yml` instead, which runs the config's own
+`nvim --headless "+Lazy! update"` and opens a PR scoped to the lock, so no
+plugin-name-to-repo mapping table has to be maintained. There are no release
+tags: the machine repos track this repo's main branch, so a core change
+reaches a machine after a push plus that machine's next lock refresh, or
+immediately with `nix flake update dotfiles` there. `gen-m5`'s updater and CI
+live on the work side, since its base-flake input needs the work netrc.
 
 ## Nix architecture decisions
 
@@ -130,7 +159,8 @@ ordinary primitives (functions, overlays, modules).
 - The machine repos own machine facts: username, home directory, hostname,
   and profile choices. No module here may hard-code `jsyed` or a home path,
   except the base bootstrap outputs in `flake.nix`, which hard-code the
-  username by decision (ROADMAP item 14).
+  username by decision, since the core is the personal base and the name is in
+  its history regardless.
 - Actively edited configuration (nvim, shell startup, sketchybar, the Claude
   directory, generated themes) stays as plain files linked out-of-store, so
   editing a file needs no switch. Home Manager owns only the links and

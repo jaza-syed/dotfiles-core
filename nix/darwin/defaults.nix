@@ -1,4 +1,4 @@
-# macOS defaults; mirrors scripts/macos.sh until ROADMAP items 7/10 retire it.
+# macOS defaults, previously applied by the retired scripts/macos.sh.
 { config, ... }:
 let
   home = config.users.users.${config.system.primaryUser}.home;

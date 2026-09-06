@@ -62,7 +62,7 @@
         };
       };
       # Base bootstrap profiles (install.md phase 1): no machine facts beyond
-      # the username and home directory, hard-coded by decision (ROADMAP 14).
+      # the username and home directory, hard-coded by decision (AGENTS.md).
       baseHome = {
         home.username = "jsyed";
         home.homeDirectory = "/Users/jsyed";

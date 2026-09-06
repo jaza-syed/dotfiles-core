@@ -16,6 +16,22 @@ local function direnv_cmd(argv)
   end
 end
 
+-- Launch a server through `mise exec` when the project declares a mise
+-- toolchain, since there is no global mise config.
+local function mise_cmd(argv)
+  return function(dispatchers, config)
+    local root = config.root_dir
+    local cmd = argv
+    if root and #vim.fs.find({ "mise.toml", ".mise.toml" }, { path = root, upward = true }) > 0 then
+      cmd = vim.list_extend({ "mise", "exec", "--" }, argv)
+    end
+    return vim.lsp.rpc.start(cmd, dispatchers, {
+      cwd = root,
+      env = config.cmd_env,
+    })
+  end
+end
+
 -- Root a workspace-aware server at its cargo/uv workspace inside the managed
 -- workspace, else fall back to the given markers.
 local function workspace_root_dir(marker, key, fallback_markers)
@@ -238,6 +254,14 @@ local function setup_language_servers(capabilities)
     },
   })
   vim.lsp.enable("elmls")
+
+  vim.lsp.config("zls", {
+    cmd = mise_cmd({ "zls" }),
+    filetypes = { "zig", "zon" },
+    root_markers = { "build.zig", "build.zig.zon", ".git" },
+    capabilities = capabilities,
+  })
+  vim.lsp.enable("zls")
 end
 
 function M.setup()
