@@ -1,7 +1,9 @@
+# Black is the background colour in every palette, so the light side uses White,
+# which is the foreground in every palette.
 [style]
-header = "White|Black"
-unit = "White|Black"
-tree = "White|Black"
+header = "White|White"
+unit = "White|White"
+tree = "White|White"
 
 [[columns]]
 kind = "Pid"
@@ -26,7 +28,7 @@ align = "Left"
 
 [[columns]]
 kind = "Tty"
-style = "BrightWhite|Black"
+style = "BrightWhite|BrightWhite"
 numeric_search = false
 nonnumeric_search = false
 align = "Left"
