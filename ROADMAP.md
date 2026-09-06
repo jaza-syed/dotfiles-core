@@ -15,11 +15,11 @@ switched (the darwin switch adopted the Homebrew prefix through
 nix-homebrew), and is pushed to the work GitLab. The personal machine repo
 `../dotfiles-m1` exists (unpushed) and owns the personal Claude settings and
 git/jj identity. `scripts/setup-secrets.sh` in the machine repo writes the
-work credentials from 1Password. The core restarted its history and lives at
-`github.com/jaza-syed/dotfiles-core`; publishing (9) is down to flipping it
-public and repointing the Gist, which also unblocks install.md's anonymous
-phase 1 clone. The personal Mac bring-up (item 7) is the first real run of
-the reworked flow.
+work credentials from 1Password. The core restarted its history and is
+public at `github.com/jaza-syed/dotfiles-core`, so install.md's anonymous
+phase 1 clone works once `main` is pushed. Publishing review.nvim (15) is
+next, and the personal Mac bring-up (item 7) is the first real run of the
+reworked flow.
 
 tmux plugins stay on TPM, so plugin management is not on this roadmap.
 
@@ -36,9 +36,9 @@ tmux plugins stay on TPM, so plugin management is not on this roadmap.
         │
   8  Secrets model             DONE — setup-secrets.sh · 1Password source of truth
         │
-  9  Publish the core          NEXT — dotfiles-core made · flip visibility · gist
+  9  Publish the core          DONE — public dotfiles-core · fresh history
         │
- 15  Publish review.nvim       ownership · author rewrite · license · github spec
+ 15  Publish review.nvim       NEXT — ownership · author rewrite · license · github spec
         │
   7  Personal Mac (m1)       first run of the reworked bootstrap
         │
@@ -442,18 +442,17 @@ stale identity files are deleted.
   are, and the unlock/fail-closed rules and the rotation and recovery runbook
   are not being written.
 
-## 9. Publish the public core — done except the visibility flip
+## 9. Publish the public core — done
 
-- Done: instead of rewriting history, the core restarted it. The tree was
-  audited (gitleaks plus the term list: no secrets; company references remain
-  only as prose in `ROADMAP.md` and `AGENTS.md`), then `main` was collapsed
-  to a single fresh commit authored with the personal identity and pushed to
-  the new `github.com/jaza-syed/dotfiles-core` (private), which `origin` now
-  points at. The old history survives in the old private
-  `github.com/jaza-syed/dotfiles` and the local `old-main` branch.
-- Remaining: flip `dotfiles-core` public
-  (`gh repo edit jaza-syed/dotfiles-core --visibility public`), and edit the
-  public Gist to point at `install.md`.
+- Instead of rewriting history, the core restarted it. The tree was audited
+  (gitleaks plus the term list: no secrets; company references remain only as
+  prose in `ROADMAP.md` and `AGENTS.md`), then `main` was collapsed to a
+  single fresh commit authored with the personal identity, and `origin` now
+  points at the new public `github.com/jaza-syed/dotfiles-core`. The old
+  history survives only in the old private `github.com/jaza-syed/dotfiles`;
+  the local backup branch was deleted so it cannot be pushed by accident.
+- The authentication Gist is deleted; `install.md` is the only bootstrap
+  document.
 - Keep the public repository useful on its own as the personal/common base.
 - Make setup a one-command, idempotent, testable path with and without the
   work-side repositories.
