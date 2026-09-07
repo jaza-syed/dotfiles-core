@@ -448,7 +448,7 @@ for monitor in "${MONITOR_IDS[@]}"; do
               drawing=on
               icon="$window_icon"
               icon.color="$window_color"
-              click_script="aerospace focus --window-id $window_id"
+              click_script="$AEROSPACE_BIN focus --window-id $window_id"
             )
           else
             cmd+=(

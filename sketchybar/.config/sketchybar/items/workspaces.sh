@@ -40,7 +40,7 @@ add_workspace_cluster() {
     background.drawing=off
     padding_left="$WORKSPACE_ITEM_PADDING_LEFT"
     padding_right="$WORKSPACE_ITEM_PADDING_RIGHT"
-    click_script="aerospace workspace $ws"
+    click_script="$AEROSPACE_BIN workspace $ws"
     --add item "$separator_item" left
     --set "$separator_item"
     drawing=off
