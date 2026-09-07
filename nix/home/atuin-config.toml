@@ -43,8 +43,9 @@
 # sync_frequency = "10m"
 
 ## which search mode to use
-## possible values: prefix, fulltext, fuzzy, skim
-# search_mode = "fuzzy"
+## possible values: prefix, fulltext, fuzzy, skim, daemon-fuzzy
+## daemon-fuzzy ranks by nucleo match score plus frecency and needs the daemon
+search_mode = "daemon-fuzzy"
 
 ## which filter mode to use by default
 ## possible values: "global", "host", "session", "session-preload", "directory", "workspace"
@@ -260,7 +261,10 @@ records = true
 
 [daemon]
 ## Enables using the daemon to sync. Requires the daemon to be running in the background. Start it with `atuin daemon`
-# enabled = false
+enabled = true
+
+## Automatically start and manage a local daemon when needed.
+autostart = true
 
 ## How often the daemon should sync in seconds
 # sync_frequency = 300

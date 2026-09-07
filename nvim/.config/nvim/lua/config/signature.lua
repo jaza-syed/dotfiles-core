@@ -1,5 +1,6 @@
 -- Signature help for the call being typed, rendered as virtual lines below it
--- so it pushes code down rather than covering it.
+-- so it pushes code down rather than covering it. Off until the toggle key
+-- turns it on.
 local M = {}
 
 local ns = vim.api.nvim_create_namespace("config.signature")
@@ -8,14 +9,18 @@ local WRAP_WIDTH = 80
 local INDENT = "  "
 local TITLE = " SIGNATURE "
 
+-- Both keys sit under a prefix so neither shadows a single-key mapping.
+local PREFIX = "<C-\\>"
+
 -- The body is always this tall, so the code below the block does not move as
 -- the documentation changes from keystroke to keystroke.
 local BODY_HEIGHT = 6
 local SPLIT_HEIGHT = 12
 
--- buf and line locate the extmark. result is the last response, which <C-g>
--- renders in full. split_label is the signature the split currently shows.
-local state = { buf = nil, line = nil, result = nil, split = nil, split_label = nil }
+-- buf and line locate the extmark. result is the last response, which the
+-- split key renders in full. split_label is the signature the split shows.
+-- enabled gates the whole feature, including the requests.
+local state = { buf = nil, line = nil, result = nil, split = nil, split_label = nil, enabled = false }
 local generation = 0
 
 local function split_open()
@@ -263,8 +268,22 @@ local function render(result)
   state.buf, state.line = buf, line
 end
 
+-- The block pushes the surrounding code out of view, so it stays off until it
+-- is asked for. Turning it off drops the in-flight request with the block.
+function M.toggle()
+  state.enabled = not state.enabled
+  if state.enabled then
+    M.update()
+  else
+    invalidate()
+  end
+end
+
 function M.update()
   generation = generation + 1
+  if not state.enabled then
+    return clear()
+  end
   local request_generation = generation
   if vim.api.nvim_get_mode().mode:sub(1, 1) ~= "i" then
     return clear()
@@ -387,7 +406,8 @@ function M.setup()
     callback = M.update,
   })
 
-  vim.keymap.set({ "i", "n" }, "<C-g>", M.open_split, { desc = "Signature help in a split" })
+  vim.keymap.set({ "i", "n" }, PREFIX .. "<C-s>", M.open_split, { desc = "Signature help in a split" })
+  vim.keymap.set({ "i", "n" }, PREFIX .. "<C-t>", M.toggle, { desc = "Toggle signature help" })
 
   vim.api.nvim_create_autocmd({ "InsertLeave", "BufLeave" }, {
     group = group,

@@ -17,6 +17,14 @@ local function action_state()
   return require("telescope.actions.state")
 end
 
+local function entry_display()
+  return require("telescope.pickers.entry_display")
+end
+
+local function make_entry()
+  return require("telescope.make_entry")
+end
+
 local function normalize_path(path)
   if vim.fs and vim.fs.normalize then
     return vim.fs.normalize(path)
@@ -373,6 +381,117 @@ end
 function M.zoxide(opts)
   opts = opts or {}
   require("telescope").extensions.zoxide.list(opts)
+end
+
+local function git_log(...)
+  return vim.list_extend({ "git", "log", "--pretty=oneline", "--abbrev-commit" }, { ... })
+end
+
+-- "--source" writes "<sha>\t<ref> <subject>", and telescope's own maker splits
+-- on the first space, which leaves the ref glued to the sha. The branch is in
+-- the ordinal too, so typing a branch name filters the list.
+local function commit_entry_maker(show_branch)
+  local items = { { width = 8 } }
+  if show_branch then
+    table.insert(items, { width = 18 })
+  end
+  table.insert(items, { remaining = true })
+  local displayer = entry_display().create({ separator = " ", items = items })
+
+  return function(line)
+    if line == "" then
+      return nil
+    end
+
+    local sha, ref, subject = line:match("^(%S+)\t(%S+) (.*)$")
+    if not sha then
+      sha, subject = line:match("^(%S+) (.*)$")
+    end
+    sha, subject = sha or line, subject or "<empty commit message>"
+    local branch = (ref or ""):gsub("^refs/heads/", ""):gsub("^refs/remotes/", "")
+
+    return make_entry().set_default_entry_mt({
+      value = sha,
+      ordinal = show_branch and table.concat({ sha, branch, subject }, " ") or (sha .. " " .. subject),
+      display = function()
+        local columns = { { sha, "TelescopeResultsIdentifier" } }
+        if show_branch then
+          table.insert(columns, { branch, "TelescopeResultsComment" })
+        end
+        table.insert(columns, subject)
+        return displayer(columns)
+      end,
+    }, {})
+  end
+end
+
+-- git_commits over a prepared git log command. Telescope runs the builtin's
+-- attach_mappings before this one, so replacing select_default here overrides
+-- the builtin's checkout.
+local function pick_commit(command, title, on_select, on_working_tree)
+  builtin().git_commits({
+    git_command = command,
+    prompt_title = title,
+    entry_maker = commit_entry_maker(vim.list_contains(command, "--source")),
+    attach_mappings = function(prompt_bufnr, map)
+      actions().select_default:replace(function()
+        local entry = action_state().get_selected_entry()
+        actions().close(prompt_bufnr)
+        if not entry or not entry.value then
+          vim.notify("No commit selected", vim.log.levels.WARN)
+          return
+        end
+        vim.schedule(function()
+          on_select(entry.value)
+        end)
+      end)
+
+      if on_working_tree then
+        map({ "i", "n" }, "<C-e>", function()
+          actions().close(prompt_bufnr)
+          vim.schedule(on_working_tree)
+        end, { desc = "Use the working tree as the range end" })
+      end
+
+      return true
+    end,
+  })
+end
+
+-- Pick the range end, then the start, then diff the range. ".." offers only the
+-- end's ancestors, so the range cannot come out backwards. "..." offers every
+-- branch, because a merge-base diff differs from ".." only across branches.
+-- Only a log spanning branches can name a branch per commit, so the ancestor
+-- lists mark the tips with "--decorate" instead.
+-- A lone rev makes diffview diff the working tree against it, so the
+-- working-tree end needs no operator and no second endpoint.
+local function diff_range(operator)
+  local across_branches = operator == "..."
+  local function log_command(revspec)
+    if across_branches then
+      return git_log("--source", "--all")
+    end
+    return revspec and git_log("--decorate", revspec) or git_log("--decorate")
+  end
+
+  pick_commit(log_command(), "Range end (<C-e> working tree)", function(end_rev)
+    local title = string.format("Range start (end: %s)", end_rev)
+    pick_commit(log_command(end_rev), title, function(start_rev)
+      vim.cmd(string.format("DiffviewOpen %s%s%s", start_rev, operator, end_rev))
+    end)
+  end, function()
+    pick_commit(log_command(), "Diff working tree against", function(start_rev)
+      vim.cmd("DiffviewOpen " .. start_rev)
+    end)
+  end)
+end
+
+function M.diff_range()
+  diff_range("..")
+end
+
+function M.diff_range_merge_base()
+  diff_range("...")
 end
 
 return M
