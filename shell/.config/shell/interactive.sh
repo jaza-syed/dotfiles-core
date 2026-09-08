@@ -27,6 +27,7 @@ alias ls='eza --color=auto'
 alias code="/Applications/Visual\ Studio\ Code.app/Contents/MacOS/Code"
 alias g="git"
 alias n="nvim"
+alias typora="open -a Typora"
 
 # Notes shortcuts
 alias checklist="bat ~/drive-jaza/CHECKLIST.md"
