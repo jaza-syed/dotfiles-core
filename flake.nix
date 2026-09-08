@@ -94,12 +94,14 @@
       };
 
       darwinModules = {
+        atrun = ./nix/darwin/atrun.nix;
         defaults = ./nix/darwin/defaults.nix;
         homebrew = homebrewModule;
       };
 
       darwinConfigurations.base = nix-darwin.lib.darwinSystem {
         modules = [
+          ./nix/darwin/atrun.nix
           ./nix/darwin/defaults.nix
           homebrewModule
           baseDarwin

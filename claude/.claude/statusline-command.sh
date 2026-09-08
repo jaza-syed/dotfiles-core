@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
-# Claude Code status line: user@host  dir  branch | model | context, 5h and 7d usage bars with time to reset.
+# Claude Code status line, two rows: user@host, dir, branch and model on the first;
+# Ctx, 5h and 7d usage line2 with time to reset on the second.
 
 input=$(cat)
 
@@ -31,7 +32,7 @@ fi
 
 # bar <pct> <yellow-from> <red-above> -> coloured "███░░░░░░░ 31%"; fails if pct absent
 bar() {
-  local p=${1%%.*} t1=$2 t2=$3 colour cells="" i filled width=10
+  local p=${1%%.*} t1=$2 t2=$3 colour cells="" i filled width=6
   [[ $p =~ ^[0-9]+$ ]] || return 1
 
   if   ((p < t1));  then colour=$GREEN
@@ -64,15 +65,19 @@ eta() {
 seg() {
   local b t
   b=$(bar "$2" "$3" "$4") || return 0
-  out+=" ${DIM}|${RESET} ${DIM}${1}${RESET} ${b}"
-  if t=$(eta "${5--1}"); then out+=" ${DIM}·${t}${RESET}"; fi
+  [[ -n $line2 ]] && line2+="  ${DIM}|${RESET}  "
+  line2+="${DIM}${1}${RESET} ${b}"
+  if t=$(eta "${5--1}"); then line2+=" ${DIM}·${t}${RESET}"; fi
 }
 
-out="${BOLD}$(whoami)@$(hostname -s)${RESET}  ${BLUE}${cwd/#$HOME/~}${RESET}"
-[[ -n $git_branch ]] && out+="  ${PURPLE} ${git_branch}${RESET}"
-out+="  ${DIM}|${RESET}  ${MAGENTA}${model}${RESET}"
-seg Context "$ctx"   50 70
-seg 5h      "$five"  50 80 "$five_at"
-seg 7d      "$seven" 50 80 "$seven_at"
+line1="${BOLD}$(whoami)@$(hostname -s)${RESET}  ${BLUE}${cwd/#$HOME/~}${RESET}"
+[[ -n $git_branch ]] && line1+="  ${PURPLE} ${git_branch}${RESET}"
+line1+="  ${DIM}|${RESET}  ${MAGENTA}${model}${RESET}"
 
-printf '%s' "$out"
+line2=""
+seg Ctx "$ctx"   50 70
+seg 5h  "$five"  50 80 "$five_at"
+seg 7d  "$seven" 50 80 "$seven_at"
+
+printf '%s' "$line1"
+[[ -n $line2 ]] && printf '\n%s' "$line2"
