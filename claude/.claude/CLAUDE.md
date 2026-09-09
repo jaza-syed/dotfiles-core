@@ -44,24 +44,30 @@ This applies whether you ask in prose or through the AskUserQuestion tool. The s
 
 ## Running commands
 
+### Searching
+
 - You SHOULD use `rg` and `fd` over `grep` and `find`. You MUST pass `--color never` to `rg`.
 - You MUST NOT pass `-r` to `rg` out of `grep -r` habit. In `rg`, `-r` means `--replace`, so the args shift by one and you get an empty result that reads as "no matches", with no error. `rg` recurses by default, so drop the flag.
 - `fd` and `rg` both skip what git ignores, and `-H` only adds dotfiles, so `fd -H '^\.env'` hides an ignored `.env` and reads as "the file does not exist". You MUST pass `-I` to `fd` (`--no-ignore` to `rg`) when a gitignored file would change your answer, for example checking whether a `.env` exists next to a committed `.env-example`.
-- The shell has `pipefail` on, so `git log | head -1` exits 141 when git dies of SIGPIPE. Use `| tail` or pipe `rg`, `fd` or `cat` to `head`. For builds and tests redirect to a log in the scratchpad directory and check the exit code before reading the log: `cmd > "$log" 2>&1; echo "exit=$?"; tail -20 "$log"`.
-- The log-and-exit-code rules below cover builds, tests and anything else with long output. You MUST NOT apply them to short commands such as `rg`, `fd`, `git status`, `git log` or `git diff`; run those plainly and read the output.
+
+### Choosing foreground or background
+
+- Short commands such as `rg`, `fd`, `git status`, `git log` or `git diff` run plainly in the foreground, and you read the output. You MUST NOT apply the log-and-exit-code rules below to them.
+- The shell has `pipefail` on, so `git log | head -1` exits 141 when git dies of SIGPIPE. Use `| tail` or pipe `rg`, `fd` or `cat` to `head`.
+- You MUST background a shell call you expect to run for over 10 seconds, using `run_in_background` rather than a trailing `&`. Backgrounding also keeps the output out of context until you ask for it. You SHOULD run anything shorter in the foreground, so its output arrives in one call.
+- Put scratch files and logs in the scratchpad directory from the system prompt. `$TMPDIR` differs by context (sandboxed commands get `/tmp/claude-*`, unsandboxed commands get the macOS `/var/folders/...` path, and `nix develop` sets a fresh `/tmp/nix-shell.*` per invocation), so you MUST NOT reuse a `$TMPDIR` path across commands.
+
+### Foreground commands with long output
+
+- For builds, tests and anything else with long output, redirect to a log in the scratchpad directory and check the exit code before reading the log: `cmd > "$log" 2>&1; echo "exit=$?"; tail -20 "$log"`.
 - A foreground command MUST redirect rather than pipe through `tee`. On a non-zero exit the harness puts about 30,000 characters into context, taken from the start of the stream, so `tee` on a failing build spends that budget on the start of the log and drops the end. On a zero exit large output is persisted to a file with a 2KB preview, so it is cheap either way.
+
+### Background commands
+
 - A backgrounded command MUST pipe through `tee` so its log can be polled while it runs: `cmd 2>&1 | tee "$log"; echo "exit=$?"`. `pipefail` makes `$?` the command's own status rather than tee's. Reading the command's status directly, with `${pipestatus[1]}` in zsh or `${PIPESTATUS[0]}` in bash, avoids depending on `pipefail`.
 - The pipeline MUST end at `tee`. A filter after it, e.g. `| tee "$log" | tail`, buffers until the command exits, so nothing streams live. Trim the log in a follow-up command instead.
-- Detect hangs by monitoring the log: with the command backgrounded and piping to `tee "$log"`, poll the log, and if it stops growing for much longer than the phase normally takes, kill the command and diagnose. When a test harness's default timeout is long, you SHOULD also pass a short explicit timeout (e.g. `playwright test --timeout=180000`) so a hang fails loudly with artifacts.
-- Put scratch files in the scratchpad directory from the system prompt. `$TMPDIR` differs by context (sandboxed commands get `/tmp/claude-*`, unsandboxed commands get the macOS `/var/folders/...` path, and `nix develop` sets a fresh `/tmp/nix-shell.*` per invocation), so you MUST NOT reuse a `$TMPDIR` path across commands.
-- You MUST background a shell call you expect to run for over 10 seconds, using `run_in_background` rather than a trailing `&`.
-  Backgrounding also keeps the output out of context until you ask for it.
-  You SHOULD run anything shorter in the foreground, so its output arrives in one call.
-- Long-running commands are the ones that need watching.
-  Monitor the log as it grows and terminate early to avoid wasting time.
-- You MUST NOT `sleep` to wait for a backgrounded command.
-  A task-completion notification arrives on its own, so read the log when it does.
-  Poll before then only to check whether a log has stopped growing, which is how you detect a hang.
+- You MUST NOT `sleep` to wait for a backgrounded command. A task-completion notification arrives on its own, so read the log when it does.
+- Poll the log before then only to detect a hang. If the log stops growing for much longer than the phase normally takes, kill the command and diagnose. When a test harness's default timeout is long, you SHOULD also pass a short explicit timeout (e.g. `playwright test --timeout=180000`) so a hang fails loudly with artifacts.
 
 ## Machine-specific instructions
 
