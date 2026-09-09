@@ -114,10 +114,10 @@ runners are free on a public repo if evaluation ever misses breakage.
 Renovate's GitHub App keeps `flake.lock` and the workflow pins current here
 and in `../dotfiles-m1`, and automerges only on green CI. There is no branch
 protection, because it would block direct pushes to main and Renovate waits
-for green checks anyway. `lazy-lock.json` updates through the weekly
+for green checks anyway. `nvim-pack-lock.json` updates through the weekly
 `.github/workflows/nvim-lock-update.yml` instead, which runs the config's own
-`nvim --headless "+Lazy! update"` and opens a PR scoped to the lock, so no
-plugin-name-to-repo mapping table has to be maintained. There are no release
+`vim.pack.update(nil, { force = true })` headless and opens a PR scoped to the
+lock, so no plugin-name-to-repo mapping table has to be maintained. There are no release
 tags: the machine repos track this repo's main branch, so a core change
 reaches a machine after a push plus that machine's next lock refresh, or
 immediately with `nix flake update dotfiles` there. `gen-m5`'s updater and CI
@@ -348,8 +348,9 @@ filetype-local policy, and a custom Alabaster colors/highlighting system:
 ```text
 nvim/.config/nvim/
 ├── init.vim                  # Vimscript shim into Lua startup
+├── nvim-pack-lock.json       # vim.pack revisions, written back through its link
 ├── lua/
-│   ├── init.lua              # lazy.nvim bootstrap, plugins, editor setup
+│   ├── init.lua              # vim.pack plugin list, plugin setup, editor setup
 │   ├── settings.lua          # reloadable settings entry point
 │   ├── config/
 │   │   ├── editor.lua        # LSP/lint/completion orchestration
@@ -374,12 +375,18 @@ nvim/.config/nvim/
     └── queries/*/            # Treesitter query extensions
 ```
 
-`init.vim` loads `lua/init.lua`. Startup bootstraps lazy.nvim, registers plugin
-specs, configures integrations through `config.editor`, and loads
-`settings.lua`. `config.reload` holds the one ordered lifecycle registry:
+`init.vim` loads `lua/init.lua`. Startup adds the plugins with `vim.pack.add`,
+calls each plugin's own setup, configures integrations through `config.editor`,
+and loads `settings.lua`. Plugins load eagerly, since a UI startup opening a
+file measures 245-253 ms against 220-287 ms under lazy.nvim's triggers, and
+`vim.loader.enable()` supplies the byte-compiled module cache lazy.nvim carried
+itself; without it the same config takes 140-250 ms headless instead of 82-85
+ms. Conjure is the exception: `:ConjureStart` runs its `vim.pack.add`, because
+a plugin added during startup has its `plugin/` files sourced by Nvim's own
+end-of-startup pass whatever `load` says. `config.reload` holds the one ordered lifecycle registry:
 `config.editor` and `settings.lua` derive their setup sequences from it, and
 `<leader>cr` derives invalidation from it, runs teardown hooks, re-runs editor
-integrations, and reloads settings. Plugin specs and lazy.nvim bootstrap are
+integrations, and reloads settings. The plugin list and its setup calls are
 intentionally outside the reload boundary. Dropbar configuration lives in
 `config.dropbar` and is restart-only, though it re-requires `config.projects`
 and `config.machine` at call time so path policy follows a reload.

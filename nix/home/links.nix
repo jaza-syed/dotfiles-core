@@ -49,13 +49,13 @@ in
 
   xdg.configFile = {
     # Editors. Neovim owns ~/.config/nvim (it writes nvim.log there), so only
-    # the config entries are linked; lazy.nvim writes lazy-lock.json through
-    # its link into the repo.
+    # the config entries are linked; vim.pack writes nvim-pack-lock.json
+    # through its link into the repo.
     "nvim/init.vim".source = link "nvim/.config/nvim/init.vim";
     "nvim/lua".source = link "nvim/.config/nvim/lua";
     "nvim/after".source = link "nvim/.config/nvim/after";
     "nvim/colors".source = link "nvim/.config/nvim/colors";
-    "nvim/lazy-lock.json".source = link "nvim/.config/nvim/lazy-lock.json";
+    "nvim/nvim-pack-lock.json".source = link "nvim/.config/nvim/nvim-pack-lock.json";
     "vim".source = link "vim/.config/vim";
 
     # Terminal, prompt and jj. tmux and wezterm are whole-directory links, and

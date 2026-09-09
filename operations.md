@@ -41,7 +41,7 @@ home-manager switch --flake .#jsyed@gen-m5
 ```
 
 Renovate also opens weekly lock PRs on the GitHub repos, and a weekly Action
-(`nvim-lock-update.yml`) refreshes `lazy-lock.json`, so the machines keep
+(`nvim-lock-update.yml`) refreshes `nvim-pack-lock.json`, so the machines keep
 moving without manual relocks.
 
 To test uncommitted core changes before pushing, override the machine repo's

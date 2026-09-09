@@ -123,9 +123,9 @@ publishing anything.
   and unusable by anyone else.
 - Publish to `github.com/jaza-syed/review.nvim` so it sits with the core rather
   than on GitLab, and keep the GitLab remote as a mirror or retire it.
-- Switch the core's plugin spec from the local `dir`/`enabled` pair to a plain
-  `"jaza-syed/review.nvim"` GitHub spec, add it to `lazy-lock.json`, and drop
-  the "optional, enabled when a local checkout exists" wording from README and
+- Switch the core from the local checkout it appends to the runtimepath to a
+  `vim.pack` entry for the GitHub source, so it enters `nvim-pack-lock.json`,
+  and drop the "optional, enabled when a local checkout exists" wording from README and
   AGENTS.md. The `workspace.mani` argument keeps coming from the machine
   module, so the plugin still no-ops on a machine with no managed workspace.
 - Write a README for a reader who is not the author: what it does, the GitLab
@@ -147,7 +147,7 @@ The test for each file, in order:
 
 - Does the app write the file? Then the link must stay out-of-store, or the
   file must be copied rather than linked. Known cases:
-  `nvim/.config/nvim/lazy-lock.json` (lazy.nvim writes it back into the
+  `nvim/.config/nvim/nvim-pack-lock.json` (vim.pack writes it back into the
   repo), `~/.claude` and `~/.pi` (the agents write there), and Claude's
   `settings.json`, which is already copied rather than linked because the
   atomic rename replaces a symlink with a regular file.
