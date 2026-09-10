@@ -1,3 +1,10 @@
+# Bash also sources this file for the non-interactive shells sshd starts, where
+# stty and bind have no terminal to act on.
+case $- in
+    *i*) ;;
+    *) return ;;
+esac
+
 [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
 
 # Homebrew, nixpkgs or system bash-completion, plus dotfiles-generated CLI completions.

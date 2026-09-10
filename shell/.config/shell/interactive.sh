@@ -15,8 +15,10 @@ fi
 set -o pipefail
 
 # Unmap C-s and C-q (freeze and unfreeze terminal)
-stty stop undef
-stty start undef
+if [ -t 0 ]; then
+    stty stop undef
+    stty start undef
+fi
 
 # --- Aliases ---
 
