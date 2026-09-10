@@ -30,7 +30,7 @@ When you stop part-way through a sequence of actions because you need a decision
 terminal-notifier -title "Claude Code" -message "<the decision you need>"
 ```
 
-This applies whether you ask in prose or through the AskUserQuestion tool.
+This applies whether you ask in prose or through the AskUserQuestion tool. `terminal-notifier` exists only on the Macs, so skip the notification where the command is absent.
 
 ## Writing comments
 

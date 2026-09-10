@@ -25,7 +25,7 @@ in
     # Colored underlines in Neovim inside tmux need this user terminfo entry.
     tmuxTerminfo = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       if [ ! -e "$HOME/.terminfo/74/tmux-256color" ] && [ ! -e "$HOME/.terminfo/t/tmux-256color" ]; then
-        run /usr/bin/tic -x "${repo}/terminfo/tmux-256color.ti"
+        run ${pkgs.ncurses}/bin/tic -x "${repo}/terminfo/tmux-256color.ti"
       fi
     '';
 

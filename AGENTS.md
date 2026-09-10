@@ -15,6 +15,8 @@ are translated into modules under `nix/home/` and do need a switch to change.
 
 **Generated theme artifacts are not committed**: Files produced by `./scripts/generate_colorscheme.sh` are local build artifacts and are gitignored. Do not edit or commit them; edit `palettes/*.lua` and the manual theme logic instead. Generate them on a fresh clone; the links to them may dangle until then.
 
+**A host can link from the store instead of a checkout**: `packages.<system>.sourceWithThemes` is this repo's source with the generated theme artifacts built in, so a host that sets `dotfiles.repoDir` to that store path needs no clone. Editing any linked file then means bumping the input rather than saving the file, and `nvim-pack-lock.json` becomes read-only, so `vim.pack` cannot record plugin updates there. The DGX in `generative/pocs/home-manager` uses it; both Macs keep their checkouts.
+
 **Avoid app-generated files leaking into the repo**: App-owned directories like `~/Library/Application Support/...` or `~/.claude` get file links inside a real directory, never a link to the whole directory. Otherwise files the app later writes there would show up as untracked files inside this repo. `nix/home/links.nix` follows this rule; keep following it when adding links.
 
 Machine-specific committed config lives in the machine repos `../dotfiles-m1`
@@ -56,9 +58,14 @@ Package ownership is deliberate:
 
 - `gh`, `1password`, and `1password-cli` are in the shared darwin module so
   the phase 1 base switch installs them before phase 2 authenticates.
-- Global tools and toolchains belong to Home Manager (`nix/home/tools.nix`),
-  including mise, which stays project-local in use: there is no global mise
-  config.
+- Global tools belong to Home Manager (`nix/home/tools.nix`), including mise,
+  which stays project-local in use: there is no global mise config. That module
+  holds the base set only, meaning what the linked config needs plus the daily
+  CLI. Language toolchains, documents, media and infra CLIs are declared by each
+  machine repo, so a machine can carry a smaller set.
+- `interactive.sh` initializes mise, fzf, starship, zoxide and atuin
+  unconditionally, so removing any of them from the base set breaks every
+  interactive shell.
 - Common applications, including Discord and Zulip, belong only to the shared
   darwin module; machine repos declare only machine-specific additions.
 
@@ -156,6 +163,12 @@ ordinary primitives (functions, overlays, modules).
 - Home Manager feature modules stay platform-neutral where reasonable and
   must work under nix-darwin, NixOS, and standalone Home Manager. The work
   machine uses the standalone mode.
+- `homeModules.default` evaluates on Linux as well as macOS. The macOS-only
+  links and packages, meaning aerospace, sketchybar, hammerspoon, Typora,
+  wezterm, `terminal-notifier` and `jankyborders`, are in
+  `homeModules.darwin`, which each Mac host file imports. The split is stated
+  by the machine repo rather than derived from `stdenv.isDarwin`, so a Linux
+  host that wants one of these can import it.
 - The machine repos own machine facts: username, home directory, hostname,
   and profile choices. No module here may hard-code `jsyed` or a home path,
   except the base bootstrap outputs in `flake.nix`, which hard-code the
@@ -173,7 +186,8 @@ ordinary primitives (functions, overlays, modules).
 ## Repository layout
 
 The top-level directories mirror paths below `$HOME` and are linked
-out-of-store by `nix/home/links.nix`:
+out-of-store by `nix/home/links.nix`, except the macOS-only ones, which
+`nix/home/darwin.nix` links:
 
 | Package | Contents |
 |---|---|

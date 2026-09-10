@@ -6,7 +6,9 @@ export EDITOR=nvim
 export HOMEBREW_NO_AUTO_UPDATE=1
 
 # Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 # Home Manager profile ahead of Homebrew and system paths
 export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"

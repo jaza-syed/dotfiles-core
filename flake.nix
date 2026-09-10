@@ -21,6 +21,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       home-manager,
       nix-darwin,
@@ -29,10 +30,17 @@
       ...
     }:
     let
+      forAllSystems =
+        f:
+        nixpkgs.lib.genAttrs [ "aarch64-darwin" "aarch64-linux" "x86_64-linux" ] (
+          system: f nixpkgs.legacyPackages.${system}
+        );
       # Pinned dependencies enter through flake inputs at the entry point only.
-      direnvInstantModule = {
-        home.packages = [ direnv-instant.packages.aarch64-darwin.default ];
-      };
+      direnvInstantModule =
+        { pkgs, ... }:
+        {
+          home.packages = [ direnv-instant.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+        };
       sharedHomeModules = [
         ./nix/home/activation.nix
         ./nix/home/cli.nix
@@ -79,12 +87,28 @@
       };
     in
     {
+      packages = forAllSystems (pkgs: {
+        # The repo source with the generated theme artifacts built in, for
+        # hosts that set dotfiles.repoDir to a store path instead of a
+        # checkout. scripts/generate_colorscheme.sh keeps producing them in a
+        # checkout, where editing a palette needs no switch.
+        sourceWithThemes =
+          pkgs.runCommand "dotfiles-source-with-themes" { nativeBuildInputs = [ pkgs.lua5_4 ]; }
+            ''
+              cp -r ${self} $out
+              chmod -R u+w $out
+              cd $out
+              lua palettes/generate.lua
+            '';
+      });
+
       homeModules = {
         default = {
           imports = sharedHomeModules;
         };
         activation = ./nix/home/activation.nix;
         cli = ./nix/home/cli.nix;
+        darwin = ./nix/home/darwin.nix;
         git = ./nix/home/git.nix;
         links = ./nix/home/links.nix;
         ssh = ./nix/home/ssh.nix;
@@ -110,7 +134,10 @@
 
       homeConfigurations.base = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-        modules = sharedHomeModules ++ [ baseHome ];
+        modules = sharedHomeModules ++ [
+          ./nix/home/darwin.nix
+          baseHome
+        ];
       };
     };
 }

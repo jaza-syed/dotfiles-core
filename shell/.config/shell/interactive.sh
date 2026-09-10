@@ -24,14 +24,8 @@ alias l='eza'
 alias la='eza -a'
 alias ll='eza -lah'
 alias ls='eza --color=auto'
-alias code="/Applications/Visual\ Studio\ Code.app/Contents/MacOS/Code"
 alias g="git"
 alias n="nvim"
-alias typora="open -a Typora"
-
-# Notes shortcuts
-alias checklist="bat ~/drive-jaza/CHECKLIST.md"
-alias status="nvim + ~/drive-jaza/STATUS.md"
 
 # Python project checks (ruff + mypy + uv lock consistency)
 alias pycheck='ruff check . && mypy && uv lock --check'
@@ -41,7 +35,6 @@ alias pycheck='ruff check . && mypy && uv lock --check'
 export NTS1_URL="https://stream-relay-geo.ntslive.net/stream"
 export NTS2_URL="https://stream-relay-geo.ntslive.net/stream2"
 export BBCR3_URL="http://lstn.lv/bbcradio.m3u8?station=bbc_radio_three&bitrate=96000"
-export VLC_APP=/Applications/VLC.app/Contents/MacOS/VLC
 export EZA_COLORS="di=1:da=0"
 
 # Colorized less/man
