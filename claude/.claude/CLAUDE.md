@@ -22,7 +22,7 @@ Generating code costs you nothing, so you have a natural bias towards over-engin
 
 The Plain Language output style defines the rules for prose a person may read. If your system prompt has no Output Style section and you are about to write such prose, e.g. a document, commit message, comment, or a CLAUDE.md, skill or memory file, you MUST first read and follow `~/.claude/output-styles/plain-language.md`.
 
-When you write instructions for a subagent, they MUST tell the subagent to follow the current output style.
+When you write instructions for a subagent, they MUST tell the subagent that the current output style is Plain Language, defined in `~/.claude/output-styles/plain-language.md`, and that it MUST read and follow that file. If the subagent will write code, the instructions MUST also tell it to read and follow `~/.claude/writing-comments.md`.
 
 When you stop part-way through a sequence of actions because you need a decision or a go-ahead from me before you can continue, you MUST also send a desktop notification saying what you need:
 
@@ -30,17 +30,11 @@ When you stop part-way through a sequence of actions because you need a decision
 terminal-notifier -title "Claude Code" -message "<the decision you need>"
 ```
 
-This applies whether you ask in prose or through the AskUserQuestion tool. The sandbox blocks the notification centre and the command hangs there rather than failing, so you MUST run it with the sandbox disabled.
+This applies whether you ask in prose or through the AskUserQuestion tool.
 
 ## Writing comments
 
-- Comments and docstrings are for human readers to understand the current state of the codebase. A comment or docstring MUST contain only context that cannot be easily inferred from the code and that is useful to a human reader.
-- You MUST follow the current output style when writing a comment or docstring, since both are prose a person may read.
-- You MUST NOT write new comments or docstrings longer than one sentence. They SHOULD be shorter than one line of code.
-- You MAY edit existing comments or docstrings longer than one sentence.
-- You MUST NOT write comments or docstrings that detail your own reasoning or justify design choices, for example why a shared variable means something "can't drift".
-- You MUST NOT write comments or docstrings that refer to things only relevant to the session history, for example why we use a given approach instead of an earlier one, or notes to yourself about remaining steps.
-- Reasoning, justifications and notes to yourself belong in your chain of thought.
+@~/.claude/writing-comments.md
 
 ## Running commands
 

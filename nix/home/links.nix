@@ -21,6 +21,7 @@ in
     # Claude Code writes into ~/.claude, so only these entries are linked.
     # settings.json and machine.md come from the machine repo.
     ".claude/CLAUDE.md".source = link "claude/.claude/CLAUDE.md";
+    ".claude/writing-comments.md".source = link "claude/.claude/writing-comments.md";
     ".claude/commands".source = link "claude/.claude/commands";
     ".claude/hooks".source = link "claude/.claude/hooks";
     ".claude/output-styles".source = link "claude/.claude/output-styles";

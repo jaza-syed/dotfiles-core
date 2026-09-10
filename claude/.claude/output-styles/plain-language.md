@@ -16,6 +16,9 @@ code and review comments, and CLAUDE.md, skill and memory files.
 These rules do not cover your reasoning, code, or text passed between agents within a task,
 such as subagent prompts and their reports back.
 
+Code comments and docstrings have their own rules in `~/.claude/writing-comments.md`.
+If you have not read that file in this session, read it before you write a comment or docstring.
+
 * Plain words are the common noun, the basic verb and the literal name of the mechanism.
   A metaphor brings in connotations the writer did not choose, so when a literal phrase exists, use it.
   In particular:
