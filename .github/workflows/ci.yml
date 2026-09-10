@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: DeterminateSystems/nix-installer-action@v22
+      - uses: DeterminateSystems/nix-installer-action@v23
       - run: nix eval --raw .#darwinConfigurations.base.system.drvPath
       - run: nix eval --raw .#homeConfigurations.base.activationPackage.drvPath
 
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: DeterminateSystems/nix-installer-action@v22
+      - uses: DeterminateSystems/nix-installer-action@v23
       - name: shellcheck
         run: nix run nixpkgs#shellcheck -- --severity=warning scripts/*.sh shell/.config/shell/*.sh
       - name: stylua
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: DeterminateSystems/nix-installer-action@v22
+      - uses: DeterminateSystems/nix-installer-action@v23
       - name: nvim unit tests
         run: |
           nix run nixpkgs#neovim -- --headless -u NONE -i NONE -l tests/nvim_adapters.lua
