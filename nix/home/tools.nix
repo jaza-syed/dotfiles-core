@@ -6,8 +6,8 @@
     # Sixel support, which the Homebrew tmux lacks.
     (pkgs.tmux.override { withSixel = true; })
 
-    # Nix ecosystem
-    pkgs.cachix
+    # Nix ecosystem. cachix is not here, because the work home-manager modules
+    # ship a wrapper of that name and two would collide in one profile.
     pkgs.nix-direnv
     pkgs.nixd
     pkgs.treefmt
