@@ -49,6 +49,9 @@ If you have not read that file in this session, read it before you write a comme
   * You SHOULD cut phrases that delay the point
     e.g. "at the end of the day", "when it comes to", "at its core",
     "in terms of", "in order to", "going forward".
+  * The present tense already states the current state,
+    so you MUST NOT add "today", "currently", "at the moment", "for now" or "as of now" to it.
+    If a change is planned, state the change and its date.
 * Sentences are complete and connected. In particular:
   * Every statement MUST have a subject and a finite verb,
     so "There is no RFC verb on it" rather than "No RFC verb on it",
