@@ -92,6 +92,7 @@ vim.pack.add({
   gh("Bekaboo/dropbar.nvim"),
   gh("stevearc/aerial.nvim"),
   gh("stevearc/quicker.nvim"),
+  gh("folke/trouble.nvim"),
 
   -- Git integration
   gh("lewis6991/gitsigns.nvim"),
@@ -231,7 +232,7 @@ clue.setup({
     { mode = "n", keys = "<Leader>d", desc = "+debug" },
     { mode = "n", keys = "<Leader>n", desc = "+test" },
     { mode = "n", keys = "<Leader>g", desc = "+git" },
-    { mode = "n", keys = "<Leader>q", desc = "+quickfix" },
+    { mode = "n", keys = "<Leader>x", desc = "+trouble" },
     -- review.nvim registers its own <Leader>r groups.
     { mode = "n", keys = "<Leader>h", desc = "+hunks" },
     { mode = "n", keys = "<Leader>w", desc = "+window" },
@@ -295,12 +296,9 @@ require("aerial").setup({
 })
 
 require("quicker").setup({})
-vim.keymap.set("n", "<leader>qq", function()
-  require("quicker").toggle()
-end, { desc = "Toggle quickfix" })
-vim.keymap.set("n", "<leader>ql", function()
-  require("quicker").toggle({ loclist = true })
-end, { desc = "Toggle location list" })
+require("trouble").setup({})
+vim.keymap.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { desc = "Toggle quickfix" })
+vim.keymap.set("n", "<leader>xl", "<cmd>Trouble loclist toggle<cr>", { desc = "Toggle location list" })
 
 require("gitsigns").setup({
   signs = {
