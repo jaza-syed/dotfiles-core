@@ -30,6 +30,14 @@ function M.abbrev_path_symbols(buf, symbols)
   return symbols
 end
 
+-- conform formatter names for a buffer, or nil to use the filetype's.
+function M.formatters(bufnr)
+  if machine.formatters then
+    return machine.formatters(bufnr)
+  end
+  return nil
+end
+
 -- Dropbar title for a cwd, or nil to fall back to the absolute path.
 function M.project_title(cwd)
   if machine.project_title then

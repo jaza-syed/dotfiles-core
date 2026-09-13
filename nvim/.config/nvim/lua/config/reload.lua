@@ -11,6 +11,7 @@ M.registry = {
   { module = "config.lsp", kind = "editor" },
   { module = "config.lsp.global_symbols", kind = "helper" },
   { module = "config.lint", kind = "editor" },
+  { module = "config.format", kind = "editor" },
   { module = "config.completion", kind = "editor" },
   { module = "config.signature", kind = "editor" },
   { module = "config.pickers", kind = "helper" },

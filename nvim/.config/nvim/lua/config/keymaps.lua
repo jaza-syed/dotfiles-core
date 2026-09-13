@@ -278,6 +278,15 @@ function M.setup()
   map_lsp_jump("t", vim.lsp.buf.type_definition, "Goto type definition")
   vim.keymap.set("n", "<leader>lf", vim.diagnostic.setloclist, { desc = "File diagnostics to loclist" })
   vim.keymap.set("n", "<leader>lQ", vim.diagnostic.setqflist, { desc = "All diagnostics to quickfix" })
+  vim.keymap.set("n", "<leader>lF", function()
+    require("config.format").format()
+  end, { desc = "Format buffer" })
+
+  -- Tasks
+  vim.keymap.set("n", "<leader>kr", "<cmd>OverseerRun<cr>", { desc = "Run a task" })
+  vim.keymap.set("n", "<leader>kt", "<cmd>OverseerToggle<cr>", { desc = "Toggle the task list" })
+  vim.keymap.set("n", "<leader>ka", "<cmd>OverseerTaskAction<cr>", { desc = "Act on a task" })
+  vim.keymap.set("n", "<leader>kq", "<cmd>OverseerQuickAction<cr>", { desc = "Quick action on the last task" })
 
   -- Telescope shortcuts
   local pickers = require("config.pickers")

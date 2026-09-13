@@ -81,6 +81,7 @@ vim.pack.add({
   gh("nvim-mini/mini.ai"),
   gh("nvim-mini/mini.operators"),
   gh("nvim-mini/mini.clue"),
+  gh("nvim-mini/mini.bracketed"),
   gh("windwp/nvim-autopairs"),
   gh("tpope/vim-repeat"), -- Repeat plugin commands
   { src = gh("smoka7/hop.nvim"), version = vim.version.range("*") },
@@ -93,6 +94,7 @@ vim.pack.add({
   gh("stevearc/aerial.nvim"),
   gh("stevearc/quicker.nvim"),
   gh("folke/trouble.nvim"),
+  gh("stevearc/overseer.nvim"),
 
   -- Git integration
   gh("lewis6991/gitsigns.nvim"),
@@ -118,6 +120,7 @@ vim.pack.add({
   -- Treesitter
   { src = gh("nvim-treesitter/nvim-treesitter"), version = "main" },
   { src = gh("nvim-treesitter/nvim-treesitter-textobjects"), version = "main" },
+  gh("nvim-treesitter/nvim-treesitter-context"),
 
   -- Display
   gh("rickhowe/wrapwidth"),
@@ -133,6 +136,7 @@ vim.pack.add({
   gh("hrsh7th/nvim-cmp"),
   gh("hrsh7th/cmp-nvim-lsp"),
   gh("mfussenegger/nvim-lint"),
+  gh("stevearc/conform.nvim"),
 
   -- Debugging
   gh("mfussenegger/nvim-dap"),
@@ -203,6 +207,7 @@ require("mini.splitjoin").setup({})
 require("mini.align").setup({})
 require("mini.ai").setup({})
 require("mini.operators").setup({})
+require("mini.bracketed").setup({})
 
 local clue = require("mini.clue")
 clue.setup({
@@ -232,10 +237,11 @@ clue.setup({
     { mode = "n", keys = "<Leader>d", desc = "+debug" },
     { mode = "n", keys = "<Leader>n", desc = "+test" },
     { mode = "n", keys = "<Leader>g", desc = "+git" },
-    { mode = "n", keys = "<Leader>x", desc = "+trouble" },
     -- review.nvim registers its own <Leader>r groups.
     { mode = "n", keys = "<Leader>h", desc = "+hunks" },
     { mode = "n", keys = "<Leader>w", desc = "+window" },
+    { mode = "n", keys = "<Leader>q", desc = "+quickfix" },
+    { mode = "n", keys = "<Leader>k", desc = "+tasks" },
     { mode = "n", keys = "<Leader>t", desc = "+tab/theme" },
     { mode = "n", keys = "<Leader>c", desc = "+config/clear" },
     clue.gen_clues.builtin_completion(),
@@ -297,8 +303,67 @@ require("aerial").setup({
 
 require("quicker").setup({})
 require("trouble").setup({})
-vim.keymap.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { desc = "Toggle quickfix" })
-vim.keymap.set("n", "<leader>xl", "<cmd>Trouble loclist toggle<cr>", { desc = "Toggle location list" })
+require("overseer").setup({})
+require("treesitter-context").setup({})
+
+-- A native list window opened by the toggle must not be replaced again.
+local opening_native_list = false
+
+-- Switches a list window between its native form and Trouble, keeping the
+-- height and the focus.
+local function switch_list_window(win)
+  local height = vim.api.nvim_win_get_height(win)
+
+  if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "trouble" then
+    local trouble = require("trouble")
+    local loclist = trouble.is_open("loclist")
+
+    trouble.close()
+    opening_native_list = true
+    vim.cmd(string.format("botright %s %d", loclist and "lopen" or "copen", height))
+    opening_native_list = false
+    return
+  end
+
+  local loclist = vim.fn.getwininfo(win)[1].loclist == 1
+
+  vim.api.nvim_win_close(win, true)
+  require("trouble").open({
+    mode = loclist and "loclist" or "qflist",
+    focus = true,
+    win = { size = { height = height } },
+  })
+end
+
+local list_group = vim.api.nvim_create_augroup("dotfiles_trouble_list", { clear = true })
+
+-- Quickfix and location lists open in Trouble by default.
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = list_group,
+  callback = function(ev)
+    if opening_native_list or vim.bo[ev.buf].buftype ~= "quickfix" then
+      return
+    end
+
+    local win = vim.fn.bufwinid(ev.buf)
+
+    vim.schedule(function()
+      if vim.api.nvim_win_is_valid(win) then
+        switch_list_window(win)
+      end
+    end)
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = list_group,
+  pattern = { "qf", "trouble" },
+  callback = function(ev)
+    vim.keymap.set("n", "<C-t>", function()
+      switch_list_window(vim.api.nvim_get_current_win())
+    end, { buffer = ev.buf, desc = "Switch between Trouble and the native list" })
+  end,
+})
 
 require("gitsigns").setup({
   signs = {
