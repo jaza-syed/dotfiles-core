@@ -1,3 +1,7 @@
+# The following lines were added by Docker Desktop to add commands to your PATH.
+export PATH="$PATH:/Users/jsyed/.docker/bin"
+# End of Docker Desktop section.
+
 # path_helper in /etc/zprofile demotes the PATH set by env.sh, so restore the
 # Home Manager profile and Homebrew to the front without a second brew
 # shellenv eval.

@@ -215,6 +215,7 @@ function M.setup()
 
   -- Files
   vim.keymap.set("n", "<leader>-", M.open_mini_files, { desc = "Open mini.files" })
+  vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle reveal<cr>", { desc = "Toggle file tree" })
 
   -- Quickfix
   vim.keymap.set("n", "<leader>qj", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
@@ -244,6 +245,7 @@ function M.setup()
   vim.keymap.set("n", "<leader>;", function()
     require("dropbar.api").pick()
   end, { desc = "Pick symbols in winbar" })
+  vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle!<cr>", { desc = "Toggle symbol outline" })
   vim.keymap.set("n", "[;", function()
     require("dropbar.api").goto_context_start()
   end, { desc = "Go to start of current context" })
@@ -289,6 +291,7 @@ function M.setup()
   vim.keymap.set("n", "<leader>fh", pickers.command_history, { desc = "Command history" })
   vim.keymap.set("n", "<leader>fp", pickers.builtin, { desc = "Telescope pickers" })
   vim.keymap.set("n", "<leader>fS", pickers.workspace_symbols, { desc = "Live workspace symbols" })
+  vim.keymap.set("n", "<leader>fo", "<cmd>Telescope aerial<cr>", { desc = "Document symbols" })
   vim.keymap.set("n", "<leader>fc", pickers.commands, { desc = "Find Vim commands" })
   vim.keymap.set("n", "<leader>fz", pickers.zoxide, { desc = "Zoxide" })
   vim.keymap.set("n", "<leader>fG", pickers.global_symbols, { desc = "Live global symbols" })

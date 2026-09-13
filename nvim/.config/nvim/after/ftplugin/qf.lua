@@ -17,7 +17,7 @@ local function qf_open_in_picked_window()
     filter_rules = {
       include_current_win = false,
       bo = {
-        filetype = { "qf", "oil", "NvimTree", "neo-tree", "notify", "snacks_notif" },
+        filetype = { "qf", "oil", "aerial", "NvimTree", "neo-tree", "notify", "snacks_notif" },
         buftype = { "quickfix", "terminal", "nofile", "prompt" },
       },
     },

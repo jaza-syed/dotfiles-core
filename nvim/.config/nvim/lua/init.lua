@@ -90,6 +90,7 @@ vim.pack.add({
   gh("nvim-zh/colorful-winsep.nvim"),
   gh("andymass/vim-tradewinds"),
   gh("Bekaboo/dropbar.nvim"),
+  gh("stevearc/aerial.nvim"),
   gh("stevearc/quicker.nvim"),
 
   -- Git integration
@@ -122,6 +123,7 @@ vim.pack.add({
   gh("karb94/neoscroll.nvim"),
   gh("xiyaowong/virtcolumn.nvim"),
   gh("stevearc/oil.nvim"),
+  { src = gh("nvim-neo-tree/neo-tree.nvim"), version = vim.version.range("3") },
   gh("nvim-lualine/lualine.nvim"),
   gh("folke/zen-mode.nvim"),
 
@@ -244,6 +246,10 @@ clue.setup({
   },
   window = {
     delay = 500,
+    config = {
+      -- The default is a fixed 30 columns, which clips the longer descriptions.
+      width = "auto",
+    },
   },
 })
 
@@ -281,6 +287,12 @@ require("colorful-winsep").setup({
 })
 
 require("config.dropbar").setup()
+
+-- Opens on the right by default, opposite neo-tree's left, and prefers the
+-- treesitter backend over LSP.
+require("aerial").setup({
+  show_guides = true,
+})
 
 require("quicker").setup({})
 vim.keymap.set("n", "<leader>qq", function()
@@ -463,6 +475,7 @@ telescope.setup({
   },
 })
 
+telescope.load_extension("aerial")
 telescope.load_extension("fzf")
 telescope.load_extension("live_grep_args")
 telescope.load_extension("ui-select")
@@ -588,7 +601,7 @@ local function oil_select_in_picked_window()
     filter_rules = {
       include_current_win = false,
       bo = {
-        filetype = { "oil", "NvimTree", "neo-tree", "notify", "snacks_notif" },
+        filetype = { "oil", "aerial", "NvimTree", "neo-tree", "notify", "snacks_notif" },
         buftype = { "terminal", "quickfix", "nofile", "prompt" },
       },
     },
@@ -636,6 +649,23 @@ require("oil").setup({
   view_options = { show_hidden = true },
   win_options = {
     winbar = "%{v:lua.require('oil').get_current_dir()}",
+  },
+})
+
+require("neo-tree").setup({
+  close_if_last_window = true,
+  filesystem = {
+    -- Oil is the default file explorer, so neo-tree must not claim directory
+    -- buffers as well.
+    hijack_netrw_behavior = "disabled",
+    follow_current_file = { enabled = true },
+    filtered_items = { visible = true },
+  },
+  window = {
+    mappings = {
+      -- Matches Oil's <leader><CR>.
+      ["<leader><CR>"] = "open_with_window_picker",
+    },
   },
 })
 

@@ -14,12 +14,13 @@ MUST, MUST NOT, SHOULD, SHOULD NOT and MAY carry their RFC 2119 meanings.
 - A docstring MUST state what the thing is or does. It MUST NOT narrate how the code below does it and MUST NOT restate the name of the function or field. If the fact is visible on the next line or by grepping the name, write no docstring.
   - `Mint a fresh evaluation-set id.` on `new_evaluation_set_id()` becomes no docstring.
   - `` `**`, not `*`: these globs are minimatch, so `*` stops at a `/` and misses subgroups. `` above `matchRepositories: ["generative/functions/**"]` becomes no comment.
-- A docstring for a value, field, property or return MUST be a noun phrase whose head noun names the value. It MUST NOT be a clause headed by "where", "when", "whether", "what" or "how", and a relation MUST use the literal preposition rather than "about".
+- A docstring for a value, field, property or return MUST be a noun phrase whose head noun names the value. It MUST NOT be a clause headed by "where", "when", "what" or "how", and a relation MUST use the literal preposition rather than "about".
   - `Where the error is about` becomes `The location of the error in the inputs`.
   - `The shape of a stored view's body. Bump when the body stops being a bare JSON array.` becomes `The version of a stored view's body.`
 - You MUST state the fact and stop. You MUST NOT add a clause justifying the fact or describing what would go wrong otherwise, whether after a colon, after "so", or in parentheses, and you MUST NOT detail your own reasoning or design choices. Those belong in your chain of thought.
   - `Tests may pre-set either persistence with a mock before the lifespan runs, so each is decided on its own: pre-setting one neither leaves the other unset nor gets overwritten by building it.` becomes `Tests may pre-set either persistence with a mock before the lifespan runs`.
   - `` Excludes dead evaluations (an upstream failed, so they never sent) and any lacking a `requested_at`/`completed_at` stamp, so each returned entry has honest bounds. `` becomes `` Excludes dead evaluations and any lacking a `requested_at`/`completed_at` stamp. ``
+- A comment on defensive code SHOULD be the imperative naming the outcome the guard secures, e.g. `# Ensure nothing left on S3` on a shielded cleanup, rather than a description of the failure it prevents.
 - A comment on a test MUST state the condition the test relies on, not the internals that make it true. If an `assert` checks the condition, put the text in the assertion message instead.
 - You MUST NOT refer to the session history, e.g. why we use a given approach instead of an earlier one, or notes to yourself about remaining steps.
 

@@ -37,6 +37,9 @@ If you have not read that file in this session, read it before you write a comme
     You MUST NOT coin a verb-metaphor of your own
     e.g. "the key names no function", "the view keeps the arrays in the body".
     State the mechanism instead e.g. "the key does not include a function".
+  * You SHOULD state a claim with the domain's own verb and let the reader check it,
+    e.g. "`step` can't sleep" rather than "`step` cannot express 'do nothing for n seconds'".
+    Keep the formulation that proves the claim only where the reader is far from the thing it describes.
   * You MUST NOT use an idiom where a plain noun works.
     You MUST NOT use "load bearing", "seam", "smoking gun", "say the word", "earns its keep",
     "heavy lifting", "footgun", "sharp edge", "under the hood", "moving parts" or "a dial worth turning".
@@ -75,6 +78,9 @@ If you have not read that file in this session, read it before you write a comme
     You MUST NOT put a single point or a line of argument in a list.
   * You MUST NOT pad lists to round numbers
     e.g. forcing a tricolon, or adding a third weak bullet point to a list.
+  * A decision in a ticket or design document SHOULD be one sentence:
+    the decision, then the one reason that would change a reader's mind, joined with "as" or "because".
+    Cut the remaining reasons.
 * You MUST NOT editorialise.
   State the fact and stop, rather than adding your own evaluation of it.
   In particular:
