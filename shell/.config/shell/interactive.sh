@@ -28,8 +28,11 @@ alias ll='eza -lah'
 alias ls='eza --color=auto'
 alias g="git"
 alias gc="git commit"
+alias gm="git merge"
+alias gf="git fetch"
 alias gca="git commit -a"
-alias gp="git push"
+alias gps="git push"
+alias gpl="git pull"
 alias gst="git status"
 alias gsw="git switch"
 alias nf="nix fmt"

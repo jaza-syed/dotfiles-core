@@ -218,8 +218,10 @@ function M.apply(palette_name)
   local diff_span_blend = 0.38
 
   local diff_add_bg = blend_hex(c.green, c.bg, diff_line_blend)
+  local diff_add_span_bg = blend_hex(c.green, c.bg, diff_span_blend)
   -- Red carries more chroma than the green, so it blends lighter to match.
   local diff_delete_bg = blend_hex(c.red, c.bg, 0.14)
+  local diff_delete_span_bg = blend_hex(c.red, c.bg, 0.28)
   -- Cool hue for change: at these opacities wood desaturates into the delete
   -- rose. Blue reads stronger than the sage and rose, so it blends lighter.
   local diff_change_bg = blend_hex(c.blue, c.bg, 0.12)
@@ -768,8 +770,9 @@ function M.apply(palette_name)
   }
 
   -- Native diff paints lines unique to a buffer with DiffAdd in both panes, so
-  -- the left pane renders them as deletions. Changed lines exist on both sides
-  -- and keep the shared change colours. Filler stays pale on both.
+  -- the left pane renders them as deletions. A changed line exists on both
+  -- sides, so each pane paints it in that pane's own hue and the intra-line
+  -- span deepens the same hue. Filler stays pale on both.
   -- Diff viewers paint full-line backgrounds, which hide a background-based
   -- cursor line. Underline it instead.
   local diff_cursor_line = { underline = true, sp = c.gray }
@@ -777,10 +780,20 @@ function M.apply(palette_name)
   local diff_sides = {
     a = {
       DiffAdd = { bg = diff_delete_bg },
+      DiffChange = { bg = diff_delete_bg },
+      DiffviewDiffChange = { bg = diff_delete_bg },
+      DiffText = { bg = diff_delete_span_bg },
+      DiffviewDiffText = { bg = diff_delete_span_bg },
+      DiffviewDiffTextInline = { bg = diff_delete_span_bg },
       DiffDelete = { fg = diff_filler_fg },
       CursorLine = diff_cursor_line,
     },
     b = {
+      DiffChange = { bg = diff_add_bg },
+      DiffviewDiffChange = { bg = diff_add_bg },
+      DiffText = { bg = diff_add_span_bg },
+      DiffviewDiffText = { bg = diff_add_span_bg },
+      DiffviewDiffTextInline = { bg = diff_add_span_bg },
       DiffDelete = { fg = diff_filler_fg },
       CursorLine = diff_cursor_line,
     },

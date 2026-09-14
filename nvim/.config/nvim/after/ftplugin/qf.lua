@@ -1,12 +1,51 @@
 -- Quickfix buffer-local mapping for opening items in a picked window.
-local function qf_open_in_picked_window()
+local function qf_item_at_cursor()
   local qf_win = vim.api.nvim_get_current_win()
-  local qf_buf = vim.api.nvim_get_current_buf()
   local qf_line = vim.api.nvim_win_get_cursor(qf_win)[1]
   local wininfo = vim.fn.getwininfo(qf_win)[1] or {}
   local is_loclist = wininfo.loclist == 1
   local list = is_loclist and vim.fn.getloclist(0, { items = 0 }) or vim.fn.getqflist({ items = 0 })
-  local item = list.items and list.items[qf_line]
+
+  return qf_win, qf_line, is_loclist, list.items and list.items[qf_line]
+end
+
+local function qf_set_index(is_loclist, index)
+  if is_loclist then
+    vim.fn.setloclist(0, {}, "a", { idx = index })
+  else
+    vim.fn.setqflist({}, "a", { idx = index })
+  end
+end
+
+local function qf_open_review_thread(item)
+  local user_data = type(item.user_data) == "table" and item.user_data or {}
+  local review = package.loaded.review
+
+  return item.module == "review.nvim"
+    and review
+    and review.jump_quickfix_thread
+    and review.jump_quickfix_thread(user_data.session_id, user_data.thread_id)
+end
+
+local function qf_open_item()
+  local _, qf_line, is_loclist, item = qf_item_at_cursor()
+
+  if not item then
+    vim.notify("No quickfix item under cursor", vim.log.levels.WARN)
+    return
+  end
+
+  qf_set_index(is_loclist, qf_line)
+  if qf_open_review_thread(item) then
+    return
+  end
+
+  vim.cmd((is_loclist and "ll " or "cc ") .. qf_line)
+end
+
+local function qf_open_in_picked_window()
+  local qf_win, qf_line, is_loclist, item = qf_item_at_cursor()
+  local qf_buf = vim.api.nvim_get_current_buf()
 
   if not item then
     vim.notify("No quickfix item under cursor", vim.log.levels.WARN)
@@ -31,11 +70,7 @@ local function qf_open_in_picked_window()
     return
   end
 
-  if is_loclist then
-    vim.fn.setloclist(0, {}, "a", { idx = qf_line })
-  else
-    vim.fn.setqflist({}, "a", { idx = qf_line })
-  end
+  qf_set_index(is_loclist, qf_line)
 
   local bufnr = item.bufnr
   if (not bufnr or bufnr == 0) and item.filename and item.filename ~= "" then
@@ -49,6 +84,10 @@ local function qf_open_in_picked_window()
   local user_data = type(item.user_data) == "table" and item.user_data or {}
   local lnum = item.lnum and item.lnum > 0 and item.lnum or user_data.lnum or 1
   local col = item.col and item.col > 0 and item.col - 1 or 0
+
+  if qf_open_review_thread(item) then
+    return
+  end
 
   vim.bo[bufnr].buflisted = true
   vim.fn.bufload(bufnr)
@@ -68,7 +107,12 @@ local function qf_open_in_picked_window()
   end
 end
 
-vim.keymap.set("n", "<leader><CR>", qf_open_in_picked_window, {
+vim.keymap.set("n", "<CR>", qf_open_item, {
+  buffer = true,
+  desc = "Open quickfix item",
+})
+
+vim.keymap.set("n", "<C-CR>", qf_open_in_picked_window, {
   buffer = true,
   desc = "Open quickfix item in picked window",
 })
@@ -94,19 +138,19 @@ local function qf_toggle_follow()
   vim.notify("qf follow: " .. (config.follow.enabled and "on" or "off"))
 end
 
-vim.keymap.set("n", "<leader>qf", qf_toggle_follow, {
+vim.keymap.set("n", "<C-f>", qf_toggle_follow, {
   buffer = true,
   desc = "Toggle quickfix/loclist follow mode",
 })
 
-vim.keymap.set("n", "<leader>qe", function()
+vim.keymap.set("n", "<C-e>", function()
   require("quicker").toggle_expand()
 end, {
   buffer = true,
   desc = "Expand/collapse source context",
 })
 
-vim.keymap.set("n", "<leader>qr", function()
+vim.keymap.set("n", "<C-r>", function()
   require("quicker").refresh()
 end, {
   buffer = true,

@@ -315,12 +315,53 @@ require("aerial").setup({
 })
 
 require("quicker").setup({})
-require("trouble").setup({})
+require("trouble").setup({
+  keys = {
+    ["<C-CR>"] = {
+      action = function(_, ctx)
+        local item = ctx.item
+
+        if not item then
+          vim.notify("No Trouble item under cursor", vim.log.levels.WARN)
+          return
+        end
+
+        local win = require("window-picker").pick_window({
+          filter_rules = {
+            include_current_win = false,
+            bo = {
+              filetype = { "trouble", "qf", "oil", "aerial", "NvimTree", "neo-tree", "notify", "snacks_notif" },
+              buftype = { "quickfix", "terminal", "nofile", "prompt" },
+            },
+          },
+        })
+
+        if not win or not vim.api.nvim_win_is_valid(win) then
+          return
+        end
+
+        local bufnr = item.buf
+        if not bufnr and item.filename then
+          bufnr = vim.fn.bufadd(item.filename)
+        end
+        if not bufnr then
+          vim.notify("Trouble item has no file to open", vim.log.levels.WARN)
+          return
+        end
+
+        vim.fn.bufload(bufnr)
+        vim.bo[bufnr].buflisted = true
+        vim.api.nvim_win_set_buf(win, bufnr)
+        vim.api.nvim_set_current_win(win)
+        vim.api.nvim_win_set_cursor(win, item.pos)
+        vim.cmd("normal! zvzz")
+      end,
+      desc = "Open item in picked window",
+    },
+  },
+})
 require("overseer").setup({})
 require("treesitter-context").setup({})
-
--- A native list window opened by the toggle must not be replaced again.
-local opening_native_list = false
 
 -- Switches a list window between its native form and Trouble, keeping the
 -- height and the focus.
@@ -332,9 +373,7 @@ local function switch_list_window(win)
     local loclist = trouble.is_open("loclist")
 
     trouble.close()
-    opening_native_list = true
     vim.cmd(string.format("botright %s %d", loclist and "lopen" or "copen", height))
-    opening_native_list = false
     return
   end
 
@@ -349,24 +388,6 @@ local function switch_list_window(win)
 end
 
 local list_group = vim.api.nvim_create_augroup("dotfiles_trouble_list", { clear = true })
-
--- Quickfix and location lists open in Trouble by default.
-vim.api.nvim_create_autocmd("BufWinEnter", {
-  group = list_group,
-  callback = function(ev)
-    if opening_native_list or vim.bo[ev.buf].buftype ~= "quickfix" then
-      return
-    end
-
-    local win = vim.fn.bufwinid(ev.buf)
-
-    vim.schedule(function()
-      if vim.api.nvim_win_is_valid(win) then
-        switch_list_window(win)
-      end
-    end)
-  end,
-})
 
 vim.api.nvim_create_autocmd("FileType", {
   group = list_group,
@@ -450,6 +471,12 @@ require("diffview").setup({
     diff_buf_win_enter = function(_, winid, ctx)
       require("colors").apply_diff_window_highlights(winid, ctx and ctx.symbol)
     end,
+  },
+  keymaps = {
+    -- Alongside the default `R`, and only in the panel, where <C-r> is free.
+    file_panel = {
+      { "n", "<C-r>", require("diffview.actions").refresh_files, { desc = "Update stats and entries in the file list" } },
+    },
   },
 })
 
