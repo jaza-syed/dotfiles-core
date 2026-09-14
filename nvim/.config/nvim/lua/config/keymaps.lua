@@ -146,12 +146,45 @@ local function current_mini_files_path()
     end
   end
 
+  -- Buffer names for terminals and other plugins are URIs rather than paths
   local path = vim.api.nvim_buf_get_name(0)
-  if path == "" then
-    path = vim.uv.cwd()
+  if path == "" or not vim.uv.fs_stat(path) then
+    return vim.uv.cwd()
   end
 
   return path
+end
+
+-- mini.sessions detects session files during setup, so re-running setup picks
+-- up sessions another Nvim instance has written since.
+local function refresh_sessions()
+  MiniSessions.setup(MiniSessions.config)
+end
+
+-- MiniSessions.select() sorts names alphabetically with no option to change it.
+local function select_session(action)
+  refresh_sessions()
+
+  local names = vim.tbl_keys(MiniSessions.detected)
+  if #names == 0 then
+    vim.notify("No sessions detected", vim.log.levels.WARN)
+    return
+  end
+
+  table.sort(names, function(a, b)
+    return MiniSessions.detected[a].modify_time > MiniSessions.detected[b].modify_time
+  end)
+
+  vim.ui.select(names, {
+    prompt = "Select session to " .. action,
+    format_item = function(name)
+      return ("%s (%s)"):format(name, os.date("%Y-%m-%d %H:%M", MiniSessions.detected[name].modify_time))
+    end,
+  }, function(name)
+    if name then
+      MiniSessions[action](name)
+    end
+  end)
 end
 
 function M.open_mini_files()
@@ -179,13 +212,41 @@ function M.setup()
   vim.keymap.set("n", "<leader>tc", "<cmd>tabnew<cr>", { desc = "New tab" })
   vim.keymap.set("n", "<leader>tx", close_current_tab, { desc = "Close tab" })
 
-  -- vim-tmux-navigator maps C-hjkl in terminal mode using Vim 8's <C-w>: window
-  -- prefix, which Neovim's terminal has no equivalent of, so the Ex command gets
-  -- typed into the shell. Drop them; these keys belong to the program in the
-  -- terminal. <C-\><C-n> first still navigates.
-  for _, key in ipairs({ "<C-h>", "<C-j>", "<C-k>", "<C-l>" }) do
-    pcall(vim.keymap.del, "t", key)
+  -- C-hjkl move between windows and, at an edge, tmux panes. The plugin's own
+  -- mappings are off (g:tmux_navigator_no_mappings) because its terminal-mode
+  -- ones use Vim 8's <C-w>: prefix, which Neovim's terminal lacks.
+  local navigate = {
+    ["<C-h>"] = "TmuxNavigateLeft",
+    ["<C-j>"] = "TmuxNavigateDown",
+    ["<C-k>"] = "TmuxNavigateUp",
+    ["<C-l>"] = "TmuxNavigateRight",
+  }
+  for key, command in pairs(navigate) do
+    vim.keymap.set("n", key, "<Cmd>" .. command .. "<CR>", { desc = command })
   end
+  vim.keymap.set("n", "<C-\\>", "<Cmd>TmuxNavigatePrevious<CR>", { desc = "TmuxNavigatePrevious" })
+
+  -- In a terminal the same keys navigate while the shell is idle. A running
+  -- program such as fzf, atuin or a pager gets the key instead.
+  local shells = { zsh = true, bash = true, fish = true, sh = true }
+  local function shell_is_idle()
+    local pid = vim.b.terminal_job_pid
+    if not pid then
+      return false
+    end
+    local name = vim.trim(vim.system({ "ps", "-o", "comm=", "-p", tostring(pid) }):wait().stdout or "")
+    return shells[vim.fs.basename(name):gsub("^%-", "")] == true
+      and vim.system({ "pgrep", "-P", tostring(pid) }):wait().code ~= 0
+  end
+  for key, command in pairs(navigate) do
+    vim.keymap.set("t", key, function()
+      if shell_is_idle() then
+        return "<C-\\><C-n><Cmd>" .. command .. "<CR>"
+      end
+      return key
+    end, { expr = true, desc = command .. " unless a program is running" })
+  end
+  vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Leave terminal mode" })
 
   -- Window/tab management
   vim.keymap.set("n", "<Leader>nn", ":set invnumber<CR>", { noremap = true, desc = "Toggle line numbers" })
@@ -287,6 +348,45 @@ function M.setup()
   vim.keymap.set("n", "<leader>kt", "<cmd>OverseerToggle<cr>", { desc = "Toggle the task list" })
   vim.keymap.set("n", "<leader>ka", "<cmd>OverseerTaskAction<cr>", { desc = "Act on a task" })
   vim.keymap.set("n", "<leader>kq", "<cmd>OverseerQuickAction<cr>", { desc = "Quick action on the last task" })
+  vim.keymap.set("n", "<leader>kl", function()
+    -- list_tasks() sorts by start time, newest first.
+    local task = require("overseer").list_tasks({ unique = true })[1]
+    if task == nil then
+      vim.notify("No tasks to restart", vim.log.levels.WARN)
+      return
+    end
+
+    task:restart(true)
+  end, { desc = "Restart the last task" })
+
+  -- Sessions
+  vim.keymap.set("n", "<leader>ss", function()
+    MiniSessions.write(os.date("%Y-%m-%d_%H-%M-%S"))
+  end, { desc = "Save timestamped session" })
+  vim.keymap.set("n", "<leader>sw", function()
+    vim.ui.input({ prompt = "Session name: " }, function(name)
+      if name and name ~= "" then
+        MiniSessions.write(name)
+      end
+    end)
+  end, { desc = "Save named session" })
+  vim.keymap.set("n", "<leader>sl", function()
+    refresh_sessions()
+
+    local latest = MiniSessions.get_latest()
+    if latest == nil then
+      vim.notify("No sessions detected", vim.log.levels.WARN)
+      return
+    end
+
+    MiniSessions.read(latest)
+  end, { desc = "Read the latest session" })
+  vim.keymap.set("n", "<leader>sp", function()
+    select_session("read")
+  end, { desc = "Pick a session" })
+  vim.keymap.set("n", "<leader>sd", function()
+    select_session("delete")
+  end, { desc = "Delete a session" })
 
   -- Telescope shortcuts
   local pickers = require("config.pickers")

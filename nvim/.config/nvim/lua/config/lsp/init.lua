@@ -262,6 +262,14 @@ local function setup_language_servers(capabilities)
     capabilities = capabilities,
   })
   vim.lsp.enable("zls")
+
+  vim.lsp.config("expert", {
+    cmd = direnv_cmd({ "expert", "--stdio" }),
+    filetypes = { "elixir", "eelixir", "heex", "surface" },
+    root_markers = { "mix.exs", ".git" },
+    capabilities = capabilities,
+  })
+  vim.lsp.enable("expert")
 end
 
 function M.setup()

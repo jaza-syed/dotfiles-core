@@ -27,16 +27,17 @@ alias la='eza -a'
 alias ll='eza -lah'
 alias ls='eza --color=auto'
 alias g="git"
+alias gc="git commit"
+alias gca="git commit -a"
+alias gp="git push"
+alias gst="git status"
+alias gsw="git switch"
+alias nf="nix fmt"
 alias n="nvim"
 
 # Python project checks (ruff + mypy + uv lock consistency)
 alias pycheck='ruff check . && mypy && uv lock --check'
 
-# --- Environment ---
-
-export NTS1_URL="https://stream-relay-geo.ntslive.net/stream"
-export NTS2_URL="https://stream-relay-geo.ntslive.net/stream2"
-export BBCR3_URL="http://lstn.lv/bbcradio.m3u8?station=bbc_radio_three&bitrate=96000"
 export EZA_COLORS="di=1:da=0"
 
 # Colorized less/man

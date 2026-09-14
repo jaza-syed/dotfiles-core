@@ -16,6 +16,10 @@
       "rev": "6134b5cd4a38990c7b720adc90973ed32f726179",
       "src": "https://github.com/nvim-zh/colorful-winsep.nvim"
     },
+    "conform.nvim": {
+      "rev": "016802de402556da54c36bd7359b441266b01cdd",
+      "src": "https://github.com/stevearc/conform.nvim"
+    },
     "conjure": {
       "rev": "84c739c753bd07c006849d10ebce1863dd41af7f",
       "src": "https://github.com/Olical/conjure"
@@ -57,6 +61,10 @@
       "rev": "77d7446b9f2452193f13ced9fb73a8b3aa4a4f4d",
       "src": "https://github.com/nvim-mini/mini.align"
     },
+    "mini.bracketed": {
+      "rev": "203eb35f386b4fc9abcff1518c84d5537d41c80a",
+      "src": "https://github.com/nvim-mini/mini.bracketed"
+    },
     "mini.clue": {
       "rev": "1c136d62729c8c3b0c2d91379bc37efac15d916e",
       "src": "https://github.com/nvim-mini/mini.clue"
@@ -72,6 +80,10 @@
     "mini.operators": {
       "rev": "9e0aa164b097c6cb45e59b9371c9347ac06eb822",
       "src": "https://github.com/nvim-mini/mini.operators"
+    },
+    "mini.sessions": {
+      "rev": "59b682b3208eefb5053a80dd3bc93ced69f363af",
+      "src": "https://github.com/nvim-mini/mini.sessions"
     },
     "mini.splitjoin": {
       "rev": "9301717c7612ccb72e89629df89416585dd54c9b",
@@ -147,6 +159,10 @@
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
+    "nvim-treesitter-context": {
+      "rev": "f3061339b8eaf9fda873600bc425b8d2d8502533",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
+    },
     "nvim-treesitter-textobjects": {
       "rev": "5c7b0263797dfd1bd6202f2b219f3b53a80b2187",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
@@ -160,6 +176,10 @@
     "oil.nvim": {
       "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"
+    },
+    "overseer.nvim": {
+      "rev": "a93d9f6d6defdac4bcd6d2c8ba988650e42e0a0e",
+      "src": "https://github.com/stevearc/overseer.nvim"
     },
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",

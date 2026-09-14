@@ -31,6 +31,8 @@ vim.api.nvim_create_autocmd("PackChanged", {
 
 -- Globals read by plugin/ files, which Nvim sources at the end of startup.
 vim.g.tradewinds_no_maps = 1
+-- config.keymaps maps C-hjkl itself, including the terminal-mode variants.
+vim.g.tmux_navigator_no_mappings = 1
 vim.g.wrapwidth_sign = "│"
 vim.g.virtcolumn_char = "┆"
 vim.g.rooter_cd_cmd = "lcd"
@@ -82,6 +84,7 @@ vim.pack.add({
   gh("nvim-mini/mini.operators"),
   gh("nvim-mini/mini.clue"),
   gh("nvim-mini/mini.bracketed"),
+  gh("nvim-mini/mini.sessions"),
   gh("windwp/nvim-autopairs"),
   gh("tpope/vim-repeat"), -- Repeat plugin commands
   { src = gh("smoka7/hop.nvim"), version = vim.version.range("*") },
@@ -208,6 +211,13 @@ require("mini.align").setup({})
 require("mini.ai").setup({})
 require("mini.operators").setup({})
 require("mini.bracketed").setup({})
+-- Sessions are named and read or written on request only. The machine module
+-- may point `directory` at a per-repo location.
+require("mini.sessions").setup({
+  autoread = false,
+  autowrite = false,
+  file = "",
+})
 
 local clue = require("mini.clue")
 clue.setup({
@@ -242,6 +252,7 @@ clue.setup({
     { mode = "n", keys = "<Leader>w", desc = "+window" },
     { mode = "n", keys = "<Leader>q", desc = "+quickfix" },
     { mode = "n", keys = "<Leader>k", desc = "+tasks" },
+    { mode = "n", keys = "<Leader>s", desc = "+session" },
     { mode = "n", keys = "<Leader>t", desc = "+tab/theme" },
     { mode = "n", keys = "<Leader>c", desc = "+config/clear" },
     clue.gen_clues.builtin_completion(),
@@ -270,7 +281,9 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   end,
 })
 
-require("nvim-autopairs").setup()
+local autopairs = require("nvim-autopairs")
+autopairs.setup()
+autopairs.add_rules(require("nvim-autopairs.rules.endwise-elixir"))
 require("cmp").event:on("confirm_done", require("nvim-autopairs.completion.cmp").on_confirm_done())
 
 require("hop").setup()
@@ -483,6 +496,8 @@ telescope.setup({
       vertical = {
         mirror = true,
         preview_height = 0.5,
+        -- The default of 40 drops the preview in a half-height tmux pane.
+        preview_cutoff = 20,
       },
     },
     mappings = {
@@ -580,6 +595,8 @@ treesitter.install({
   "clojure",
   "cpp",
   "diff",
+  "elixir",
+  "elm",
   "go",
   "haskell",
   "javascript",

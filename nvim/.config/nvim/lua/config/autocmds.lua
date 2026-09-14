@@ -11,7 +11,7 @@ function M.setup()
     command = "set ft=json syntax=javascript",
   })
 
-  -- A new terminal starts ready to type. <C-\><C-n> for normal mode.
+  -- A new terminal starts ready to type. <Esc><Esc> or <C-\><C-n> for normal mode.
   vim.api.nvim_create_autocmd("TermOpen", {
     group = group,
     callback = function(args)
