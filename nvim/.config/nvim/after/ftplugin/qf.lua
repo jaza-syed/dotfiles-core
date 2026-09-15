@@ -27,6 +27,11 @@ local function qf_open_review_thread(item)
     and review.jump_quickfix_thread(user_data.session_id, user_data.thread_id)
 end
 
+local function qf_open_review_location(item)
+  local review = package.loaded.review
+  return review and review.jump_quickfix_location and review.jump_quickfix_location(item)
+end
+
 local function qf_open_item()
   local _, qf_line, is_loclist, item = qf_item_at_cursor()
 
@@ -36,7 +41,7 @@ local function qf_open_item()
   end
 
   qf_set_index(is_loclist, qf_line)
-  if qf_open_review_thread(item) then
+  if qf_open_review_thread(item) or qf_open_review_location(item) then
     return
   end
 
@@ -49,6 +54,11 @@ local function qf_open_in_picked_window()
 
   if not item then
     vim.notify("No quickfix item under cursor", vim.log.levels.WARN)
+    return
+  end
+
+  qf_set_index(is_loclist, qf_line)
+  if qf_open_review_thread(item) or qf_open_review_location(item) then
     return
   end
 
@@ -85,10 +95,6 @@ local function qf_open_in_picked_window()
   local lnum = item.lnum and item.lnum > 0 and item.lnum or user_data.lnum or 1
   local col = item.col and item.col > 0 and item.col - 1 or 0
 
-  if qf_open_review_thread(item) then
-    return
-  end
-
   vim.bo[bufnr].buflisted = true
   vim.fn.bufload(bufnr)
   lnum = math.min(math.max(1, lnum), vim.api.nvim_buf_line_count(bufnr))
@@ -108,6 +114,11 @@ local function qf_open_in_picked_window()
 end
 
 vim.keymap.set("n", "<CR>", qf_open_item, {
+  buffer = true,
+  desc = "Open quickfix item",
+})
+
+vim.keymap.set("n", "<2-LeftMouse>", qf_open_item, {
   buffer = true,
   desc = "Open quickfix item",
 })

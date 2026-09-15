@@ -18,6 +18,7 @@ M.registry = {
   { module = "config.options", kind = "settings" },
   { module = "config.ui", kind = "settings" },
   { module = "config.keymaps", kind = "settings" },
+  { module = "config.review_quickfix", kind = "settings" },
   { module = "config.window_move", kind = "helper" },
   { module = "config.markdown", kind = "settings" },
   { module = "config.python_strings", kind = "settings" },
