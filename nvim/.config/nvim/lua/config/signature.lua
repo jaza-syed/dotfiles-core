@@ -246,7 +246,7 @@ local function render(result)
     table.remove(body)
   end
 
-  -- Only the first line of the documentation. <C-g> opens the rest in a split.
+  -- Only the first line of the documentation. <C-\><C-s> opens the rest in a split.
   local documentation = documentation_of(signature)
   if documentation then
     local first = vim.split(documentation, "\n", { plain = true })[1]
@@ -321,8 +321,27 @@ function M.update()
   end, buf)
 end
 
+-- Splitting from inside a float gives a normal window on the same buffer, and
+-- the buffer stays alive through the float's bufhidden=wipe because the split
+-- still shows it.
+local function promote_float()
+  local win = vim.api.nvim_get_current_win()
+  if vim.api.nvim_win_get_config(win).relative == "" then
+    return false
+  end
+
+  vim.cmd("botright split")
+  vim.api.nvim_win_close(win, true)
+  return true
+end
+
 -- Move the last signature into a scrollable split. One way: close it with :q.
+-- In a focused float, such as a hover opened with a second K, move that instead.
 function M.open_split()
+  if promote_float() then
+    return
+  end
+
   local result = state.result
   if not result or not result.signatures then
     return

@@ -284,7 +284,11 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 local autopairs = require("nvim-autopairs")
 autopairs.setup()
 autopairs.add_rules(require("nvim-autopairs.rules.endwise-elixir"))
-require("cmp").event:on("confirm_done", require("nvim-autopairs.completion.cmp").on_confirm_done())
+require("cmp").event:on(
+  "confirm_done",
+  -- Elm applies a function without parentheses, so the default "(" rule is wrong there.
+  require("nvim-autopairs.completion.cmp").on_confirm_done({ filetypes = { elm = false } })
+)
 
 require("hop").setup()
 
