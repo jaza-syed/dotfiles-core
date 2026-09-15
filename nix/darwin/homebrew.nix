@@ -94,6 +94,7 @@
       "Numbers" = 409203825;
       "Pages" = 409201541;
       "Todoist" = 585829637;
+      "Toggl Track" = 1291898086;
       "WhatsApp" = 310633997;
       "Xcode" = 497799835;
     };

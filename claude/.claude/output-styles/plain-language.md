@@ -27,7 +27,7 @@ If you have not read that file in this session, read it before you write a comme
     "contains" rather than "holds" or "carries",
     "uses" rather than "spends" or "leans on",
     "shows" rather than "surfaces",
-    "is merged" rather than "lands",
+    "is merged" or "is present" rather than "lands",
     "controls" rather than "drives" or "gates",
     "connects" rather than "wires up",
     "starts" rather than "kicks off" or "spins up",
