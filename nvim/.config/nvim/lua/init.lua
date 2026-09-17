@@ -796,10 +796,9 @@ require("zen-mode").setup({
   end,
 })
 
--- Sixel rather than the kitty default: WezTerm's kitty protocol support is
--- incomplete, and the tmux above is built with sixel.
+-- The sixel backend has no VimResized handling, so panes resize badly under it.
 require("image").setup({
-  backend = "sixel",
+  backend = "kitty",
   processor = "magick_cli",
   -- The default 50 squashes a tall diagram into half the window.
   max_height_window_percentage = 80,
