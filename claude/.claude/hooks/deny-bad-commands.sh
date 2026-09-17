@@ -20,8 +20,8 @@ if [[ $background == true ]]; then
     deny 'The pipeline must end at tee. A filter after it buffers until the command exits, so nothing streams live and polling the log returns nothing. Trim the log in a follow-up command instead.'
   fi
   # nix and most build tools write their progress to stderr, not stdout.
-  if ! has '(2>&1|\|&)'; then
-    deny 'Redirect stderr into the log as well, with 2>&1 before the pipe. Most build tools write their progress to stderr, so a log without it records almost nothing.'
+  if ! has '2>'; then
+    deny 'Send stderr somewhere too, with 2>&1 before the pipe or a redirect of its own. Most build tools write their progress to stderr, so a log without it records almost nothing.'
   fi
   if has '\|&?[[:space:]]*tee[^|;&]*\$TMPDIR'; then
     deny '$TMPDIR differs between invocations, so a log written there cannot be read back by a later command. Use the scratchpad directory from the system prompt.'
@@ -31,7 +31,8 @@ elif has '\|&?[[:space:]]*tee([[:space:]]|$)'; then
 fi
 
 # pipefail turns the producer's SIGPIPE into exit 141, which reads as a failure.
-if has '\|&?[[:space:]]*head([[:space:]]|$)' && ! has '(rg|fd|cat)[^|]*\|&?[[:space:]]*head([[:space:]]|$)'; then
+# .* rather than [^|]*, since an rg pattern often contains a | of its own.
+if has '\|&?[[:space:]]*head([[:space:]]|$)' && ! has '(rg|fd|cat)[[:space:]].*\|&?[[:space:]]*head([[:space:]]|$)'; then
   deny 'Piping into head makes the producer die of SIGPIPE, which pipefail reports as exit 141 rather than success. Use | tail, or pipe rg, fd or cat into head.'
 fi
 
