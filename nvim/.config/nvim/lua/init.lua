@@ -812,13 +812,11 @@ if vim.fn.has("mac") == 1 then
 end
 
 -- diagram.nvim requires image.nvim at load time, and defaults its integrations
--- to markdown and neorg.
+-- to markdown and neorg. Empty event lists leave the diagrams out of the
+-- document, so config.diagrams owns how they are shown.
 require("diagram").setup({
-  renderer_options = {
-    -- width and scale are mmdc's pixel dimensions, so they set how much
-    -- detail survives being fitted to the window.
-    mermaid = { theme = "neutral", width = 2400, scale = 2 },
-  },
+  events = { render_buffer = {}, clear_buffer = {} },
+  renderer_options = { mermaid = require("config.diagrams").mermaid_options },
 })
 
 require("lazydev").setup({
