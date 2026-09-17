@@ -64,9 +64,11 @@ function M.open()
   end
 
   local path = render(blocks(buf)[index])
+  -- A horizontal split, since these diagrams are far wider than they are tall.
+  -- belowright rather than split, which 'splitbelow' being off puts on top.
   if not (split_win and vim.api.nvim_win_is_valid(split_win)) then
     local current = vim.api.nvim_get_current_win()
-    vim.cmd("vsplit")
+    vim.cmd("belowright split")
     split_win = vim.api.nvim_get_current_win()
     vim.api.nvim_set_current_win(current)
   end
