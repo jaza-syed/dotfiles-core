@@ -8,6 +8,7 @@
     settings = {
       "*" = {
         IgnoreUnknown = "UseKeychain";
+        UseKeychain = "yes";
         AddKeysToAgent = "yes";
         IdentityFile = "~/.ssh/id_ed25519";
       };
