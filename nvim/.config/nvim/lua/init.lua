@@ -803,6 +803,12 @@ require("image").setup({
   processor = "magick_cli",
 })
 
+-- mmdc drives puppeteer, which ships no browser of its own. google-chrome is a
+-- declared cask in nix/darwin/homebrew.nix.
+if vim.fn.has("mac") == 1 then
+  vim.env.PUPPETEER_EXECUTABLE_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+end
+
 -- diagram.nvim requires image.nvim at load time, and defaults its integrations
 -- to markdown and neorg.
 require("diagram").setup({
