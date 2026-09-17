@@ -62,5 +62,6 @@
 
     # Editors
     pkgs.neovim
+    (pkgs.callPackage ../pkgs/mmdflux.nix { })
   ];
 }

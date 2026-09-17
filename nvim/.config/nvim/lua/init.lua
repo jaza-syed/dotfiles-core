@@ -82,11 +82,13 @@ vim.pack.add({
   gh("nvim-mini/mini.align"),
   gh("nvim-mini/mini.ai"),
   gh("nvim-mini/mini.operators"),
+  gh("nvim-mini/mini.move"),
   gh("nvim-mini/mini.clue"),
   gh("nvim-mini/mini.bracketed"),
   gh("nvim-mini/mini.sessions"),
   gh("windwp/nvim-autopairs"),
   gh("tpope/vim-repeat"), -- Repeat plugin commands
+  gh("jbyuki/venn.nvim"), -- :VBox draws boxes and lines; see <Leader>v
   { src = gh("smoka7/hop.nvim"), version = vim.version.range("*") },
 
   -- Windows and quickfix
@@ -210,6 +212,9 @@ require("mini.splitjoin").setup({})
 require("mini.align").setup({})
 require("mini.ai").setup({})
 require("mini.operators").setup({})
+-- Defaults are <M-hjkl>. A blockwise selection moves as a block, which is how
+-- a box drawn with venn is repositioned.
+require("mini.move").setup({})
 require("mini.bracketed").setup({})
 -- Sessions are named and read or written on request only. The machine module
 -- may point `directory` at a per-repo location.

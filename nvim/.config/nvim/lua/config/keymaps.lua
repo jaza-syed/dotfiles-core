@@ -117,6 +117,33 @@ local function set_foldlevel_for_buffer(level)
   end
 end
 
+-- venn.nvim draws where the cursor is, including past the end of a line, so
+-- the mode turns on 'virtualedit' and binds the drawing keys until it is off.
+local function toggle_venn()
+  local draw = { H = "h", J = "j", K = "k", L = "l" }
+
+  if vim.b.venn_enabled then
+    vim.wo.virtualedit = vim.b.venn_virtualedit
+    for key in pairs(draw) do
+      vim.keymap.del("n", key, { buffer = 0 })
+    end
+    vim.keymap.del("x", "f", { buffer = 0 })
+    vim.b.venn_enabled = nil
+    return
+  end
+
+  vim.b.venn_virtualedit = vim.wo.virtualedit
+  vim.wo.virtualedit = "all"
+  for key, motion in pairs(draw) do
+    vim.keymap.set("n", key, "<C-v>" .. motion .. ":VBox<CR>", {
+      buffer = 0,
+      desc = "Draw a line " .. motion,
+    })
+  end
+  vim.keymap.set("x", "f", ":VBox<CR>", { buffer = 0, desc = "Draw a box round the selection" })
+  vim.b.venn_enabled = true
+end
+
 local function go_to_tab(tabnr)
   if tabnr > vim.fn.tabpagenr("$") then
     vim.notify("No tab " .. tabnr, vim.log.levels.WARN)
@@ -265,6 +292,9 @@ function M.setup()
   vim.keymap.set("n", "<Leader>wm", function()
     require("config.window_move").enter()
   end, { desc = "Window move mode" })
+
+  -- Diagrams
+  vim.keymap.set("n", "<Leader>v", toggle_venn, { desc = "Toggle venn box drawing" })
 
   -- Folds
   for level = 0, 9 do

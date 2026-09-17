@@ -452,6 +452,15 @@ function M.apply_lualine_theme()
       color = { fg = c.blue, gui = "bold" },
     },
     {
+      function()
+        return "HJKL draw · f box selection · <Leader>v exit"
+      end,
+      cond = function()
+        return vim.b.venn_enabled == true
+      end,
+      color = { fg = c.blue, gui = "bold" },
+    },
+    {
       statusline_filepath,
     },
   }
