@@ -21,7 +21,6 @@ M.registry = {
   { module = "config.review_quickfix", kind = "settings" },
   { module = "config.window_move", kind = "helper" },
   { module = "config.markdown", kind = "settings" },
-  { module = "config.diagrams", kind = "settings" },
   { module = "config.python_strings", kind = "settings" },
   { module = "config.nix_strings", kind = "settings" },
   { module = "config.yaml_strings", kind = "settings" },

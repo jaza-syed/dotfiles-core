@@ -135,6 +135,8 @@ vim.pack.add({
   { src = gh("nvim-neo-tree/neo-tree.nvim"), version = vim.version.range("3") },
   gh("nvim-lualine/lualine.nvim"),
   gh("folke/zen-mode.nvim"),
+  gh("3rd/image.nvim"),
+  gh("3rd/diagram.nvim"),
 
   -- LSP, completion and linting
   gh("folke/lazydev.nvim"),
@@ -792,6 +794,21 @@ require("zen-mode").setup({
   on_open = function(win)
     require("colors").apply_window_highlights(win)
   end,
+})
+
+-- Sixel rather than the kitty default: WezTerm's kitty protocol support is
+-- incomplete, and the tmux above is built with sixel.
+require("image").setup({
+  backend = "sixel",
+  processor = "magick_cli",
+})
+
+-- diagram.nvim requires image.nvim at load time, and defaults its integrations
+-- to markdown and neorg.
+require("diagram").setup({
+  renderer_options = {
+    mermaid = { theme = "neutral" },
+  },
 })
 
 require("lazydev").setup({

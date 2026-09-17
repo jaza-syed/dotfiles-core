@@ -62,6 +62,9 @@
 
     # Editors
     pkgs.neovim
-    (pkgs.callPackage ../pkgs/mmdflux.nix { })
+
+    # Shelled out to by nvim's image.nvim and diagram.nvim.
+    pkgs.imagemagick
+    pkgs.mermaid-cli
   ];
 }
