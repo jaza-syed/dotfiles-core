@@ -801,6 +801,8 @@ require("zen-mode").setup({
 require("image").setup({
   backend = "sixel",
   processor = "magick_cli",
+  -- The default 50 squashes a tall diagram into half the window.
+  max_height_window_percentage = 80,
 })
 
 -- mmdc drives puppeteer, which ships no browser of its own. google-chrome is a
@@ -813,7 +815,9 @@ end
 -- to markdown and neorg.
 require("diagram").setup({
   renderer_options = {
-    mermaid = { theme = "neutral" },
+    -- width and scale are mmdc's pixel dimensions, so they set how much
+    -- detail survives being fitted to the window.
+    mermaid = { theme = "neutral", width = 2400, scale = 2 },
   },
 })
 

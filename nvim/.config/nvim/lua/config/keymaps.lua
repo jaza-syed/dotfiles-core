@@ -295,6 +295,9 @@ function M.setup()
 
   -- Diagrams
   vim.keymap.set("n", "<Leader>v", toggle_venn, { desc = "Toggle venn box drawing" })
+  vim.keymap.set("n", "<Leader>i", function()
+    require("diagram").show_diagram_hover()
+  end, { desc = "Show the diagram under the cursor in a float" })
 
   -- Folds
   for level = 0, 9 do
