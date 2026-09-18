@@ -65,6 +65,6 @@
 
     # Shelled out to by nvim's image.nvim and diagram.nvim.
     pkgs.imagemagick
-    pkgs.mermaid-cli
+    (pkgs.callPackage ../pkgs/mermaid-cli/package.nix { })
   ];
 }

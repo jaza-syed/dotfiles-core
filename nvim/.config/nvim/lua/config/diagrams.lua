@@ -1,9 +1,14 @@
 -- Opens a mermaid block's rendered image in a split and rerenders it on write.
 local M = {}
 
+-- mmdc's -t flag has a fixed list of four themes and rejects neo, so the theme
+-- is set in the JSON config instead.
+local config_file =
+  assert(vim.api.nvim_get_runtime_file("lua/config/mermaid.json", false)[1], "mermaid.json is not on the runtimepath")
+
 -- width and scale are mmdc's pixel dimensions, so they set how much detail
 -- survives being fitted to the window.
-M.mermaid_options = { theme = "neutral", width = 2400, scale = 2 }
+M.mermaid_options = { cli_args = { "-c", config_file }, width = 2400, scale = 2 }
 
 local split_win = nil
 local source_buf = nil

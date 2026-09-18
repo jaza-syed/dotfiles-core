@@ -88,6 +88,8 @@
     in
     {
       packages = forAllSystems (pkgs: {
+        mermaid-cli = pkgs.callPackage ./nix/pkgs/mermaid-cli/package.nix { };
+
         # The repo source with the generated theme artifacts built in, for
         # hosts that set dotfiles.repoDir to a store path instead of a
         # checkout. scripts/generate_colorscheme.sh keeps producing them in a
