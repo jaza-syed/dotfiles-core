@@ -2,7 +2,10 @@
 
 vim.loader.enable() -- Byte-compiled Lua module cache; lazy.nvim carried its own
 
-vim.g.mapleader = " " -- Must be set before plugin setup
+-- Must be set before plugin setup. Backslash is Nvim's own fallback for
+-- maplocalleader, so setting it changes nothing but records the choice.
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
 
 -- Per-machine module linked by the machine repo; see config.machine.
 local machine_path = vim.fn.expand("~/.config/nvim-local")
@@ -114,6 +117,7 @@ vim.pack.add({
   { src = gh("nvim-telescope/telescope-live-grep-args.nvim"), version = vim.version.range("^1.0.0") },
   gh("jvgrootveld/telescope-zoxide"),
   gh("jmacadie/telescope-hierarchy.nvim"),
+  gh("MagicDuck/grug-far.nvim"),
 
   -- Tmux and project roots
   gh("christoomey/vim-tmux-navigator"), -- Navigate between tmux panes
@@ -125,7 +129,6 @@ vim.pack.add({
   -- Treesitter
   { src = gh("nvim-treesitter/nvim-treesitter"), version = "main" },
   { src = gh("nvim-treesitter/nvim-treesitter-textobjects"), version = "main" },
-  gh("nvim-treesitter/nvim-treesitter-context"),
 
   -- Display
   gh("rickhowe/wrapwidth"),
@@ -372,7 +375,6 @@ require("trouble").setup({
   },
 })
 require("overseer").setup({})
-require("treesitter-context").setup({})
 
 -- Switches a list window between its native form and Trouble, keeping the
 -- height and the focus.
@@ -597,6 +599,8 @@ telescope.load_extension("live_grep_args")
 telescope.load_extension("ui-select")
 telescope.load_extension("hierarchy")
 telescope.load_extension("zoxide")
+
+require("grug-far").setup({})
 
 require("todo-comments").setup({
   signs = false,

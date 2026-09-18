@@ -435,6 +435,8 @@ function M.setup()
   vim.keymap.set("n", "<leader>fc", pickers.commands, { desc = "Find Vim commands" })
   vim.keymap.set("n", "<leader>fz", pickers.zoxide, { desc = "Zoxide" })
   vim.keymap.set("n", "<leader>fS", pickers.global_symbols, { desc = "Live global symbols" })
+  vim.keymap.set("n", "<leader>fR", "<cmd>GrugFar<cr>", { desc = "Find and replace" })
+  vim.keymap.set("x", "<leader>fR", "<cmd>GrugFarWithin<cr>", { desc = "Find and replace in selection" })
 
   -- Debugging
   vim.keymap.set("n", "<leader>db", function()

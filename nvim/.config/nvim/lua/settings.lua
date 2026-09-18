@@ -4,5 +4,6 @@
 
 -- Leader (also set in init.lua before lazy, repeated here for reload)
 vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
 
 require("config.reload").setup_kind("settings")

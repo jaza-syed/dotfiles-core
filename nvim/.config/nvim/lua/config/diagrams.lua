@@ -8,6 +8,10 @@ M.mermaid_options = { theme = "neutral", width = 2400, scale = 2 }
 local split_win = nil
 local source_buf = nil
 local block_index = nil
+-- Width in columns, nil while the image is fitted to the window.
+local width = nil
+
+local STEP = 20
 
 local function blocks(buf)
   return require("diagram.integrations.markdown").query_buffer_diagrams(buf)
@@ -29,6 +33,38 @@ local function render(diagram)
   return require("diagram.renderers.mermaid").render(diagram.source, M.mermaid_options).file_path
 end
 
+local function images()
+  if not (split_win and vim.api.nvim_win_is_valid(split_win)) then
+    return {}
+  end
+  return require("image").get_images({ window = split_win })
+end
+
+-- image.nvim only ever shrinks an image to fit, so overflowing the window
+-- needs ignore_global_max_size as well as a width.
+local function resize()
+  for _, image in ipairs(images()) do
+    image.ignore_global_max_size = width ~= nil
+    image.geometry.width = width
+    image:render()
+  end
+end
+
+local function scale(columns)
+  local current = width or (images()[1] and images()[1].rendered_geometry.width)
+  if not current then
+    vim.notify("No diagram is displayed", vim.log.levels.WARN)
+    return
+  end
+  width = math.max(STEP, current + columns)
+  resize()
+end
+
+local function fit()
+  width = nil
+  resize()
+end
+
 local function show(path)
   if not (split_win and vim.api.nvim_win_is_valid(split_win)) then
     return
@@ -37,6 +73,20 @@ local function show(path)
   local current = vim.api.nvim_get_current_win()
   vim.api.nvim_set_current_win(split_win)
   vim.cmd("edit! " .. vim.fn.fnameescape(path))
+
+  -- Each refresh swaps in a buffer for the new path, so the keys are rebound.
+  local opts = { buffer = 0, nowait = true }
+  for _, key in ipairs({ "+", "=" }) do
+    vim.keymap.set("n", key, function()
+      scale(STEP)
+    end, vim.tbl_extend("force", opts, { desc = "Widen the diagram" }))
+  end
+  vim.keymap.set("n", "-", function()
+    scale(-STEP)
+  end, vim.tbl_extend("force", opts, { desc = "Narrow the diagram" }))
+  vim.keymap.set("n", "0", fit, vim.tbl_extend("force", opts, { desc = "Fit the diagram to the window" }))
+
+  resize()
   vim.api.nvim_set_current_win(current)
 end
 
@@ -73,7 +123,9 @@ function M.open()
     vim.api.nvim_set_current_win(current)
   end
 
-  source_buf, block_index = buf, index
+  -- A width set on the last diagram should not carry over to this one. A write
+  -- keeps it, since show reapplies it.
+  source_buf, block_index, width = buf, index, nil
   show_when_ready(path, 150)
 end
 
@@ -97,7 +149,7 @@ function M.setup()
 end
 
 function M.teardown()
-  split_win, source_buf, block_index = nil, nil, nil
+  split_win, source_buf, block_index, width = nil, nil, nil, nil
 end
 
 return M

@@ -216,6 +216,7 @@ apply_statusline() {
     local left_sep right_sep win_left_sep win_right_sep
     local bg_main fg_main
     local prefix_bg prefix_fg session_bg session_fg visual_bg visual_fg cpu_bg cpu_fg ram_bg ram_fg battery_bg battery_fg
+    local host_bg host_fg host_icon host_block ssh_env
     local active_bg active_fg inactive_bg inactive_fg zoom_flag zoom_icon
     local session_icon session_style session_sep_style
     local status_left status_right prev_bg
@@ -249,6 +250,8 @@ apply_statusline() {
     visual_fg=$(get_tmux_option "@statusline-visual-fg" "$ram_fg" "$session")
     battery_bg=$(get_tmux_option "@statusline-battery-bg" "#b279a7" "$session")
     battery_fg=$(get_tmux_option "@statusline-battery-fg" "#171717" "$session")
+    host_bg=$(get_tmux_option "@statusline-host-bg" "#b279a7" "$session")
+    host_fg=$(get_tmux_option "@statusline-host-fg" "#171717" "$session")
     active_bg=$(get_tmux_option "@statusline-window-active-bg" "#6099c0" "$session")
     active_fg=$(get_tmux_option "@statusline-window-active-fg" "#171717" "$session")
     inactive_bg=$(get_tmux_option "@statusline-window-inactive-bg" "#252525" "$session")
@@ -261,6 +264,15 @@ apply_statusline() {
     move_hint="#{?#{==:#{client_key_table},move},#[fg=${prefix_fg}#,bg=${prefix_bg}] #{@move-hint} #[fg=${prefix_bg}#,bg=${bg_main}]${left_sep} ,}"
     resize_hint="#{?#{==:#{client_key_table},resize},#[fg=${prefix_fg}#,bg=${prefix_bg}] #{@resize-hint} #[fg=${prefix_bg}#,bg=${bg_main}]${left_sep} ,}"
     status_left="${session_style} ${session_icon} #S ${session_sep_style}${left_sep} ${move_hint}${resize_hint}"
+    # tmux copies SSH_CONNECTION into the session environment on create and attach.
+    host_icon=""
+    ssh_env=$(tmux show-environment -t "$session" SSH_CONNECTION 2>/dev/null)
+    case "$ssh_env" in
+        SSH_CONNECTION=?*)
+            host_icon=$(get_tmux_option "@statusline-host-ssh-icon" "🌐 " "$session")
+            ;;
+    esac
+    host_block="#[nolist align=centre]#[fg=${host_bg},bg=${bg_main}]${win_left_sep}#[fg=${host_fg},bg=${host_bg},bold] ${host_icon}#h #[fg=${host_bg},bg=${bg_main},nobold]${win_right_sep}"
 
     prev_bg="$bg_main"
     status_right=""
@@ -283,6 +295,11 @@ apply_statusline() {
     tmux set-option -q -t "$session" message-style "bg=${cpu_bg},fg=${cpu_fg}"
     tmux set-option -q -t "$session" status-left "$status_left"
     tmux set-option -q -t "$session" status-right "$status_right"
+
+    # tmux has no option for content in the centre of the bar, so the host block
+    # goes into the session's copy of the default status-format.
+    tmux set-option -q -t "$session" 'status-format[0]' \
+        "$(tmux show-options -gv 'status-format[0]' | sed "s|#\[nolist align=right|${host_block}&|")"
 
     apply_window_option window-status-current-style "none"
     apply_window_option window-status-last-style "none"
