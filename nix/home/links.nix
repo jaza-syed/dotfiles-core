@@ -25,6 +25,7 @@ in
     ".claude/commands".source = link "claude/.claude/commands";
     ".claude/hooks".source = link "claude/.claude/hooks";
     ".claude/output-styles".source = link "claude/.claude/output-styles";
+    ".claude/scripts".source = link "claude/.claude/scripts";
     ".claude/statusline-command.sh".source = link "claude/.claude/statusline-command.sh";
 
     # Pi writes into ~/.pi, so only these entries are linked. The themes dir
