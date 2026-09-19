@@ -1,3 +1,4 @@
 {
-  "theme": "redux-color"
+  "theme": "redux-color",
+  "look": "neo"
 }

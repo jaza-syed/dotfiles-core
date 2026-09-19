@@ -443,7 +443,7 @@ function M.apply_lualine_theme()
   config.sections.lualine_c = {
     {
       function()
-        return "hjkl reorder · HJKL change level · 1-9 tab · Esc exit"
+        return "hjkl reorder · HJKL change level · M-hjkl resize · 1-9 tab · Esc exit"
       end,
       cond = function()
         local ok, window_move = pcall(require, "config.window_move")

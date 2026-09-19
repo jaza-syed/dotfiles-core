@@ -15,6 +15,13 @@ local directions = {
   L = "l",
 }
 
+local resizes = {
+  [vim.keycode("<M-h>")] = "vertical resize -1",
+  [vim.keycode("<M-j>")] = "resize +1",
+  [vim.keycode("<M-k>")] = "resize -1",
+  [vim.keycode("<M-l>")] = "vertical resize +1",
+}
+
 local exit_keys = {
   [vim.keycode("<Esc>")] = true,
   [vim.keycode("<C-c>")] = true,
@@ -137,6 +144,14 @@ local function on_key(key, typed)
 
   if exit_keys[input] then
     vim.schedule(M.leave)
+    return ""
+  end
+
+  local resize = resizes[input]
+  if resize then
+    run(function()
+      vim.cmd(resize)
+    end)
     return ""
   end
 

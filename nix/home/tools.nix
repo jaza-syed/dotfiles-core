@@ -36,6 +36,7 @@
     pkgs.eza
     pkgs.fd
     pkgs.ripgrep
+    pkgs.ast-grep
     pkgs.zoxide
     pkgs.fzf
     pkgs.zsh-fzf-tab

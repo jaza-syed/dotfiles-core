@@ -1,5 +1,5 @@
-# Copied from nixpkgs unstable, since nixos-26.05 has 11.12.0, which bundles a
-# mermaid older than the 11.14.0 that added the neo theme.
+# Copied from nixpkgs unstable, since nixos-26.05 has 11.12.0, whose bundled
+# mermaid predates the redux themes and the neo look.
 {
   buildNpmPackage,
   lib,
@@ -23,9 +23,12 @@ buildNpmPackage {
 
   patches = [
     ./remove-puppeteer-from-dev-deps.patch # https://github.com/mermaid-js/mermaid-cli/issues/830
+    # 11.17.0 pins mermaid ^11.14.0, so the lockfile is regenerated with
+    # mermaid 12 and the three companion packages that peer on it.
+    ./mermaid-12.patch
   ];
 
-  npmDepsHash = "sha256-6s1q+d6V/5hyjXZaAOzoLMFmQ1flKDH+YH5oOYTaoCo=";
+  npmDepsHash = "sha256-SSdHBaKSxPl03oAYMTP5UWvprM0eMgN09GDOjo5LpvM=";
 
   env = {
     PUPPETEER_SKIP_DOWNLOAD = true;
