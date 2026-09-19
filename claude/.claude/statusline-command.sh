@@ -4,14 +4,15 @@
 
 input=$(cat)
 
-IFS=$'\t' read -r model ctx five five_at seven seven_at cwd <<<"$(jq -r '
+IFS=$'\t' read -r model ctx five five_at seven seven_at cwd session <<<"$(jq -r '
   [ (.model.display_name // "?"),
     (.context_window.used_percentage // -1),
     (.rate_limits.five_hour.used_percentage // -1),
     (.rate_limits.five_hour.resets_at // -1),
     (.rate_limits.seven_day.used_percentage // -1),
     (.rate_limits.seven_day.resets_at // -1),
-    (.workspace.current_dir // .cwd // "")
+    (.workspace.current_dir // .cwd // ""),
+    (.session_id // "")
   ] | @tsv' <<<"$input")"
 
 BOLD=$'\033[1m'; DIM=$'\033[2m'; RESET=$'\033[0m'
@@ -73,6 +74,7 @@ seg() {
 line1="${BOLD}$(whoami)@$(hostname -s)${RESET}  ${BLUE}${cwd/#$HOME/~}${RESET}"
 [[ -n $git_branch ]] && line1+="  ${PURPLE} ${git_branch}${RESET}"
 line1+="  ${DIM}|${RESET}  ${MAGENTA}${model}${RESET}"
+[[ -f $HOME/.cache/dotfiles/claude/persistent/$session ]] && line1+="  ${YELLOW}📌 Persistent!${RESET}"
 
 line2=""
 seg Ctx "$ctx"   50 70
