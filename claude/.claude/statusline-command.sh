@@ -15,6 +15,16 @@ IFS=$'\t' read -r model ctx five five_at seven seven_at cwd session <<<"$(jq -r 
     (.session_id // "")
   ] | @tsv' <<<"$input")"
 
+# persistent-watch.sh and wait-for-usage-reset.sh read these rather than the usage API.
+if [[ $five == <-> || $five == <->.* ]] && [[ $five_at == <-> || $five_at == <->.* ]]; then
+  mkdir -p "$HOME/.cache/dotfiles/claude"
+  print -r -- "${five%%.*} ${five_at%%.*}" >"$HOME/.cache/dotfiles/claude/usage-5h"
+fi
+if [[ $seven == <-> || $seven == <->.* ]] && [[ $seven_at == <-> || $seven_at == <->.* ]]; then
+  mkdir -p "$HOME/.cache/dotfiles/claude"
+  print -r -- "${seven%%.*} ${seven_at%%.*}" >"$HOME/.cache/dotfiles/claude/usage-7d"
+fi
+
 BOLD=$'\033[1m'; DIM=$'\033[2m'; RESET=$'\033[0m'
 BLUE=$'\033[1;34m'; PURPLE=$'\033[1;35m'; MAGENTA=$'\033[35m'
 GREEN=$'\033[32m'; YELLOW=$'\033[33m'; RED=$'\033[31m'
@@ -74,7 +84,7 @@ seg() {
 line1="${BOLD}$(whoami)@$(hostname -s)${RESET}  ${BLUE}${cwd/#$HOME/~}${RESET}"
 [[ -n $git_branch ]] && line1+="  ${PURPLE} ${git_branch}${RESET}"
 line1+="  ${DIM}|${RESET}  ${MAGENTA}${model}${RESET}"
-[[ -f $HOME/.cache/dotfiles/claude/persistent/$session ]] && line1+="  ${YELLOW}📌 Persistent!${RESET}"
+[[ -f $HOME/.cache/dotfiles/claude/persistent/$session ]] && line1+="  ${DIM}|${RESET}  ${YELLOW}📌 persistent${RESET}"
 
 line2=""
 seg Ctx "$ctx"   50 70
