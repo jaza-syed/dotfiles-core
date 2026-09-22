@@ -34,12 +34,17 @@ function M.env_root(path)
   return path and vim.fs.root(path, ".envrc") or nil
 end
 
+-- The devshell to run `path`'s tooling in, or nil outside the machine-managed
+-- workspace, where system tools resolve normally.
+function M.direnv_root(path)
+  return require("config.machine").is_managed(path) and M.env_root(path) or nil
+end
+
 -- Prepend `direnv exec <env_root>` so an env-sensitive tool runs inside the
--- sub-repo's devshell. Only applies under the machine-managed workspace;
--- elsewhere the argv is returned unchanged (with a nil root) so system tools
--- resolve normally.
+-- sub-repo's devshell. Outside the managed workspace the argv is returned
+-- unchanged, with a nil root.
 function M.direnv_wrap(argv, path)
-  local root = require("config.machine").is_managed(path) and M.env_root(path) or nil
+  local root = M.direnv_root(path)
   if not root then
     return argv, nil
   end

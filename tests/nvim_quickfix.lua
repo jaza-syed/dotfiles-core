@@ -1,15 +1,15 @@
 -- Run from dotfiles with MINI_BRACKETED_ROOT pointing to a mini.bracketed checkout:
--- nvim --headless -u NONE -i NONE -l tests/nvim_review_quickfix.lua
+-- nvim --headless -u NONE -i NONE -l tests/nvim_quickfix.lua
 vim.opt.rtp:prepend(assert(vim.env.MINI_BRACKETED_ROOT, "Set MINI_BRACKETED_ROOT"))
 vim.opt.rtp:prepend(vim.fn.getcwd() .. "/nvim/.config/nvim")
 vim.opt.shortmess:append("F")
 local mini = require("mini.bracketed")
 mini.setup({})
 local original = mini.quickfix
-local adapter = require("config.review_quickfix")
+local adapter = require("config.quickfix")
 adapter.setup()
-package.loaded["config.review_quickfix"] = nil
-require("config.review_quickfix").setup()
+package.loaded["config.quickfix"] = nil
+require("config.quickfix").setup()
 assert(mini._dotfiles_quickfix == original, "reload stacked wrappers")
 local root = vim.fn.tempname()
 vim.fn.mkdir(root, "p")

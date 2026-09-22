@@ -33,14 +33,64 @@ local function jump_to_item_in_win(win, item, tagname, from)
   end)
 end
 
-local function lsp_in_direction(dir, fn)
+-- The side of the picked window the new split takes.
+local split_sides = {
+  h = "leftabove vsplit",
+  j = "belowright split",
+  k = "aboveleft split",
+  l = "rightbelow vsplit",
+}
+
+-- The picker returns nil for a key that labels no window, so the key is read
+-- back to tell a split request from a cancel.
+local function pick_window_or_key()
+  local pressed
+  local namespace = vim.on_key(function(key)
+    pressed = key
+  end)
+  local win = require("config.quickfix").pick_window()
+  vim.on_key(nil, namespace)
+
+  return win, pressed
+end
+
+--- A window chosen from the picker labels, split first when the label follows
+--- one of hjkl. Nil when cancelled.
+function M.pick_window_or_split()
+  local win, key = pick_window_or_key()
+  if win then
+    return win
+  end
+
+  local split = split_sides[key]
+  local target = split and require("config.quickfix").pick_window()
+  if not target then
+    return nil
+  end
+
+  local new_win
+  vim.api.nvim_win_call(target, function()
+    vim.cmd(split)
+    new_win = vim.api.nvim_get_current_win()
+  end)
+
+  return new_win
+end
+
+local function direction_finder(dir)
   return function()
     local target = find_window_in_direction(dir)
     if not target then
       vim.notify("No window in direction: " .. dir, vim.log.levels.WARN)
-      return
     end
+    return target
+  end
+end
 
+-- `find_target` runs once the server answers with a single location, so a
+-- cancelled pick costs nothing and no window is split for a list.
+local function lsp_into_window(find_target, fn)
+  return function()
     local bufnr = vim.api.nvim_get_current_buf()
     local from = vim.fn.getpos(".")
     from[1] = bufnr
@@ -49,11 +99,14 @@ local function lsp_in_direction(dir, fn)
     fn({
       on_list = function(options)
         if #options.items == 1 then
-          jump_to_item_in_win(target, options.items[1], tagname, from)
+          local target = find_target()
+          if target then
+            jump_to_item_in_win(target, options.items[1], tagname, from)
+          end
           return
         end
 
-        vim.fn.setqflist({}, " ", { title = options.title, items = options.items })
+        vim.fn.setqflist({}, " ", { title = options.title .. ": " .. tagname, items = options.items })
         vim.cmd("botright copen")
       end,
     })
@@ -71,10 +124,14 @@ local function map_lsp_jump(key, fn, desc)
   vim.keymap.set("n", "<leader>l" .. key .. key, fn, { desc = desc })
 
   for dir, name in pairs(directions) do
-    vim.keymap.set("n", "<leader>l" .. key .. dir, lsp_in_direction(dir, fn), {
+    vim.keymap.set("n", "<leader>l" .. key .. dir, lsp_into_window(direction_finder(dir), fn), {
       desc = desc .. " in " .. name .. " window",
     })
   end
+
+  vim.keymap.set("n", "<leader>l" .. key .. "p", lsp_into_window(M.pick_window_or_split, fn), {
+    desc = desc .. " in a picked window, split with hjkl first",
+  })
 end
 
 local function restart_lsp_clients()
@@ -221,6 +278,7 @@ end
 function M.setup()
   -- Clear search highlight
   vim.keymap.set("n", "<leader>cc", ":nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
+  vim.keymap.set("n", "<leader>cn", ":set invnumber<CR>", { noremap = true, desc = "Toggle line numbers" })
 
   -- Disable multi-line command input
   vim.keymap.set("n", "q:", "<nop>")
@@ -276,15 +334,22 @@ function M.setup()
   vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Leave terminal mode" })
 
   -- Window/tab management
-  vim.keymap.set("n", "<Leader>nn", ":set invnumber<CR>", { noremap = true, desc = "Toggle line numbers" })
   vim.keymap.set("n", "<Leader>wh", "<C-w>h", { noremap = true, desc = "Focus window left" })
   vim.keymap.set("n", "<Leader>wj", "<C-w>j", { noremap = true, desc = "Focus window down" })
   vim.keymap.set("n", "<Leader>wk", "<C-w>k", { noremap = true, desc = "Focus window up" })
   vim.keymap.set("n", "<Leader>wl", "<C-w>l", { noremap = true, desc = "Focus window right" })
   vim.keymap.set("n", "<Leader>wv", "<C-w>v<C-w>l", { noremap = true, desc = "Vertical split" })
   vim.keymap.set("n", "<Leader>ws", "<C-w>s<C-w>j", { noremap = true, desc = "Horizontal split" })
-  vim.keymap.set("n", "<Leader>wd", "<C-w>q", { noremap = true, desc = "Close window" })
+  vim.keymap.set("n", "<Leader>wq", "<C-w>q", { noremap = true, desc = "Close window" })
+  vim.keymap.set("n", "<Leader>wQ", ":q!<CR>", { noremap = true, desc = "Force close window" })
+  vim.keymap.set("n", "<Leader>wp", function()
+    local win = M.pick_window_or_split()
+    if win then
+      vim.api.nvim_set_current_win(win)
+    end
+  end, { desc = "Focus a picked window, split with hjkl first" })
   vim.keymap.set("n", "<Leader>w=", "<C-w>=", { noremap = true, desc = "Equalize windows" })
+  vim.keymap.set("n", "<Leader>ww", ":w<CR>", { noremap = true, desc = "Save buffer" })
   -- Clear the former one-shot maps when reloading an existing session.
   for _, key in ipairs({ "<Leader>wgh", "<Leader>wgj", "<Leader>wgk", "<Leader>wgl" }) do
     pcall(vim.keymap.del, "n", key)
@@ -310,12 +375,17 @@ function M.setup()
   vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle reveal<cr>", { desc = "Toggle file tree" })
 
   -- Quickfix
-  vim.keymap.set("n", "<leader>qj", "<cmd>cnext<cr>", { desc = "Next quickfix item" })
-  vim.keymap.set("n", "<leader>qk", "<cmd>cprevious<cr>", { desc = "Previous quickfix item" })
+  vim.keymap.set("n", "<leader>qj", function()
+    require("config.quickfix").step(vim.v.count1)
+  end, { desc = "Next quickfix item" })
+  vim.keymap.set("n", "<leader>qk", function()
+    require("config.quickfix").step(-vim.v.count1)
+  end, { desc = "Previous quickfix item" })
   vim.keymap.set("n", "<leader>q[", "<cmd>colder<cr>", { desc = "Older quickfix list" })
   vim.keymap.set("n", "<leader>q]", "<cmd>cnewer<cr>", { desc = "Newer quickfix list" })
 
   -- Git
+  vim.keymap.set("n", "<leader>gg", "<cmd>Neogit kind=replace<cr>", { desc = "Neogit in this window" })
   vim.keymap.set("n", "<leader>gt", "<cmd>Neogit kind=tab<cr>", { desc = "Neogit tab" })
   vim.keymap.set("n", "<leader>gs", "<cmd>Neogit kind=split<cr>", { desc = "Neogit split" })
   vim.keymap.set("n", "<leader>gv", "<cmd>Neogit kind=vsplit<cr>", { desc = "Neogit vertical split" })
@@ -368,8 +438,12 @@ function M.setup()
   vim.keymap.set("n", "<leader>lk", restart_lsp_clients, { desc = "Restart LSP clients" })
   map_lsp_jump("d", vim.lsp.buf.definition, "Goto definition")
   map_lsp_jump("t", vim.lsp.buf.type_definition, "Goto type definition")
-  vim.keymap.set("n", "<leader>ll", vim.diagnostic.setloclist, { desc = "File diagnostics to loclist" })
-  vim.keymap.set("n", "<leader>lq", vim.diagnostic.setqflist, { desc = "All diagnostics to quickfix" })
+  vim.keymap.set("n", "<leader>ll", function()
+    vim.diagnostic.setloclist({ title = "Diagnostics: " .. vim.fn.expand("%:t") })
+  end, { desc = "File diagnostics to loclist" })
+  vim.keymap.set("n", "<leader>lq", function()
+    vim.diagnostic.setqflist({ title = "Diagnostics: all buffers" })
+  end, { desc = "All diagnostics to quickfix" })
   vim.keymap.set("n", "<leader>lf", function()
     require("config.format").format()
   end, { desc = "Format buffer" })
@@ -471,37 +545,46 @@ function M.setup()
     require("dapui").toggle()
   end, { desc = "Toggle DAP UI" })
 
-  -- Neotest
+  -- Neotest. Shift runs the same target under the debugger.
   vim.keymap.set("n", "<leader>nr", function()
     require("neotest").run.run()
   end, { desc = "Run nearest test" })
+  vim.keymap.set("n", "<leader>nR", function()
+    require("neotest").run.run({ strategy = "dap" })
+  end, { desc = "Debug nearest test" })
   vim.keymap.set("n", "<leader>nf", function()
     require("neotest").run.run(vim.fn.expand("%"))
   end, { desc = "Run test file" })
+  vim.keymap.set("n", "<leader>nF", function()
+    require("neotest").run.run({ vim.fn.expand("%"), strategy = "dap" })
+  end, { desc = "Debug test file" })
   vim.keymap.set("n", "<leader>nl", function()
     require("neotest").run.run_last()
   end, { desc = "Run last test" })
-  vim.keymap.set("n", "<leader>nd", function()
-    require("neotest").run.run({ strategy = "dap" })
-  end, { desc = "Debug nearest test" })
-  vim.keymap.set("n", "<leader>nD", function()
-    require("neotest").run.run({ vim.fn.expand("%"), strategy = "dap" })
-  end, { desc = "Debug test file" })
   vim.keymap.set("n", "<leader>nL", function()
     require("neotest").run.run_last({ strategy = "dap" })
   end, { desc = "Debug last test" })
-  vim.keymap.set("n", "<leader>ns", function()
+  vim.keymap.set("n", "<leader>na", function()
+    require("neotest").run.run(vim.uv.cwd())
+  end, { desc = "Run all tests" })
+  vim.keymap.set("n", "<leader>nw", function()
+    require("neotest").watch.toggle(vim.fn.expand("%"))
+  end, { desc = "Toggle watch on test file" })
+  vim.keymap.set("n", "<leader>nx", function()
     require("neotest").run.stop()
   end, { desc = "Stop test" })
+  vim.keymap.set("n", "<leader>ns", function()
+    require("neotest").summary.toggle()
+  end, { desc = "Toggle test summary" })
   vim.keymap.set("n", "<leader>no", function()
     require("neotest").output.open({ enter = true })
   end, { desc = "Open test output" })
-  vim.keymap.set("n", "<leader>nO", function()
+  vim.keymap.set("n", "<leader>np", function()
     require("neotest").output_panel.toggle()
   end, { desc = "Toggle test output panel" })
-  vim.keymap.set("n", "<leader>nS", function()
-    require("neotest").summary.toggle()
-  end, { desc = "Toggle test summary" })
+  vim.keymap.set("n", "<leader>nu", function()
+    require("neotest").refresh.refresh()
+  end, { desc = "Rescan for test files" })
 
   -- Config settings
   vim.keymap.set("n", "<leader>cr", function()

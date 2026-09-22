@@ -22,7 +22,7 @@ jobs:
         run: nix run nixpkgs#shellcheck -- --severity=warning scripts/*.sh shell/.config/shell/*.sh
       - name: stylua
         run: |
-          nix run nixpkgs#ripgrep -- --files --hidden -0 nvim -g '*.lua' \
+          nix run nixpkgs#ripgrep -- --files --hidden -0 nvim tests -g '*.lua' \
             | xargs -0 nix run nixpkgs#stylua -- --config-path .stylua.toml --check
 
   tests:
@@ -30,9 +30,22 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: DeterminateSystems/nix-installer-action@v23
-      - name: nvim unit tests
+      # tests/nvim_quickfix.lua wraps mini.bracketed, at the revision the config pins.
+      - name: mini.bracketed
         run: |
-          nix run nixpkgs#neovim -- --headless -u NONE -i NONE -l tests/nvim_adapters.lua
-          nix run nixpkgs#neovim -- --headless -u NONE -i NONE -l tests/nvim_string_masks.lua
+          lock=nvim/.config/nvim/nvim-pack-lock.json
+          git init -q "$RUNNER_TEMP/mini.bracketed"
+          git -C "$RUNNER_TEMP/mini.bracketed" fetch -q --depth 1 \
+            "$(nix run nixpkgs#jq -- -r '.plugins["mini.bracketed"].src' "$lock")" \
+            "$(nix run nixpkgs#jq -- -r '.plugins["mini.bracketed"].rev' "$lock")"
+          git -C "$RUNNER_TEMP/mini.bracketed" checkout -q FETCH_HEAD
+      - name: nvim unit tests
+        env:
+          MINI_BRACKETED_ROOT: ${{ runner.temp }}/mini.bracketed
+        run: |
+          for test in tests/*.lua; do
+            echo "== $test"
+            nix run nixpkgs#neovim -- --headless -u NONE -i NONE -l "$test"
+          done
       - name: setup checks
         run: nix shell nixpkgs#ripgrep --command ./tests/setup.sh

@@ -159,8 +159,92 @@ function M.live_grep(opts)
   builtin().live_grep(opts)
 end
 
-function M.current_buffer(opts)
-  builtin().current_buffer_fuzzy_find(opts or {})
+-- current_buffer_fuzzy_find hardcodes conf.generic_sorter, ignoring
+-- opts.sorter, so line-order mode needs its own picker rather than the
+-- builtin. get_substr_matcher scores by entry.index, which is the buffer's
+-- line order here, and still filters on substring match.
+local function current_buffer_entries(bufnr)
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local entries = {}
+  for lnum, line in ipairs(lines) do
+    table.insert(entries, {
+      lnum = lnum,
+      bufnr = bufnr,
+      filename = vim.api.nvim_buf_get_name(bufnr),
+      text = line,
+    })
+  end
+  return entries
+end
+
+function M.current_buffer(opts, by_relevance)
+  opts = vim.tbl_extend("force", { bufnr = vim.api.nvim_get_current_buf() }, opts or {})
+
+  local sorters = require("telescope.sorters")
+  local conf = telescope_config()
+  local sorter = by_relevance and conf.generic_sorter(opts) or sorters.get_substr_matcher()
+
+  opts.attach_mappings = function(prompt_bufnr, map)
+    actions().select_default:replace(function()
+      local selection = action_state().get_selected_entry()
+      if not selection then
+        vim.notify("No selection", vim.log.levels.WARN)
+        return
+      end
+      local current_picker = action_state().get_current_picker(prompt_bufnr)
+      local searched_for = action_state().get_current_line()
+
+      local highlights = current_picker.sorter:highlighter(searched_for, selection.ordinal) or {}
+      highlights = vim.tbl_map(function(hl)
+        if type(hl) == "table" and hl.start then
+          return hl.start
+        end
+        return hl
+      end, highlights)
+
+      local first_col = 0
+      if #highlights > 0 then
+        first_col = math.min(unpack(highlights)) - 1
+      end
+
+      actions().close(prompt_bufnr)
+      vim.schedule(function()
+        vim.cmd("normal! m'")
+        vim.api.nvim_win_set_cursor(0, { selection.lnum, first_col })
+      end)
+    end)
+
+    map({ "i", "n" }, "<C-r>", function()
+      local query = action_state().get_current_line()
+      actions().close(prompt_bufnr)
+      vim.schedule(function()
+        M.current_buffer(
+          vim.tbl_extend("force", opts, {
+            default_text = query,
+            attach_mappings = nil,
+            prompt_title = nil,
+          }),
+          not by_relevance
+        )
+      end)
+    end, { desc = by_relevance and "Sort by line number" or "Sort by relevance" })
+
+    return true
+  end
+
+  require("telescope.pickers")
+    .new(opts, {
+      prompt_title = by_relevance and "Current buffer fuzzy (relevance, <C-r> line order)"
+        or "Current buffer fuzzy (line order, <C-r> relevance)",
+      finder = require("telescope.finders").new_table({
+        results = current_buffer_entries(opts.bufnr),
+        entry_maker = opts.entry_maker or make_entry().gen_from_buffer_lines(opts),
+      }),
+      sorter = sorter,
+      previewer = conf.grep_previewer(opts),
+      attach_mappings = opts.attach_mappings,
+    })
+    :find()
 end
 
 function M.builtin(opts)

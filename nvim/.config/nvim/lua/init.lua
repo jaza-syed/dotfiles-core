@@ -129,6 +129,7 @@ vim.pack.add({
   -- Treesitter
   { src = gh("nvim-treesitter/nvim-treesitter"), version = "main" },
   { src = gh("nvim-treesitter/nvim-treesitter-textobjects"), version = "main" },
+  gh("nvim-treesitter/nvim-treesitter-context"),
 
   -- Display
   gh("rickhowe/wrapwidth"),
@@ -488,7 +489,12 @@ require("diffview").setup({
   keymaps = {
     -- Alongside the default `R`, and only in the panel, where <C-r> is free.
     file_panel = {
-      { "n", "<C-r>", require("diffview.actions").refresh_files, { desc = "Update stats and entries in the file list" } },
+      {
+        "n",
+        "<C-r>",
+        require("diffview.actions").refresh_files,
+        { desc = "Update stats and entries in the file list" },
+      },
     },
   },
 })
@@ -708,6 +714,69 @@ vim.keymap.set({ "n", "x", "o" }, "[F", function()
   ts_move.goto_previous_end("@function.outer", "textobjects")
 end, { desc = "Previous function end" })
 
+-- treesitter-context switches on globally, so the per-buffer opt-in is kept
+-- here and read by on_attach.
+local context_buffers = {}
+require("treesitter-context").setup({
+  enable = false,
+  -- Both settings are for the Telescope previews below: a preview window is
+  -- never the current window, and telescope's own floats are at zindex 50.
+  multiwindow = true,
+  zindex = 60,
+  on_attach = function(buf)
+    return context_buffers[buf] == true
+  end,
+})
+
+vim.api.nvim_create_user_command("TSContextBufferToggle", function()
+  local buf = vim.api.nvim_get_current_buf()
+  if context_buffers[buf] then
+    context_buffers[buf] = nil
+  else
+    context_buffers[buf] = true
+  end
+  -- enable() re-runs on_attach for every loaded buffer, which is how this
+  -- buffer attaches or detaches.
+  require("treesitter-context").enable()
+end, { desc = "Toggle treesitter context in this buffer" })
+
+-- Telescope highlights a preview buffer without setting its filetype, which
+-- treesitter-context requires before it considers the buffer.
+vim.api.nvim_create_autocmd("User", {
+  group = vim.api.nvim_create_augroup("dotfiles_context_telescope", { clear = true }),
+  pattern = "TelescopePreviewerLoaded",
+  callback = function(ev)
+    local filetype = ev.data and ev.data.filetype
+    if not filetype or filetype == "" then
+      return
+    end
+
+    context_buffers[ev.buf] = true
+    vim.bo[ev.buf].filetype = filetype
+
+    local context = require("treesitter-context")
+    if not context.enabled() then
+      context.enable()
+    end
+
+    -- SessionSavePost is the plugin's only hook that redraws every window
+    -- rather than the current one.
+    local function redraw()
+      vim.api.nvim_exec_autocmds("User", { pattern = "SessionSavePost" })
+    end
+
+    redraw()
+    -- Telescope reads the previewed file asynchronously and jumps to the match
+    -- once the lines arrive, which is after this event.
+    vim.api.nvim_buf_attach(ev.buf, false, {
+      on_lines = function()
+        vim.schedule(redraw)
+        return true
+      end,
+    })
+  end,
+})
+
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "markdown", "text", "gitcommit" },
   callback = function()
@@ -829,17 +898,23 @@ require("lazydev").setup({
   },
 })
 
+local test_policy = require("config.neotest")
 require("neotest").setup({
   adapters = {
-    require("neotest-python")({
+    test_policy.direnv_adapter(require("neotest-python")({
       runner = "pytest",
       dap = {
         justMyCode = false,
       },
-    }),
-    require("neotest-rust"),
+    })),
+    test_policy.direnv_adapter(require("neotest-rust")),
   },
+  consumers = test_policy.consumers,
 })
+
+vim.api.nvim_create_user_command("NeotestRefresh", function()
+  require("neotest").refresh.refresh()
+end, { desc = "Rescan the project for test files" })
 
 require("nvim-paredit").setup({
   filetypes = { "clojure" },

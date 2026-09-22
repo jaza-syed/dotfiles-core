@@ -113,9 +113,11 @@ committed here.
 evaluation is platform-independent: Ubuntu runners force the module system
 through `nix eval .#darwinConfigurations.base.system.drvPath` and the
 `homeConfigurations.base` activation package, a lint job runs shellcheck over
-`scripts/` and the shell tree plus `stylua --check` over the nvim lua, and a
-tests job runs the `tests/*.lua` checks through a headless nixpkgs neovim and
-`tests/setup.sh`. Nothing mac-specific is built, though `macos-14` arm64
+`scripts/` and the shell tree plus `stylua --check` over the nvim and tests
+lua, and a tests job runs every `tests/*.lua` check through a headless nixpkgs
+neovim and `tests/setup.sh`. A test that needs a plugin gets it from
+`nvim-pack-lock.json` at the pinned revision, as `tests/nvim_quickfix.lua`
+does with mini.bracketed. Nothing mac-specific is built, though `macos-14` arm64
 runners are free on a public repo if evaluation ever misses breakage.
 
 Renovate's GitHub App keeps `flake.lock` and the workflow pins current here

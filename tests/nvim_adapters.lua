@@ -72,20 +72,73 @@ assert(vim.o.splitright == false, "splitright not restored after success")
 assert(not pcall(difftastic.open, true), "failure was swallowed")
 assert(vim.o.splitright == false, "splitright not restored after failure")
 
--- mypy linter adapter
-package.preload["lint"] = function()
-  return { linters = {}, linters_by_ft = {} }
+-- neotest devshell adapter
+local fixture = vim.fn.tempname()
+vim.fn.mkdir(fixture .. "/pkg", "p")
+vim.fn.writefile({ "use flake" }, fixture .. "/.envrc")
+package.preload["machine"] = function()
+  return {
+    is_managed = function(path)
+      return vim.startswith(path or "", fixture)
+    end,
+  }
 end
-package.preload["lint.linters.mypy"] = function()
-  return { cmd = "mypy", stdin = false, args = { "--strict" } }
+reload("config.machine")
+reload("config.projects")
+local test_policy = reload("config.neotest")
+
+local managed = fixture .. "/pkg/test_a.py"
+local function tree_for(path)
+  return {
+    data = function()
+      return { path = path }
+    end,
+  }
 end
+local spec_calls = 0
+local argv_adapter = {
+  build_spec = function(args)
+    spec_calls = spec_calls + 1
+    return { command = { "pytest", args.tree:data().path } }
+  end,
+}
+local argv_pristine = argv_adapter.build_spec
 for _ = 1, 2 do
-  reload("config.lint").setup()
+  test_policy.direnv_adapter(argv_adapter)
 end
-local lint = require("lint")
-assert(type(lint.linters.mypy) == "function", "mypy adapter not installed")
-local resolved = lint.linters.mypy()
-assert(resolved.cmd == "uv" and resolved.stdin == false, "upstream mypy fields lost")
-assert(vim.deep_equal(resolved.args, { "run", "mypy", "--strict" }), "mypy argv not rebuilt from upstream")
+assert(argv_adapter._dotfiles_build_spec == argv_pristine, "neotest adapter lost the pristine build_spec")
+local argv_spec = argv_adapter.build_spec({ tree = tree_for(managed) })
+assert(spec_calls == 1, "neotest wrapper stacked or skipped the pristine build_spec")
+assert(
+  vim.deep_equal(argv_spec.command, { "direnv", "exec", fixture, "pytest", managed }),
+  "argv not wrapped in direnv"
+)
+assert(argv_spec.env.DIRENV_LOG_FORMAT == "", "direnv would log into the test output")
+
+-- A shell-string command is wrapped in place, keeping its own quoting.
+local string_adapter = test_policy.direnv_adapter({
+  build_spec = function()
+    return { command = "cargo nextest run -E 'test(/^a$/)'", cwd = fixture .. "/pkg" }
+  end,
+})
+local string_spec = string_adapter.build_spec({ tree = tree_for(managed) })
+assert(
+  string_spec.command == "direnv exec " .. vim.fn.shellescape(fixture) .. " cargo nextest run -E 'test(/^a$/)'",
+  "shell command not wrapped in direnv"
+)
+
+-- A debugger run has a DAP config and no command to wrap.
+local dap_adapter = test_policy.direnv_adapter({
+  build_spec = function()
+    return { strategy = { type = "python" } }
+  end,
+})
+assert(dap_adapter.build_spec({ tree = tree_for(managed) }).command == nil, "debug spec gained a command")
+
+local outside = "/private/tmp/unrelated/test_a.py"
+assert(
+  vim.deep_equal(argv_adapter.build_spec({ tree = tree_for(outside) }).command, { "pytest", outside }),
+  "unmanaged test run went through direnv"
+)
 
 print("Adapter regression checks passed")
