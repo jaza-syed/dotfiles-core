@@ -102,6 +102,12 @@ touch ~/.ssh/config.local
 chmod 600 ~/.ssh/config.local
 ```
 
+Sign in to Atuin and sync the shell history:
+
+```sh
+atuin login && atuin sync
+```
+
 On every Mac, gen-m5 included:
 
 1. In System Settings → Touch ID & Password, add a fingerprint. The darwin
