@@ -31,13 +31,9 @@ its host's home and darwin layers plus its own out-of-store links: the Claude
 and home profiles (`.#base-<user>`) from a clone of this repo, with nix-homebrew
 installing Homebrew itself during the switch; phase 2 authenticates with the
 tools the base profile installed; and phase 3 clones the machine repo and
-switches to the machine profiles. Two scripts remain:
-
-- `scripts/auth.sh`: interactive account setup; handles GitHub CLI
-  authentication, SSH key creation/loading, and 1Password CLI sign-in
-- `scripts/link_google_drive.sh`: post-sign-in personal setup; discovers
-  mounted Google Drive accounts and safely creates `~/drive-jaza` without
-  committing an account identifier
+switches to the machine profiles. `scripts/auth.sh` handles the interactive
+account setup: GitHub CLI authentication, SSH key creation/loading, and
+1Password CLI sign-in.
 
 If you change the flow, keep `install.md`, `scripts/auth.sh`, and `README.md`
 in sync.
@@ -83,10 +79,10 @@ inventory:
   operation, not in a committed snapshot that will immediately drift
 
 Google Drive is installed by the shared darwin module, but its account-specific
-mount does not exist until the user signs in. install.md therefore invokes
-`scripts/link_google_drive.sh` in its post-install steps. Keep account
-emails and CloudStorage directory names out of committed scripts and machine
-metadata.
+mount does not exist until the user signs in. Each machine repo sets an
+environment variable with its own Drive path, as gen-m5 does with
+`GENERATIVE_MY_DRIVE`. Keep account emails and CloudStorage directory names
+out of this public repo.
 
 ## Public Repo Hygiene
 

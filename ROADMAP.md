@@ -55,9 +55,11 @@ The common management commands live in [operations.md](operations.md).
   `services.sketchybar` replaces `brew services`. Home Manager's
   `programs.sketchybar.service` is the other candidate, which item 17 covers.
 - The manual checklist is unchanged: Mac App Store sign-in, GitHub and
-  1Password recovery factors, iCloud, Google Drive plus
-  `scripts/link_google_drive.sh`, and notification and accessibility
-  permissions.
+  1Password recovery factors, iCloud, Google Drive, and notification and
+  accessibility permissions.
+- Set an environment variable with the personal Drive path in the m1
+  `home.nix`, as gen-m5 does with `GENERATIVE_MY_DRIVE`, and point any
+  `~/drive-jaza` references at it.
 - Before wiping or retiring any source machine, confirm access to GitHub and
   1Password recovery material and keep a tested fallback until clone, pull,
   push, and SSH authentication work from the laptop.

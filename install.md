@@ -116,24 +116,12 @@ On the personal Mac:
 
 1. Sign in to iCloud and enable iCloud Drive and Notes.
 2. Sign in to the required Google accounts in the browser, Mimestream, and
-   Google Drive. After Google Drive has mounted the intended account, create
-   the local convenience link:
-
-   ```sh
-   cd ~/code/jaza-syed/dotfiles
-   ./scripts/link_google_drive.sh
-   readlink ~/drive-jaza
-   ```
-
-   The helper discovers local accounts and asks which one should back
-   `~/drive-jaza` when more than one is mounted. It does not store the account
-   name in this repository.
+   Google Drive.
 3. Install Ableton Live, Max, Cold Turkey Blocker, and the locally built Noise
    Generator app if needed.
 4. In System Settings:
    - disable Siri if desired;
    - select the largest built-in display setting;
-   - remap Caps Lock to Control;
    - disable the Control-Space input-source shortcut.
 5. Review notification permissions for Mimestream, Calendar, WhatsApp, and
    other communication apps.

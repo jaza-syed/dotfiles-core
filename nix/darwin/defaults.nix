@@ -13,7 +13,14 @@ in
     reattach = true;
   };
 
+  system.keyboard = {
+    enableKeyMapping = true;
+    remapCapsLockToControl = true;
+  };
+
   system.defaults = {
+    controlcenter.BatteryShowPercentage = true;
+
     NSGlobalDomain = {
       ApplePressAndHoldEnabled = false;
       KeyRepeat = 1;
