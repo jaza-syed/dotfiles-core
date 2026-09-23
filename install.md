@@ -12,6 +12,8 @@ then switch over to the machine profile. The steps after phase 3 are manual.
    available.
 3. Give the terminal Full Disk Access in System Settings → Privacy & Security.
    The darwin switch writes Safari defaults, and that write fails without it.
+4. Install the Command Line Tools with `xcode-select --install`. Neovim
+   builds telescope-fzf-native with `make` and `cc` when it installs the plugin.
 
 ## Phase 1: base profile, public and unauthenticated
 
