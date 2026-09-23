@@ -13,7 +13,7 @@
       "Read(/private/tmp/claude*/**)",
       "Edit(/tmp/claude*/**)",
       "Edit(/private/tmp/claude*/**)",
-      "Read(/Users/jsyed/.claude/projects/**)"
+      "Read(~/.claude/projects/**)"
     ],
     "deny": [
       "Edit(//tmp/claude/**)",
@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/jsyed/.claude/hooks/deny-bad-commands.sh"
+            "command": "bash ~/.claude/hooks/deny-bad-commands.sh"
           }
         ]
       }
@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/jsyed/.claude/hooks/notify.sh"
+            "command": "bash ~/.claude/hooks/notify.sh"
           }
         ]
       }
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/jsyed/.claude/hooks/cancel-notify.sh"
+            "command": "bash ~/.claude/hooks/cancel-notify.sh"
           }
         ]
       }
@@ -67,7 +67,7 @@
       "allowWrite": [
         "/tmp/claude*/**",
         "/private/tmp/claude*/**",
-        "/Users/jsyed/.cache/**"
+        "~/.cache/**"
       ],
       "denyWrite": [
         "/tmp/claude/**",

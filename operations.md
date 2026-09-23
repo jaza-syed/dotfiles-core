@@ -14,7 +14,7 @@ Switches run against the machine repo, one command per layer:
 
 ```sh
 # User layer
-home-manager switch --flake ~/code/jaza-syed/dotfiles-gen-m5#jsyed@gen-m5
+home-manager switch --flake ~/code/jaza-syed/dotfiles-gen-m5#gen-m5
 home-manager switch --flake ~/code/jaza-syed/dotfiles-m1#jsyed@m1
 
 # System layer
@@ -37,7 +37,7 @@ nix flake update dotfiles
 git add flake.lock
 git commit -m "relock onto the pushed core"
 git push
-home-manager switch --flake .#jsyed@gen-m5
+home-manager switch --flake .#gen-m5
 ```
 
 Renovate also opens weekly lock PRs on the GitHub repos, and a weekly Action

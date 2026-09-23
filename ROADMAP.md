@@ -39,6 +39,9 @@ The common management commands live in [operations.md](operations.md).
 - Push `../dotfiles-m1` before the bring-up. It exists and mirrors
   `../dotfiles-gen-m5`: it imports the core and holds
   `homeConfigurations."jsyed@m1"` and `darwinConfigurations.m1`.
+- Rename `homeConfigurations."jsyed@m1"` to `m1` and set the username once in
+  the m1 `flake.nix`, as `../dotfiles-gen-m5` does. Then update the m1
+  commands in install.md, operations.md and AGENTS.md.
 - Follow [install.md](install.md): phase 1 activates the core's base profile
   from an anonymous clone, phase 2 authenticates GitHub and 1Password with
   the tools that profile installed, and phase 3 clones `../dotfiles-m1` and

@@ -69,21 +69,27 @@
           enableBashIntegration = false;
         };
       };
-      # Base bootstrap profiles (install.md phase 1): no machine facts beyond
-      # the username and home directory, hard-coded by decision (AGENTS.md).
-      baseHome = {
-        home.username = "generative";
-        home.homeDirectory = "/Users/generative";
+      # Base bootstrap profiles (install.md phase 1), one `base-<user>` output
+      # per username the Macs use, with no other machine facts.
+      baseUsers = [
+        "jsyed"
+        "generative"
+      ];
+      forBaseUsers =
+        f: nixpkgs.lib.genAttrs' baseUsers (user: nixpkgs.lib.nameValuePair "base-${user}" (f user));
+      baseHome = user: {
+        home.username = user;
+        home.homeDirectory = "/Users/${user}";
         home.stateVersion = "26.05";
         programs.home-manager.enable = true;
-        dotfiles.repoDir = "/Users/generative/code/jaza-syed/dotfiles";
+        dotfiles.repoDir = "/Users/${user}/code/jaza-syed/dotfiles";
       };
-      baseDarwin = {
+      baseDarwin = user: {
         nixpkgs.hostPlatform = "aarch64-darwin";
-        system.primaryUser = "generative";
-        users.users.generative.home = "/Users/generative";
+        system.primaryUser = user;
+        users.users.${user}.home = "/Users/${user}";
         system.stateVersion = 6;
-        nix-homebrew.user = "generative";
+        nix-homebrew.user = user;
       };
     in
     {
@@ -125,21 +131,27 @@
         homebrew = homebrewModule;
       };
 
-      darwinConfigurations.base = nix-darwin.lib.darwinSystem {
-        modules = [
-          ./nix/darwin/atrun.nix
-          ./nix/darwin/defaults.nix
-          homebrewModule
-          baseDarwin
-        ];
-      };
+      darwinConfigurations = forBaseUsers (
+        user:
+        nix-darwin.lib.darwinSystem {
+          modules = [
+            ./nix/darwin/atrun.nix
+            ./nix/darwin/defaults.nix
+            homebrewModule
+            (baseDarwin user)
+          ];
+        }
+      );
 
-      homeConfigurations.base = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-        modules = sharedHomeModules ++ [
-          ./nix/home/darwin.nix
-          baseHome
-        ];
-      };
+      homeConfigurations = forBaseUsers (
+        user:
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+          modules = sharedHomeModules ++ [
+            ./nix/home/darwin.nix
+            (baseHome user)
+          ];
+        }
+      );
     };
 }

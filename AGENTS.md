@@ -172,16 +172,16 @@ ordinary primitives (functions, overlays, modules).
   by the machine repo rather than derived from `stdenv.isDarwin`, so a Linux
   host that wants one of these can import it.
 - The machine repos own machine facts: username, home directory, hostname,
-  and profile choices. No module here may hard-code `jsyed` or a home path,
-  except the base bootstrap outputs in `flake.nix`, which hard-code the
-  username by decision, since the core is the personal base and the name is in
-  its history regardless.
+  and profile choices. No module here may hard-code a username or a home path.
+  The one exception is the `baseUsers` list in `flake.nix`, which produces one
+  `base-<user>` bootstrap output per username the Macs use. Each machine repo
+  sets its username once, in its `flake.nix`.
 - Actively edited configuration (nvim, shell startup, sketchybar, the Claude
   directory, generated themes) stays as plain files linked out-of-store, so
   editing a file needs no switch. Home Manager owns only the links and
   packages.
 - Work integration: `../dotfiles-gen-m5` (pushed to the work GitLab) holds
-  both the `jsyed@gen-m5` standalone Home Manager layer and
+  both the `gen-m5` standalone Home Manager layer and
   `darwinConfigurations.gen-m5`. It owns all work-specific configuration;
   the core owns ergonomics and stays free of work config.
 
@@ -234,9 +234,9 @@ load from `~/.nix-profile/share/zsh/site-functions` on fpath.
 Home Manager is flake-based and owns the Nix-specific package set, including
 tmux with sixel support. The package set lives in `nix/home/tools.nix`, and
 the per-machine user layers are `homeConfigurations` targets in the machine
-repos (`jsyed@m1` in `../dotfiles-m1`, `jsyed@gen-m5` in
+repos (`jsyed@m1` in `../dotfiles-m1`, `gen-m5` in
 `../dotfiles-gen-m5`). Nix itself is a setup prerequisite. Apply with
-`home-manager switch --flake <machine-repo>#jsyed@<machine>`, or bootstrap
+`home-manager switch --flake <machine-repo>#<target>`, or bootstrap
 through `nix run home-manager/release-26.05` when the CLI is not installed
 yet. Roll back by running a previous generation's `activate` script from
 `home-manager generations`. Do not commit `~/.config/nix/nix.conf` or

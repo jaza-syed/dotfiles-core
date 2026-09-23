@@ -55,6 +55,16 @@ Setup is rerunnable: rerun `./scripts/auth.sh` for authentication, and rerun
 the two switches from the machine repo after pulling changes. After a core
 push, relock the machine repo with `nix flake update dotfiles`.
 
+### Permissions and Touch ID
+
+These steps apply to every Mac, gen-m5 included, after the base darwin switch.
+
+1. In System Settings → Touch ID & Password, add a fingerprint. The darwin
+   switch enables Touch ID for sudo, including inside tmux.
+2. In System Settings → Privacy & Security, allow:
+   - Scroll Reverser under Accessibility and Input Monitoring;
+   - AeroSpace and Hammerspoon under Accessibility.
+
 ### Personal post-install checklist
 
 1. Sign in to iCloud and enable iCloud Drive and Notes.

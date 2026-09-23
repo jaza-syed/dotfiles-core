@@ -4,6 +4,15 @@ let
   home = config.users.users.${config.system.primaryUser}.home;
 in
 {
+  # Only takes effect on hosts where nix-darwin manages Nix (nix.enable).
+  nix.settings.experimental-features = "nix-command flakes";
+
+  security.pam.services.sudo_local = {
+    touchIdAuth = true;
+    # Lets Touch ID answer sudo inside tmux.
+    reattach = true;
+  };
+
   system.defaults = {
     NSGlobalDomain = {
       ApplePressAndHoldEnabled = false;
