@@ -18,7 +18,9 @@ local function wrap_command(spec, position_path)
   -- cwd still decides where the tests run.
   spec.env = vim.tbl_extend("keep", spec.env or {}, { DIRENV_LOG_FORMAT = "" })
   if type(spec.command) == "string" then
-    spec.command = ("direnv exec %s %s"):format(vim.fn.shellescape(root), spec.command)
+    -- build_spec runs in a fast event context, where vim.fn.shellescape raises E5560.
+    local quoted = "'" .. root:gsub("'", [['\'']]) .. "'"
+    spec.command = ("direnv exec %s %s"):format(quoted, spec.command)
   else
     spec.command = vim.list_extend({ "direnv", "exec", root }, spec.command)
   end

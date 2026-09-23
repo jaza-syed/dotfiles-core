@@ -13,9 +13,9 @@ function M.normalize(path)
     return nil
   end
 
-  local expanded = vim.fn.expand(path)
-  local normalized = vim.fs.normalize(vim.fn.fnamemodify(expanded, ":p"))
-  return trim_trailing_slash(normalized)
+  -- vim.fs.abspath expands a leading ~ and, unlike vim.fn.expand, is callable
+  -- in a fast event context.
+  return trim_trailing_slash(vim.fs.normalize(vim.fs.abspath(path)))
 end
 
 function M.is_under(path, root)

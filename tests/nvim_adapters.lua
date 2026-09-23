@@ -127,6 +127,29 @@ assert(
   "shell command not wrapped in direnv"
 )
 
+-- neotest builds a spec from a libuv callback, where vim.fn.expand and
+-- vim.fn.shellescape raise E5560.
+local fast_results
+local timer = vim.uv.new_timer()
+timer:start(0, 0, function()
+  fast_results = {
+    argv = { pcall(argv_adapter.build_spec, { tree = tree_for(managed) }) },
+    string = { pcall(string_adapter.build_spec, { tree = tree_for(managed) }) },
+  }
+  timer:close()
+end)
+vim.wait(1000, function()
+  return fast_results ~= nil
+end)
+assert(fast_results, "the fast event callback never ran")
+for kind, result in pairs(fast_results) do
+  assert(result[1], ("%s build_spec failed in a fast event context: %s"):format(kind, tostring(result[2])))
+end
+assert(
+  vim.deep_equal(fast_results.argv[2].command, { "direnv", "exec", fixture, "pytest", managed }),
+  "argv not wrapped in direnv in a fast event context"
+)
+
 -- A debugger run has a DAP config and no command to wrap.
 local dap_adapter = test_policy.direnv_adapter({
   build_spec = function()
