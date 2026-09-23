@@ -20,6 +20,7 @@
       # Dev
       "bash"
       "bash-completion@2"
+      "glab"
       "xcodegen"
 
       # Media
