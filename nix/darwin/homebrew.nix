@@ -88,9 +88,6 @@
       "Amphetamine" = 937984704;
       "Free Ruler" = 1483172210;
       "Ghostery AdBlocker for Privacy" = 6504861501;
-      "Keynote" = 409183694;
-      "Numbers" = 409203825;
-      "Pages" = 409201541;
       "Todoist" = 585829637;
       "Toggl Track" = 1291898086;
       "WhatsApp" = 310633997;

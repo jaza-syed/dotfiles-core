@@ -111,6 +111,7 @@ On every Mac, gen-m5 included:
    - AeroSpace and Hammerspoon under Accessibility.
 3. In Raycast Settings → Extensions, choose + → Add Script Directory and
    select `~/.config/raycast/scripts`.
+4. Install the ZSA Navigator app from <https://www.zsa.io/navigator/trackpad>.
 
 On the personal Mac:
 
