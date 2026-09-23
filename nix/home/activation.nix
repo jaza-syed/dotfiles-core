@@ -29,6 +29,16 @@ in
       fi
     '';
 
+    # Ghostty keeps its terminfo inside the app bundle, so tools outside Ghostty
+    # cannot read xterm-ghostty. Copy it out when the app is installed.
+    ghosttyTerminfo = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      ghostty_terminfo=/Applications/Ghostty.app/Contents/Resources/terminfo/78/xterm-ghostty
+      if [ -e "$ghostty_terminfo" ] && [ ! -e "$HOME/.terminfo/78/xterm-ghostty" ]; then
+        run mkdir -p "$HOME/.terminfo/78"
+        run cp "$ghostty_terminfo" "$HOME/.terminfo/78/xterm-ghostty"
+      fi
+    '';
+
     # Clone TPM and the plugins declared in tmux.conf without starting a server.
     tmuxPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       tmux_plugins_root="$HOME/.local/share/tmux/plugins"
