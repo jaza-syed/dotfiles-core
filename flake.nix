@@ -72,18 +72,18 @@
       # Base bootstrap profiles (install.md phase 1): no machine facts beyond
       # the username and home directory, hard-coded by decision (AGENTS.md).
       baseHome = {
-        home.username = "jsyed";
-        home.homeDirectory = "/Users/jsyed";
+        home.username = "generative";
+        home.homeDirectory = "/Users/generative";
         home.stateVersion = "26.05";
         programs.home-manager.enable = true;
-        dotfiles.repoDir = "/Users/jsyed/code/jaza-syed/dotfiles";
+        dotfiles.repoDir = "/Users/generative/code/jaza-syed/dotfiles";
       };
       baseDarwin = {
         nixpkgs.hostPlatform = "aarch64-darwin";
-        system.primaryUser = "jsyed";
-        users.users.jsyed.home = "/Users/jsyed";
+        system.primaryUser = "generative";
+        users.users.generative.home = "/Users/generative";
         system.stateVersion = 6;
-        nix-homebrew.user = "jsyed";
+        nix-homebrew.user = "generative";
       };
     in
     {
