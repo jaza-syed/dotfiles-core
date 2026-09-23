@@ -45,7 +45,7 @@ Renovate also opens weekly lock PRs on the GitHub repos, and a weekly Action
 moving without manual relocks.
 
 To test uncommitted core changes before pushing, override the machine repo's
-`dotfiles` input at the local checkout; the machine READMEs carry the exact
+`dotfiles` input at the local checkout. Each machine repo documents the exact
 command.
 
 ## Adding and removing software
@@ -103,6 +103,15 @@ hand:
 ```sh
 ./scripts/generate_completions.sh
 exec zsh   # or: exec bash
+```
+
+## Formatting Lua
+
+From the repository root, format the maintained Neovim Lua files, which
+excludes the ignored generated palettes:
+
+```sh
+rg --files --hidden -0 nvim -g '*.lua' | xargs -0 stylua --config-path .stylua.toml
 ```
 
 ## Garbage collection

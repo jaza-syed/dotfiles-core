@@ -48,5 +48,8 @@ in
     "sketchybar/lib".source = link "sketchybar/.config/sketchybar/lib";
     "sketchybar/plugins".source = link "sketchybar/.config/sketchybar/plugins";
     "sketchybar/render".source = link "sketchybar/.config/sketchybar/render";
+
+    # Raycast owns ~/.config/raycast, so only its script command directory is linked.
+    "raycast/scripts".source = link "raycast/.config/raycast/scripts";
   };
 }
