@@ -10,8 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: DeterminateSystems/nix-installer-action@v23
-      - run: nix eval --raw .#darwinConfigurations.base.system.drvPath
-      - run: nix eval --raw .#homeConfigurations.base.activationPackage.drvPath
+      - run: nix eval --raw .#darwinConfigurations.base-jsyed.system.drvPath
+      - run: nix eval --raw .#homeConfigurations.base-jsyed.activationPackage.drvPath
 
   lint:
     runs-on: ubuntu-latest

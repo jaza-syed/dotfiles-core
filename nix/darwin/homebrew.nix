@@ -21,10 +21,8 @@
       "bash"
       "bash-completion@2"
       "glab"
+      "terminal-notifier"
       "xcodegen"
-
-      # Media
-      "mplayer"
     ];
 
     casks = [
@@ -69,7 +67,6 @@
       "dropbox"
       "raycast"
       "slack"
-      "simplenote"
       "betterdisplay"
       "figma"
       "google-drive"
@@ -97,7 +94,6 @@
       "Todoist" = 585829637;
       "Toggl Track" = 1291898086;
       "WhatsApp" = 310633997;
-      "Xcode" = 497799835;
     };
   };
 }

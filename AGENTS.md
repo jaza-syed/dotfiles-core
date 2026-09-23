@@ -28,7 +28,7 @@ its host's home and darwin layers plus its own out-of-store links: the Claude
 ## Bootstrap and Auth
 
 `install.md` holds the three-phase flow: phase 1 activates the base darwin
-and home profiles (`.#base`) from a clone of this repo, with nix-homebrew
+and home profiles (`.#base-<user>`) from a clone of this repo, with nix-homebrew
 installing Homebrew itself during the switch; phase 2 authenticates with the
 tools the base profile installed; and phase 3 clones the machine repo and
 switches to the machine profiles. Two scripts remain:
@@ -111,8 +111,8 @@ committed here.
 
 `.github/workflows/ci.yml` runs on push and PR and is evaluation-only, since
 evaluation is platform-independent: Ubuntu runners force the module system
-through `nix eval .#darwinConfigurations.base.system.drvPath` and the
-`homeConfigurations.base` activation package, a lint job runs shellcheck over
+through `nix eval .#darwinConfigurations.base-jsyed.system.drvPath` and the
+`homeConfigurations.base-jsyed` activation package, a lint job runs shellcheck over
 `scripts/` and the shell tree plus `stylua --check` over the nvim and tests
 lua, and a tests job runs every `tests/*.lua` check through a headless nixpkgs
 neovim and `tests/setup.sh`. A test that needs a plugin gets it from
@@ -143,7 +143,7 @@ ordinary primitives (functions, overlays, modules).
   and host configurations. It contains no logic.
 - This public repository holds the reusable modules (`homeModules.*`,
   `darwinModules.*`, later `nixosModules.*`) plus the machine-free base
-  bootstrap profiles (`darwinConfigurations.base`, `homeConfigurations.base`)
+  bootstrap profiles (`darwinConfigurations.base-<user>`, `homeConfigurations.base-<user>`)
   for install.md phase 1. Every machine has its own repository that imports
   the core and holds its host composition. Consumers import modules and set
   options.
@@ -167,7 +167,7 @@ ordinary primitives (functions, overlays, modules).
   machine uses the standalone mode.
 - `homeModules.default` evaluates on Linux as well as macOS. The macOS-only
   links and packages, meaning aerospace, sketchybar, hammerspoon, Typora,
-  wezterm, `terminal-notifier` and `jankyborders`, are in
+  wezterm and `jankyborders`, are in
   `homeModules.darwin`, which each Mac host file imports. The split is stated
   by the machine repo rather than derived from `stdenv.isDarwin`, so a Linux
   host that wants one of these can import it.

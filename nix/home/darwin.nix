@@ -7,7 +7,6 @@ in
   imports = [ ./repo.nix ];
 
   home.packages = [
-    pkgs.terminal-notifier
     pkgs.sketchybar
     pkgs.jankyborders
   ];
