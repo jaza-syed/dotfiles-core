@@ -1,0 +1,15 @@
+# Ghostty has no dynamic config, so colors come from a generated theme file per
+# palette in themes/. The theme shell function relinks current-theme, and
+# Ghostty applies it on reload (cmd+shift+, on macOS).
+config-file = ?current-theme
+
+font-family = Liga SFMono Nerd Font
+font-size = 16
+
+# Match the wezterm rendering: subpixel with light hinting.
+font-thicken = false
+
+macos-titlebar-style = tabs
+window-padding-x = 4
+window-padding-y = 4
+confirm-close-surface = false

@@ -31,7 +31,9 @@
       "1password-cli"
 
       # Fonts
+      "font-sf-mono"
       "font-sf-mono-nerd-font-ligaturized"
+      "font-iosevka-ss04"
       "font-sketchybar-app-font"
       "sf-symbols"
       "font-ibm-plex-mono"
@@ -48,6 +50,7 @@
       # Terminals & dev
       "linear"
       "wezterm@nightly"
+      "ghostty"
       "temurin@25" # java
       "typora"
       "visual-studio-code"

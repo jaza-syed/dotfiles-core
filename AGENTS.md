@@ -194,7 +194,7 @@ out-of-store by `nix/home/links.nix`, except the macOS-only ones, which
 | `claude` / `pi` | Coding-agent configuration (Home Manager links) |
 | `aerospace` / `sketchybar` / `hammerspoon` / `raycast` | macOS window/UI automation (Home Manager links) |
 | `nvim` / `vim` | Editor configuration (Home Manager links) |
-| `wezterm` / `tmux` / `starship` | Terminal and prompt configuration (Home Manager links) |
+| `wezterm` / `ghostty` / `tmux` / `starship` | Terminal and prompt configuration (Home Manager links) |
 | `typora` | Generated local theme assets (Home Manager links) |
 
 Shell configuration is layered as follows:
@@ -325,12 +325,18 @@ It sources `fzf-theme-<name>.sh` and exports `DOTFILES_THEME`. The `theme
 opens an inline picker, an exact or single partial match applies immediately,
 multiple matches open the picker, and no matches print the available themes.
 Applying a theme updates shell-local fzf state, exports `DOTFILES_THEME`, sends
-WezTerm a `THEME` user-var escape, and, inside tmux, invokes
-`~/.config/tmux/apply-theme.sh` for the current session.
+WezTerm a `THEME` user-var escape, relinks the Ghostty theme, and, inside tmux,
+invokes `~/.config/tmux/apply-theme.sh` for the current session.
 
 WezTerm boots with the generated light palette. Its `user-var-changed` handler
 applies `THEME` as window color overrides. Tabs in one window share a theme;
 different windows can differ.
+
+Ghostty has no dynamic config, so each palette becomes a file under
+`ghostty/.config/ghostty/themes/`, and its `config` includes `?current-theme`.
+The `theme` helper relinks `~/.config/ghostty/current-theme`, and a running
+Ghostty applies the new file on reload, which is `cmd+shift+,` on macOS. The
+theme is per-application rather than per-window.
 
 tmux starts with `@theme='light'` and `colors-light.conf`. New sessions import
 the creating client's `DOTFILES_THEME` as a hint.

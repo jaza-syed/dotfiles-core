@@ -35,6 +35,7 @@ alias gps="git push"
 alias gpl="git pull"
 alias gst="git status"
 alias gsw="git switch"
+alias dots='git -C "$DOTFILES_DIR"'
 alias nf="nix fmt"
 alias n="nvim"
 
@@ -113,6 +114,16 @@ apply_shell_theme() {
 
     load_fzf_theme "$theme_name" || return 1
     export DOTFILES_THEME="$theme_name"
+}
+
+# Ghostty has no dynamic config, so point current-theme at the generated theme
+# file. A running Ghostty applies it on reload (cmd+shift+, on macOS).
+apply_ghostty_theme() {
+    local theme_name="$1"
+    local theme_dir="$HOME/.config/ghostty/themes"
+
+    [ -e "$theme_dir/$theme_name" ] || return 0
+    ln -sfn "$theme_dir/$theme_name" "$HOME/.config/ghostty/current-theme"
 }
 
 apply_terminal_theme() {
@@ -257,6 +268,7 @@ theme() {
     # Tell wezterm to switch colors for this window. Inside tmux this must be
     # wrapped in a passthrough sequence so the outer terminal actually sees it.
     apply_terminal_theme "$theme_name"
+    apply_ghostty_theme "$theme_name"
 
     if [ -n "$TMUX" ]; then
         tmux run-shell "$HOME/.config/tmux/apply-theme.sh '$theme_name' '#{session_name}'"

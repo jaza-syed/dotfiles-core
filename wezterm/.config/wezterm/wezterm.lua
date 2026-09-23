@@ -36,7 +36,13 @@ end
 -- This is where you actually apply your config choices.
 -- or, changing the font size and color scheme.
 config.font_size = 16
-config.font = wezterm.font "Liga SFMono Nerd Font"
+-- Menlo-like shapes at Iosevka's wider Extended width. Unpatched, so icons come
+-- from wezterm's built-in Symbols Nerd Font Mono fallback.
+config.font = wezterm.font("Iosevka Term SS04", { stretch = "Expanded" })
+-- Subpixel rendering with light hinting, which thins the stems macOS smoothing
+-- would otherwise thicken.
+config.freetype_render_target = "HorizontalLcd"
+config.freetype_load_target = "Light"
 -- Colors: loaded from generated palette (see palettes/ and scripts/generate_colorscheme.sh)
 local default_theme = load_theme("light")
 if default_theme then
