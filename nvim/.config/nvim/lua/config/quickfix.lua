@@ -3,7 +3,7 @@ local M = {}
 
 -- Windows that cannot serve as the target, because they hold no file.
 local filter_rules = {
-  include_current_win = false,
+  include_current_win = true,
   bo = {
     filetype = { "qf", "trouble", "oil", "aerial", "NvimTree", "neo-tree", "notify", "snacks_notif" },
     buftype = { "quickfix", "terminal", "nofile", "prompt" },

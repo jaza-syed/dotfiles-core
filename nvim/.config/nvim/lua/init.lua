@@ -305,6 +305,9 @@ require("hop").setup()
 
 require("window-picker").setup({
   hint = "floating-big-letter",
+  -- The picker matches case insensitively, so the default set's J, K and L
+  -- would shadow the hjkl split keys in config/keymaps.lua.
+  selection_chars = "FDSA;CMRUEIWOQP",
 })
 vim.keymap.set("n", "<Leader>ww", function()
   local win = require("window-picker").pick_window()

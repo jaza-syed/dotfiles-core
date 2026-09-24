@@ -15,7 +15,8 @@
 
     # Languages and runtimes
     pkgs.nodejs_latest
-    pkgs.python3
+    # debugpy is the adapter nvim's dap config runs for Python.
+    (pkgs.python3.withPackages (ps: [ ps.debugpy ]))
     pkgs.lua5_4
 
     # Language servers and checkers

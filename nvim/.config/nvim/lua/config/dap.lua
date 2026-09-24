@@ -5,8 +5,10 @@ local listener_key = "dotfiles_dap"
 local debug_tab_var = "dotfiles_dap_debug_tab"
 local origin_tab = nil
 
+-- Home Manager's python3 carries debugpy, so a project python on PATH first
+-- shadows it.
 local function debugpy_python()
-  return vim.fn.stdpath("data") .. "/debugpy/bin/python"
+  return vim.fn.exepath("python3")
 end
 
 M.debugpy_python = debugpy_python
@@ -138,14 +140,8 @@ local function setup_dap_python()
   end
 
   local python = debugpy_python()
-  if vim.fn.executable(python) ~= 1 then
-    local install_cmd = "uv venv "
-      .. vim.fn.stdpath("data")
-      .. "/debugpy"
-      .. " && uv pip install --python "
-      .. python
-      .. " debugpy"
-    vim.notify("debugpy adapter not found at " .. python .. "; run: " .. install_cmd, vim.log.levels.WARN)
+  if python == "" or vim.fn.executable(python) ~= 1 then
+    vim.notify("no python3 on PATH for the debug adapter; run a home-manager switch", vim.log.levels.WARN)
     return
   end
 

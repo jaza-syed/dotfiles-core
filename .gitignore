@@ -16,6 +16,7 @@ nvim/.config/nvim/lua/colors/*.lua
 !nvim/.config/nvim/lua/colors/util.lua
 !nvim/.config/nvim/lua/colors/windows.lua
 wezterm/.config/wezterm/colors_*.lua
+ghostty/.config/ghostty/themes/
 tmux/.config/tmux/colors-*.conf
 shell/.config/shell/fzf-theme-*.sh
 aerospace/.config/aerospace/mode-borders-*.sh
