@@ -27,10 +27,31 @@ When you write instructions for a subagent, they MUST tell the subagent that the
 When you stop part-way through a sequence of actions because you need a decision or a go-ahead from me before you can continue, you MUST also send a desktop notification saying what you need:
 
 ```sh
-terminal-notifier -title "Claude Code" -message "<the decision you need>"
+name="velvet-otter"   # two words you pick at random, see below
+printf "\033]0;$name\007" > "$(tmux display-message -p '#{client_tty}')"
+for _ in $(seq 20); do
+  wid=$(aerospace list-windows --all --format '%{window-id}|%{app-name}|%{window-title}' |
+    rg --color never "\|Ghostty\|$name\$" | cut -d'|' -f1 | tr -d ' ')
+  [ -n "$wid" ] && break
+done
+
+terminal-notifier -title "Claude Code" -subtitle "<the task that is waiting>" -message "<the decision you need>" \
+  -group claude -activate com.mitchellh.ghostty \
+  -execute "$(command -v aerospace) focus --window-id $wid; $(command -v tmux) select-window -t $TMUX_PANE; $(command -v tmux) select-pane -t $TMUX_PANE"
 ```
 
 This applies whether you ask in prose or through the AskUserQuestion tool. `terminal-notifier` exists only on the Macs, so skip the notification where the command is absent.
+
+In a Claude Desktop session, whose system prompt says it runs inside the Claude desktop app, you MUST send the notification with the PushNotification tool instead of the script, and load the tool with ToolSearch first if it is deferred. Its message names the waiting task and the decision in one line under 200 characters. The bullets below apply only to the script.
+
+- `name` MUST be two words you pick at random, joined by a hyphen, whimsical in the style of Anthropic's own naming, for example `velvet-otter` or `copper-wren`. Pick a fresh pair each time you notify. The title stays on the window afterwards, so I can tell my Ghostty windows apart.
+- The `printf` writes OSC 0 to the tty of the tmux client, which sets that Ghostty window's title. tmux leaves the title alone because `set-titles` is off, and a random pair means the lookup matches one window. AeroSpace takes about 100ms to see a title change, so the loop retries rather than guessing a delay.
+- `aerospace focus --window-id` raises that exact window. AeroSpace already holds the Accessibility permission this needs, so no grant is required. Ghostty runs all its windows in one process, so `-activate` alone can only raise whichever Ghostty window was frontmost; it stays as the fallback for when AeroSpace is not running.
+- `-execute` runs a shell command when I click. `select-window` and `select-pane` act on the session that contains the pane, so they hold whatever client is attached, unlike `switch-client`, which picks a client itself. The clicked command gets no tmux environment and a minimal PATH, so the double quotes expand `$wid`, `$TMUX_PANE` and both `command -v` lookups as you send rather than on click. Every binary in it MUST be an absolute path. Drop the tmux parts when `$TMUX_PANE` is unset, and the `aerospace` part when the command is absent.
+- `-group claude` makes each notification replace the previous one, so I cannot click a stale notification whose `$wid` and pane no longer apply.
+- `-subtitle` names the task that is waiting, so `-message` carries only the decision.
+- `-action "First,Second"` adds buttons and `-reply "<prompt>"` adds a text field. Each prints my answer on stdout and blocks until the answer arrives, so use one only when the turn has nothing to do but wait. Prefer `-action` for a closed choice and `-reply` for free text.
+- `-timeout SECONDS` MUST accompany `-action` or `-reply`, and MUST be shorter than the Bash tool's own timeout. On expiry the command prints `@TIMEOUT` and exits 6, and you then ask me in the session instead.
 
 ## Writing comments
 

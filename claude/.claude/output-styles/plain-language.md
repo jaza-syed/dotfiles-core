@@ -37,6 +37,10 @@ If you have not read that file in this session, read it before you write a comme
     You MUST NOT coin a verb-metaphor of your own
     e.g. "the key names no function", "the view keeps the arrays in the body".
     State the mechanism instead e.g. "the key does not include a function".
+  * You MUST NOT negate a verb other than "has" with "no" or "nothing" after it,
+    e.g. "names no X", "gives no X", "checks nothing".
+    Use "does not" with the verb instead,
+    e.g. "does not name X", "does not give X", "does not check anything".
   * You SHOULD state a claim with the domain's own verb and let the reader check it,
     e.g. "`step` can't sleep" rather than "`step` cannot express 'do nothing for n seconds'".
     Keep the formulation that proves the claim only where the reader is far from the thing it describes.
