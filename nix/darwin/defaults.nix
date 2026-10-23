@@ -78,4 +78,21 @@ in
       };
     };
   };
+
+  # Keys 60 and 61 are the Ctrl-Space and Ctrl-Option-Space input source
+  # switchers. `-dict-add` merges them into the other symbolic hotkeys, where
+  # CustomUserPreferences would write the whole dictionary and drop the rest.
+  # Activation runs as root, so these take the same wrapper nix-darwin uses for
+  # the `system.defaults` writes above.
+  system.activationScripts.postActivation.text =
+    let
+      asUser = ''launchctl asuser "$(id -u -- ${config.system.primaryUser})" sudo --user=${config.system.primaryUser} --'';
+    in
+    ''
+      ${asUser} defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 \
+        '{ enabled = 0; value = { parameters = (32, 49, 262144); type = standard; }; }'
+      ${asUser} defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 61 \
+        '{ enabled = 0; value = { parameters = (32, 49, 786432); type = standard; }; }'
+      ${asUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+    '';
 }
