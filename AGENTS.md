@@ -21,9 +21,11 @@ are translated into modules under `nix/home/` and do need a switch to change.
 
 Machine-specific committed config lives in the machine repos `../dotfiles-m1`
 and `../dotfiles-gen-m5`, which consume this repo as a flake input. Each holds
-its host's home and darwin layers plus its own out-of-store links: the Claude
-`settings.json` and `machine.md`, the jj identity fragment, and on gen-m5 the
-`~/.config/nvim-local` module and the starship variant config.
+its host's home and darwin layers plus its own out-of-store links, such as the
+Claude `settings.json`. Work configuration shared by gen-m5 and the DGX spark
+lives in `../dotfiles-generative`, which takes this repo as an input and links
+`machine.md`, the jj identity fragment, the `~/.config/nvim-local` module and
+the generative starship config.
 
 ## Bootstrap and Auth
 
@@ -421,7 +423,7 @@ LSP, lint, and completion live outside `init.lua`: `config.lsp` owns native LSP
 servers/attach policy, `config.lint` owns nvim-lint and project-specific mypy,
 `config.completion` owns nvim-cmp, and `config.projects` centralizes project
 detection. Machine-specific policy comes through `config.machine`, no-op
-defaults over the optional `machine` module that a machine repo links onto the
+defaults over the optional `machine` module that a host repo links onto the
 runtimepath at `~/.config/nvim-local`.
 
 Buffer-local language policy belongs in `after/ftplugin/`; global autocmds stay
