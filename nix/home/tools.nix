@@ -23,13 +23,16 @@
     pkgs.basedpyright
     pkgs.lua-language-server
 
-    # GNU userland, unprefixed, so GNU sed/awk/grep/tar/make/ls win on PATH.
+    # GNU userland, unprefixed, so GNU sed/awk/grep/find/diff/tar/make/ls win on PATH.
     pkgs.coreutils
     pkgs.gnused
     pkgs.gnutar
     pkgs.gnugrep
     pkgs.gawk
     pkgs.gnumake
+    pkgs.findutils
+    pkgs.diffutils
+    pkgs.gnupatch
 
     # CLI tools. interactive.sh initializes mise, fzf, starship, zoxide and
     # atuin unconditionally, so each has to stay in this set.

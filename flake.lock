@@ -60,6 +60,22 @@
         "type": "github"
       }
     },
+    "fzf-tab-completion": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785481312,
+        "narHash": "sha256-qxHvd91QOv4LATikWGaL4AqEM52volP8TCYXhpZKtsA=",
+        "owner": "lincheney",
+        "repo": "fzf-tab-completion",
+        "rev": "7014e0a7cd68fe3530e2f58c45740d17e98f05b8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lincheney",
+        "repo": "fzf-tab-completion",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -139,6 +155,7 @@
     "root": {
       "inputs": {
         "direnv-instant": "direnv-instant",
+        "fzf-tab-completion": "fzf-tab-completion",
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",

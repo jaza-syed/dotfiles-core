@@ -59,6 +59,10 @@ In a Claude Desktop session, whose system prompt says it runs inside the Claude 
 
 ## Running commands
 
+### GNU userland
+
+- On every machine, including the Macs, `sed`, `grep`, `awk`, `find`, `xargs`, `diff`, `patch`, `tar`, `make` and coreutils on PATH are the GNU versions. You MUST use GNU flags, e.g. `sed -i 's/a/b/' file` rather than the BSD `sed -i '' ...`, and MUST NOT call `/usr/bin` tools to get BSD behaviour.
+
 ### Searching
 
 - You SHOULD use `rg` and `fd` over `grep` and `find`. You MUST pass `--color never` to `rg`.

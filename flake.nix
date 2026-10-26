@@ -17,6 +17,11 @@
     };
     # Has no nixpkgs input; its only input is Homebrew itself.
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    # The bash counterpart of zsh-fzf-tab, which nixpkgs does not package.
+    fzf-tab-completion = {
+      url = "github:lincheney/fzf-tab-completion";
+      flake = false;
+    };
   };
 
   outputs =
@@ -27,6 +32,7 @@
       nix-darwin,
       direnv-instant,
       nix-homebrew,
+      fzf-tab-completion,
       ...
     }:
     let
@@ -41,6 +47,9 @@
         {
           home.packages = [ direnv-instant.packages.${pkgs.stdenv.hostPlatform.system}.default ];
         };
+      fzfTabCompletionModule = {
+        xdg.dataFile."fzf-tab-completion".source = fzf-tab-completion;
+      };
       sharedHomeModules = [
         ./nix/home/activation.nix
         ./nix/home/cli.nix
@@ -51,6 +60,7 @@
         ./nix/home/starship.nix
         ./nix/home/tools.nix
         direnvInstantModule
+        fzfTabCompletionModule
       ];
       # nix-homebrew installs Homebrew itself during the darwin switch;
       # nix-homebrew.user is a machine fact that each host file sets.

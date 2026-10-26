@@ -28,6 +28,14 @@ if [[ -d "$_dotfiles_completion_dir" ]]; then
 fi
 unset _dotfiles_completion _dotfiles_completion_dir
 
+# Use fzf as the UI for bash completion candidates, as fzf-tab does in zsh.
+_fzf_tab_completion="${XDG_DATA_HOME:-$HOME/.local/share}/fzf-tab-completion/bash/fzf-bash-completion.sh"
+if [[ -r "$_fzf_tab_completion" ]]; then
+    source "$_fzf_tab_completion"
+    bind -x '"\t": fzf_bash_completion'
+fi
+unset _fzf_tab_completion
+
 # C-x C-e to edit command line in $EDITOR
 bind '"\C-x\C-e": edit-and-execute-command'
 
