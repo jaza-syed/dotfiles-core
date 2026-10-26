@@ -83,16 +83,19 @@ in
   # switchers. `-dict-add` merges them into the other symbolic hotkeys, where
   # CustomUserPreferences would write the whole dictionary and drop the rest.
   # Activation runs as root, so these take the same wrapper nix-darwin uses for
-  # the `system.defaults` writes above.
+  # the `system.defaults` writes above. The XML form keeps `enabled` a boolean
+  # and the parameters integers; macOS ignores entries stored as strings.
   system.activationScripts.postActivation.text =
     let
       asUser = ''launchctl asuser "$(id -u -- ${config.system.primaryUser})" sudo --user=${config.system.primaryUser} --'';
+      disableHotkey = key: modifiers: ''
+        ${asUser} defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add ${key} \
+          '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>${modifiers}</integer></array><key>type</key><string>standard</string></dict></dict>'
+      '';
     in
     ''
-      ${asUser} defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 \
-        '{ enabled = 0; value = { parameters = (32, 49, 262144); type = standard; }; }'
-      ${asUser} defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 61 \
-        '{ enabled = 0; value = { parameters = (32, 49, 786432); type = standard; }; }'
+      ${disableHotkey "60" "262144"}
+      ${disableHotkey "61" "786432"}
       ${asUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
     '';
 }
