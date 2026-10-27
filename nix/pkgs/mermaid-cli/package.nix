@@ -8,7 +8,7 @@
   chromium,
 }:
 let
-  version = "11.17.0";
+  version = "12.0.0";
 in
 buildNpmPackage {
   pname = "mermaid-cli";
@@ -18,17 +18,14 @@ buildNpmPackage {
     owner = "mermaid-js";
     repo = "mermaid-cli";
     rev = version;
-    hash = "sha256-Dujs0HNHVWOWlOhPkbAzooWrUqR1kNOdPUfe2f7rVLo=";
+    hash = "sha256-8CPcwqWz7A91Qyp9fpObv1m7K8H6A0c8UULjj1XlB+c=";
   };
 
   patches = [
     ./remove-puppeteer-from-dev-deps.patch # https://github.com/mermaid-js/mermaid-cli/issues/830
-    # 11.17.0 pins mermaid ^11.14.0, so the lockfile is regenerated with
-    # mermaid 12 and the three companion packages that peer on it.
-    ./mermaid-12.patch
   ];
 
-  npmDepsHash = "sha256-SSdHBaKSxPl03oAYMTP5UWvprM0eMgN09GDOjo5LpvM=";
+  npmDepsHash = "sha256-Y1w7oMGDUU7fNFijbjNbnlhY9nEMSR7ilNC3RnlLMaU=";
 
   env = {
     PUPPETEER_SKIP_DOWNLOAD = true;
