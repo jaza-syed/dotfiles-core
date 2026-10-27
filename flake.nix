@@ -22,6 +22,12 @@
       url = "github:lincheney/fzf-tab-completion";
       flake = false;
     };
+    # nixpkgs 26.05 has 2.23.0, where a click on an empty part of the bar hides
+    # every item on macOS 27 (FelixKratz/SketchyBar#850).
+    sketchybar = {
+      url = "github:FelixKratz/SketchyBar/v2.24.1";
+      flake = false;
+    };
   };
 
   outputs =
@@ -33,6 +39,7 @@
       direnv-instant,
       nix-homebrew,
       fzf-tab-completion,
+      sketchybar,
       ...
     }:
     let
@@ -50,6 +57,26 @@
       fzfTabCompletionModule = {
         xdg.dataFile."fzf-tab-completion".source = fzf-tab-completion;
       };
+      # Imported by both the home and the darwin modules, so the CLI and the
+      # launchd service run the same build.
+      sketchybarModule = {
+        nixpkgs.overlays = [
+          (final: prev: {
+            sketchybar = prev.sketchybar.overrideAttrs {
+              version = "2.24.1";
+              src = sketchybar;
+            };
+          })
+        ];
+      };
+      homeDarwinModule.imports = [
+        ./nix/home/darwin.nix
+        sketchybarModule
+      ];
+      darwinDefaultsModule.imports = [
+        ./nix/darwin/defaults.nix
+        sketchybarModule
+      ];
       sharedHomeModules = [
         ./nix/home/activation.nix
         ./nix/home/cli.nix
@@ -126,7 +153,7 @@
         };
         activation = ./nix/home/activation.nix;
         cli = ./nix/home/cli.nix;
-        darwin = ./nix/home/darwin.nix;
+        darwin = homeDarwinModule;
         git = ./nix/home/git.nix;
         links = ./nix/home/links.nix;
         ssh = ./nix/home/ssh.nix;
@@ -137,7 +164,7 @@
 
       darwinModules = {
         atrun = ./nix/darwin/atrun.nix;
-        defaults = ./nix/darwin/defaults.nix;
+        defaults = darwinDefaultsModule;
         homebrew = homebrewModule;
       };
 
@@ -146,7 +173,7 @@
         nix-darwin.lib.darwinSystem {
           modules = [
             ./nix/darwin/atrun.nix
-            ./nix/darwin/defaults.nix
+            darwinDefaultsModule
             homebrewModule
             (baseDarwin user)
           ];
@@ -158,7 +185,7 @@
         home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.aarch64-darwin;
           modules = sharedHomeModules ++ [
-            ./nix/home/darwin.nix
+            homeDarwinModule
             (baseHome user)
           ];
         }

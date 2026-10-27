@@ -159,7 +159,25 @@
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "sketchybar": "sketchybar"
+      }
+    },
+    "sketchybar": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791580379,
+        "narHash": "sha256-fEbVzafjFTigR7TjQ41gOnDpk6S4B8qCwpz890ZNgwE=",
+        "owner": "FelixKratz",
+        "repo": "SketchyBar",
+        "rev": "515046e8a150d6b8767a8a6dd624824eaafa2c8b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "FelixKratz",
+        "ref": "v2.24.1",
+        "repo": "SketchyBar",
+        "type": "github"
       }
     },
     "treefmt-nix": {
