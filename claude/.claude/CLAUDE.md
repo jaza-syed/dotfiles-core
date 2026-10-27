@@ -24,6 +24,8 @@ The Plain Language output style defines the rules for prose a person may read. I
 
 When you write instructions for a subagent, they MUST tell the subagent that the current output style is Plain Language, defined in `~/.claude/output-styles/plain-language.md`, and that it MUST read and follow that file. If the subagent will write code, the instructions MUST also tell it to read and follow `~/.claude/writing-comments.md`.
 
+When you give me commands to run myself, you SHOULD give as few separate commands as possible, joining steps that run one after another with `&&`, e.g. `git add … && git commit … && git push …`. Give a separate command only where I need to read the output of one before running the next.
+
 When you stop part-way through a sequence of actions because you need a decision or a go-ahead from me before you can continue, you MUST also send a desktop notification saying what you need:
 
 ```sh
@@ -52,6 +54,11 @@ In a Claude Desktop session, whose system prompt says it runs inside the Claude 
 - `-subtitle` names the task that is waiting, so `-message` carries only the decision.
 - `-action "First,Second"` adds buttons and `-reply "<prompt>"` adds a text field. Each prints my answer on stdout and blocks until the answer arrives, so use one only when the turn has nothing to do but wait. Prefer `-action` for a closed choice and `-reply` for free text.
 - `-timeout SECONDS` MUST accompany `-action` or `-reply`, and MUST be shorter than the Bash tool's own timeout. On expiry the command prints `@TIMEOUT` and exits 6, and you then ask me in the session instead.
+
+## Review comments
+
+- You MUST NOT post a comment, reply or thread on a merge request or pull request, through any tool, including `glab`, `gh` or the API. Reading review comments is fine. If a task seems to call for a post, give me the text and stop.
+- You MUST NOT draft or suggest a reply to a review comment unless I ask for one. When I ask what a comment means or whether it is right, answer that question only.
 
 ## Writing comments
 
