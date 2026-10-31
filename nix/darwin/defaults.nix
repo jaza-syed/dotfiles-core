@@ -50,7 +50,7 @@ in
       static-only = true;
     };
 
-    # macos.sh also creates this directory; screencapture needs it to exist.
+    # postActivation below creates the directory, which screencapture needs.
     screencapture = {
       location = "${home}/screenshots";
       disable-shadow = true;
@@ -94,6 +94,7 @@ in
       '';
     in
     ''
+      ${asUser} mkdir -p ${config.system.defaults.screencapture.location}
       ${disableHotkey "60" "262144"}
       ${disableHotkey "61" "786432"}
       ${asUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
