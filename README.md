@@ -36,7 +36,7 @@ The Neovim review integration is optional. It is enabled when a local
 without it. Its workspace review commands also require the configured work
 workspace.
 
-sketchybar comes from nixpkgs. gen-m5's `darwin.nix` runs it through
+sketchybar comes from nixpkgs. Each Mac's `darwin.nix` runs it through
 nix-darwin's `services.sketchybar`.
 
 Recurring tasks (switches, updates, rollbacks, garbage collection, formatting)

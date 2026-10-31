@@ -14,7 +14,7 @@ of work config, and public at `github.com/jaza-syed/dotfiles-core`; AGENTS.md
 holds the architecture decisions and operations.md holds the commands.
 `../dotfiles-gen-m5` imports the core, holds both layers and all work-specific
 config, has both layers switched, and is pushed to the work GitLab.
-`../dotfiles-m1` exists, is unpushed, and owns the personal Claude settings and
+`../dotfiles-m1` is pushed to GitHub and owns the personal Claude settings and
 the git/jj identity. Next: the personal Mac bring-up (7) as the first real run
 of the reworked bootstrap.
 
@@ -36,24 +36,18 @@ The common management commands live in [operations.md](operations.md).
 
 ## 7. Bring up the personal Mac on its machine repo — not started
 
-- Push `../dotfiles-m1` before the bring-up. It exists and mirrors
-  `../dotfiles-gen-m5`: it imports the core and holds
-  `homeConfigurations."jsyed@m1"` and `darwinConfigurations.m1`.
-- Rename `homeConfigurations."jsyed@m1"` to `m1` and set the username once in
-  the m1 `flake.nix`, as `../dotfiles-gen-m5` does. Then update the m1
-  commands in install.md, operations.md and AGENTS.md.
+- `../dotfiles-m1` is pushed and mirrors `../dotfiles-gen-m5`: it imports the
+  core's shared and macOS home modules, sets the username once in its
+  `flake.nix`, holds `homeConfigurations.m1` and `darwinConfigurations.m1`,
+  and runs sketchybar and borders through nix-darwin's services.
 - Follow [install.md](install.md): phase 1 activates the core's base profile
   from an anonymous clone, phase 2 authenticates GitHub and 1Password with
   the tools that profile installed, and phase 3 clones `../dotfiles-m1` and
-  switches to `.#m1` and `.#jsyed@m1`.
+  switches to `.#m1`.
 - The phase 1 darwin switch adopts the existing Homebrew prefix through
   nix-homebrew's `autoMigrate`, as it did on gen-m5, where only the
   git-tracked repository files were replaced and the bundle reconciled without
   reinstalling.
-- Settle the m1 `services.sketchybar` question, deferred from the move of the
-  Homebrew CLIs to Nix: sketchybar comes from nixpkgs and nix-darwin's
-  `services.sketchybar` replaces `brew services`. Home Manager's
-  `programs.sketchybar.service` is the other candidate, which item 17 covers.
 - The manual checklist is unchanged: Mac App Store sign-in, GitHub and
   1Password recovery factors, iCloud, Google Drive, and notification and
   accessibility permissions.
@@ -210,8 +204,8 @@ flake.
 The modules also own process management, which is a separate reason to adopt
 them: `programs.aerospace.launchd.enable`, `programs.sketchybar.service`, and
 `services.jankyborders` each manage a launchd agent, and enabling the
-aerospace one forces `start-at-login = false` in the generated config. That
-overlaps the m1 sketchybar question in item 7.
+aerospace one forces `start-at-login = false` in the generated config. Both
+Macs run sketchybar and borders through nix-darwin's services instead.
 
 Not covered by any module: `hammerspoon` and the Typora themes, so those stay
 scope A. Partly covered: the sketchybar module's `config` is only

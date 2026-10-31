@@ -75,7 +75,7 @@ cd ~/code/jaza-syed
 gh repo clone jaza-syed/dotfiles-m1
 cd dotfiles-m1
 sudo /run/current-system/sw/bin/darwin-rebuild switch --flake .#m1
-home-manager switch --flake .#jsyed@m1
+home-manager switch --flake .#m1
 ```
 
 The machine generation replaces the base one, and Home Manager removes the

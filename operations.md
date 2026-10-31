@@ -15,7 +15,7 @@ Switches run against the machine repo, one command per layer:
 ```sh
 # User layer
 home-manager switch --flake ~/code/jaza-syed/dotfiles-gen-m5#gen-m5
-home-manager switch --flake ~/code/jaza-syed/dotfiles-m1#jsyed@m1
+home-manager switch --flake ~/code/jaza-syed/dotfiles-m1#m1
 
 # System layer
 sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ~/code/jaza-syed/dotfiles-gen-m5#gen-m5

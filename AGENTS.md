@@ -232,7 +232,7 @@ load from `~/.nix-profile/share/zsh/site-functions` on fpath.
 Home Manager is flake-based and owns the Nix-specific package set, including
 tmux with sixel support. The package set lives in `nix/home/tools.nix`, and
 the per-machine user layers are `homeConfigurations` targets in the machine
-repos (`jsyed@m1` in `../dotfiles-m1`, `gen-m5` in
+repos (`m1` in `../dotfiles-m1`, `gen-m5` in
 `../dotfiles-gen-m5`). Nix itself is a setup prerequisite. Apply with
 `home-manager switch --flake <machine-repo>#<target>`, or bootstrap
 through `nix run home-manager/release-26.05` when the CLI is not installed
