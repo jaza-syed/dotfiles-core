@@ -53,10 +53,11 @@ auth_1password() {
         return
     fi
 
-    if ! op signin; then
+    if ! op account list >/dev/null 2>&1; then
         op account add
-        eval "$(op signin -f)"
     fi
+
+    eval "$(op signin -f)"
 }
 
 auth_github
