@@ -162,6 +162,9 @@ vim.pack.add({
   -- Clojure and TidalCycles
   gh("julienvincent/nvim-paredit"),
   gh("grddavies/tidal.nvim"),
+
+  -- AI chat
+  gh("olimorris/codecompanion.nvim"),
 }, { confirm = false })
 
 -- Conjure attaches a client to Clojure buffers, so it is added on request
@@ -266,6 +269,8 @@ clue.setup({
     { mode = "n", keys = "<Leader>s", desc = "+session" },
     { mode = "n", keys = "<Leader>t", desc = "+tab/theme" },
     { mode = "n", keys = "<Leader>c", desc = "+config/clear" },
+    { mode = "n", keys = "<Leader>a", desc = "+ai" },
+    { mode = "x", keys = "<Leader>a", desc = "+ai" },
     clue.gen_clues.builtin_completion(),
     clue.gen_clues.g(),
     clue.gen_clues.marks(),
@@ -924,6 +929,35 @@ require("nvim-paredit").setup({
 })
 
 require("tidal").setup({})
+
+-- The plugin defaults every interaction to Copilot. Only chat and inline can
+-- use an agent such as Claude Code, so the rest use the Anthropic API.
+require("codecompanion").setup({
+  adapters = {
+    acp = {
+      -- The Homebrew claude rather than the older one bundled with claude-agent-acp.
+      claude_code = function()
+        return require("codecompanion.adapters").extend("claude_code", {
+          env = {
+            CLAUDE_CODE_EXECUTABLE = function()
+              return vim.fn.exepath("claude")
+            end,
+          },
+        })
+      end,
+    },
+  },
+  interactions = {
+    chat = { adapter = "claude_code" },
+    inline = { adapter = "claude_code" },
+    cmd = { adapter = "anthropic" },
+    background = { adapter = "anthropic" },
+  },
+})
+vim.keymap.set({ "n", "x" }, "<Leader>aa", "<Cmd>CodeCompanionChat Toggle<CR>", { desc = "Toggle AI chat" })
+vim.keymap.set("x", "<Leader>as", "<Cmd>CodeCompanionChat Add<CR>", { desc = "Add selection to AI chat" })
+vim.keymap.set({ "n", "x" }, "<Leader>ap", "<Cmd>CodeCompanionActions<CR>", { desc = "AI action palette" })
+vim.keymap.set({ "n", "x" }, "<Leader>ai", ":CodeCompanion ", { desc = "AI inline prompt" })
 
 -- Editor integrations configured after plugins are available.
 require("config.editor").setup()

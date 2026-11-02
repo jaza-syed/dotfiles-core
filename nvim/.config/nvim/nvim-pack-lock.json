@@ -12,6 +12,10 @@
       "rev": "cbc7b02bb99fae35cb42f514762b89b5126651ef",
       "src": "https://github.com/hrsh7th/cmp-nvim-lsp"
     },
+    "codecompanion.nvim": {
+      "rev": "9cc3c1352181253d6a65c709431f30a90a45eb05",
+      "src": "https://github.com/olimorris/codecompanion.nvim"
+    },
     "colorful-winsep.nvim": {
       "rev": "6134b5cd4a38990c7b720adc90973ed32f726179",
       "src": "https://github.com/nvim-zh/colorful-winsep.nvim"

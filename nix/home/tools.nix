@@ -1,7 +1,14 @@
 # Base package set: what the linked config needs plus the daily CLI. Language
 # toolchains, documents, media and infra CLIs are declared by the machine repos.
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
+  nixpkgs.config.allowUnfreePredicate =
+    pkg:
+    builtins.elem (lib.getName pkg) [
+      "claude-agent-acp"
+      "claude-code"
+    ];
+
   home.packages = [
     # Sixel support, which the Homebrew tmux lacks.
     (pkgs.tmux.override { withSixel = true; })
@@ -67,6 +74,8 @@
 
     # Editors
     pkgs.neovim
+    # The bridge nvim's CodeCompanion runs to chat with Claude Code.
+    pkgs.claude-agent-acp
 
     # Shelled out to by nvim's image.nvim and diagram.nvim.
     pkgs.imagemagick
