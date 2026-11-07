@@ -25,13 +25,20 @@ If you have not read that file in this session, read it before you write a comme
   * You MUST use the basic verb.
     Write "is" or "is in" rather than "sits", "lives" or "stays",
     "contains" rather than "holds" or "carries",
-    "uses" rather than "spends" or "leans on",
+    "takes", "calls" or "reads" rather than "spends" or "leans on",
     "shows" rather than "surfaces",
     "is merged" or "is present" rather than "lands",
     "controls" rather than "drives" or "gates",
     "connects" rather than "wires up",
     "starts" rather than "kicks off" or "spins up",
     and "hides" rather than "papers over".
+  * You SHOULD NOT write "use" where a more specific verb says what happens,
+    e.g. "calls", "reads", "runs", "sends", "follows" or "is built on",
+    so "this commit has the message from `commit-message-3.txt`" rather than "this commit uses the message from …".
+    Quoting the word to talk about it is fine.
+  * You MUST NOT write a verb as a noun for the action or request it names,
+    e.g. "its create returns", "the import create is held", "while the save is pending".
+    Name the thing in full instead, e.g. "the request that creates the import returns".
   * You MAY use a verb with an established technical meaning
     e.g. "the client retries", "the writer owns the upload".
     You MUST NOT coin a verb-metaphor of your own
@@ -46,7 +53,9 @@ If you have not read that file in this session, read it before you write a comme
     Keep the formulation that proves the claim only where the reader is far from the thing it describes.
   * You MUST NOT use an idiom where a plain noun works.
     You MUST NOT use "load bearing", "seam", "smoking gun", "say the word", "earns its keep",
-    "heavy lifting", "footgun", "sharp edge", "under the hood", "moving parts" or "a dial worth turning".
+    "heavy lifting", "footgun", "sharp edge", "under the hood", "moving parts", "a dial worth turning"
+    or "in flight".
+    Write "being created" or "has not returned" rather than "in flight".
   * You MUST use the project's own terminology,
     and you MUST NOT refer to anything by a name you coined during the session.
   * You MUST define a technical term or acronym the first time you use it,
@@ -72,6 +81,21 @@ If you have not read that file in this session, read it before you write a comme
   * You SHOULD join clauses with connective words e.g. "so", "and", "because"
     rather than semi-colons, colons or dashes.
     You SHOULD NOT chain clauses with colons. Split them into sentences.
+  * You SHOULD NOT put a comma before "and" or "or", whether it joins two clauses or ends a list,
+    unless the sentence would be misread without it.
+    Write "Fade the top edge when there is content above and the bottom edge when there is content below"
+    rather than "…above, and the bottom edge…".
+    Where the clauses are long enough to need the comma, split them into two sentences.
+  * You SHOULD NOT end a sentence on a trailing clause,
+    or on a noun narrowed by a "that", "which", "where" or "whose" clause.
+    Repeated, the pattern gives every sentence the same falling rhythm.
+    Split the sentence or put the narrowed noun first. For example, write
+    * "Delete the section `key`. Each section's position is now its accordion value."
+      rather than "Delete the section `key`, and make each section's position its accordion value."
+    * "REAL-368 adds alerts above the sections. The alerts will scroll with the sections."
+      rather than "…, so the alerts that REAL-368 adds above the sections scroll with them."
+    * "Show the title and detail of a function's first failure"
+      rather than "Show the title and detail of the first failure a function reports."
   * You MUST NOT use "it", "this" or "they" where the sentence offers more than one possible referent,
     e.g. "the output style sets the system prompt and CLAUDE.md adds to it".
     Name the thing instead.
