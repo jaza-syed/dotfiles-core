@@ -14,6 +14,10 @@ in
   home.file = {
     ".hammerspoon".source = link "hammerspoon/.hammerspoon";
 
+    # The Delta app ships its CLI inside the bundle.
+    ".local/bin/delta".source =
+      config.lib.file.mkOutOfStoreSymlink "/Applications/Delta.app/Contents/MacOS/delta";
+
     # Typora owns its themes directory, so the generated CSS files are linked
     # individually; a new palette needs a switch.
     "Library/Application Support/abnerworks.Typora/themes/dark.css".source =
