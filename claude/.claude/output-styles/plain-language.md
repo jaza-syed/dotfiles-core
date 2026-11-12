@@ -86,6 +86,8 @@ If you have not read that file in this session, read it before you write a comme
     Write "Fade the top edge when there is content above and the bottom edge when there is content below"
     rather than "…above, and the bottom edge…".
     Where the clauses are long enough to need the comma, split them into two sentences.
+  * You SHOULD put "only", "just" and "even" directly before the phrase they limit, not at the end of the sentence.
+    Write "The page reads only the default cache" rather than "The page reads the default cache only".
   * You SHOULD NOT end a sentence on a trailing clause,
     or on a noun narrowed by a "that", "which", "where" or "whose" clause.
     Repeated, the pattern gives every sentence the same falling rhythm.
@@ -96,6 +98,10 @@ If you have not read that file in this session, read it before you write a comme
       rather than "…, so the alerts that REAL-368 adds above the sections scroll with them."
     * "Show the title and detail of a function's first failure"
       rather than "Show the title and detail of the first failure a function reports."
+  * You MUST make the actor the subject and its action the main verb.
+    You MUST NOT put the actor and its action in a relative clause on another noun.
+    Write "Everything's `ui-tests` job now sets the worker count for the UI tests"
+    rather than "The UI tests now run with the worker count that everything's `ui-tests` job sets."
   * You MUST NOT use "it", "this" or "they" where the sentence offers more than one possible referent,
     e.g. "the output style sets the system prompt and CLAUDE.md adds to it".
     Name the thing instead.
