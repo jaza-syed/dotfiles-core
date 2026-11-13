@@ -23,7 +23,7 @@ If you have not read that file in this session, read it before you write a comme
   A metaphor brings in connotations the writer did not choose, so when a literal phrase exists, use it.
   In particular:
   * You MUST use the basic verb.
-    Write "is" or "is in" rather than "sits", "lives" or "stays",
+    Write "is" or "is in" rather than "sits" or "lives",
     "contains" rather than "holds" or "carries",
     "takes", "calls" or "reads" rather than "spends" or "leans on",
     "shows" rather than "surfaces",
@@ -32,6 +32,10 @@ If you have not read that file in this session, read it before you write a comme
     "connects" rather than "wires up",
     "starts" rather than "kicks off" or "spins up",
     and "hides" rather than "papers over".
+  * You MUST NOT write "stay", "stays", "stayed" or "staying".
+    Write "is" for a state and "remains" for a state that continues through a change,
+    so "the box is 512px wide" or "the box remains 512px wide" rather than "the box stays 512px wide".
+    Check every draft for "stay" before you send it.
   * You SHOULD NOT write "use" where a more specific verb says what happens,
     e.g. "calls", "reads", "runs", "sends", "follows" or "is built on",
     so "this commit has the message from `commit-message-3.txt`" rather than "this commit uses the message from …".
@@ -51,6 +55,13 @@ If you have not read that file in this session, read it before you write a comme
   * You SHOULD state a claim with the domain's own verb and let the reader check it,
     e.g. "`step` can't sleep" rather than "`step` cannot express 'do nothing for n seconds'".
     Keep the formulation that proves the claim only where the reader is far from the thing it describes.
+  * You SHOULD describe behaviour from the user's side: the path a user takes and what they see.
+    Write "the user" or "a user" for the person using the product, not "you".
+    Write "If a user opens Experiments without visiting Resources first, Generate runs the experiment
+    without the warnings dialog" rather than "A workflow that the Resources page has not evaluated
+    starts without the dialog."
+  * You SHOULD write the sentence you would say out loud to a colleague,
+    with "so", "but" and "then" rather than "therefore", "thus" and "hence".
   * You MUST NOT use an idiom where a plain noun works.
     You MUST NOT use "load bearing", "seam", "smoking gun", "say the word", "earns its keep",
     "heavy lifting", "footgun", "sharp edge", "under the hood", "moving parts", "a dial worth turning"
@@ -115,6 +126,15 @@ If you have not read that file in this session, read it before you write a comme
   * A decision in a ticket or design document SHOULD be one sentence:
     the decision, then the one reason that would change a reader's mind, joined with "as" or "because".
     Cut the remaining reasons.
+  * An open decision in a ticket, merge request or design document SHOULD state, in this order:
+    what the code does, the alternative and why it was not taken, and how often the case comes up.
+    Leave the question for the reader to me.
+    You MUST NOT write "I" or "we" in text that I will publish.
+    Make the product, the page or the user the subject, and mark an estimate with "probably" or "likely".
+    For example: "The page reads only the default evaluation cache, so if a user opens Experiments
+    without visiting Resources first, Redback doesn't show the dialog and runs the experiment.
+    Running the default evaluation when the user clicks Generate would cover this case,
+    but it might take too long. This case is probably rare."
 * You MUST NOT editorialise.
   State the fact and stop, rather than adding your own evaluation of it.
   In particular:
