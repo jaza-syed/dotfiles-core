@@ -69,6 +69,10 @@ In a Claude Desktop session, whose system prompt says it runs inside the Claude 
 - Before you write or change a Linear ticket, or a prompt for the Linear agent, you MUST read and follow `~/.claude/linear.md`.
 - When I start working on a design, and before you write a design proposal or agreement for an API or data model between services, you MUST read and follow `~/.claude/proposals.md`.
 
+## Diagrams
+
+- Before you draw a dependency diagram, you MUST read and follow `~/.claude/diagrams.md`.
+
 ## Running commands
 
 ### GNU userland
