@@ -6,7 +6,7 @@ MUST, MUST NOT, SHOULD, SHOULD NOT and MAY carry their RFC 2119 meanings.
 A dependency diagram is a graph whose edges mean "depends on", e.g. flake inputs, module imports, service calls or ticket blockers.
 
 * You MUST draw a dependency diagram as a Mermaid flowchart with this front matter,
-  which lays it out with ELK, draws right-angled edges and puts each node one layer below
+  which lays it out with ELK, draws right-angled edges, keeps each label line on one row and puts each node one layer below
   the deepest node that depends on it:
 
   ```
@@ -16,6 +16,7 @@ A dependency diagram is a graph whose edges mean "depends on", e.g. flake inputs
     theme: default
     flowchart:
       curve: step
+      wrappingWidth: 500
     elk:
       layeringStrategy: LONGEST_PATH_SOURCE
       considerModelOrder: NODES_AND_EDGES
