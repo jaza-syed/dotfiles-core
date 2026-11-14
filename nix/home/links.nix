@@ -22,6 +22,8 @@ in
     # settings.json and machine.md come from the machine repo.
     ".claude/CLAUDE.md".source = link "claude/.claude/CLAUDE.md";
     ".claude/writing-comments.md".source = link "claude/.claude/writing-comments.md";
+    ".claude/linear.md".source = link "claude/.claude/linear.md";
+    ".claude/proposals.md".source = link "claude/.claude/proposals.md";
     ".claude/commands".source = link "claude/.claude/commands";
     ".claude/hooks".source = link "claude/.claude/hooks";
     ".claude/output-styles".source = link "claude/.claude/output-styles";
