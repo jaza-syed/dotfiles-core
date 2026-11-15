@@ -34,5 +34,6 @@ yet which maintainers / consumers may care about (e.g. dependency upgrades).
 3. Check if `changelog.d/` exists, and has changelog fragments in it.
 4. If required, add a new fragment with `Bash(changeling create)`.
    Prioritise using the CLI's `--fixed` / `--changed` / `--added` etc. flags, as a one-shot flow.
-5. If the _changes being documented_ are already committed, then you _must_ commit the fragment.
-6. If the _changes being documented_ are staged, then stage the fragment.
+5. Stage the fragment.
+6. If the _changes being documented_ are already committed, commit the fragment too,
+   or give me the commit command where the machine forbids commits.

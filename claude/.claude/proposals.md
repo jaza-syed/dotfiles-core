@@ -23,8 +23,6 @@ Mindset
   Take the questions from the reader's job, not from the order in which you worked the problem out.
 * Open with one sentence that states the question and its constraints,
   then state the core idea, with a diagram if the idea has a structure.
-* Give each reader question one short answer in a table or list,
-  so the reader can find their own question without reading the rest.
 * Cut the account of how you reached the proposal. Keep only the text that answers a question.
 
 
@@ -33,9 +31,9 @@ Shape
 
 * A proposal MUST propose one option.
   List the alternatives considered in one line each, with the reason each was not taken.
-* Open each option with its core idea in one sentence, then a diagram.
 * Explain the implications as lenses rather than long prose:
-  a table of the questions a developer would ask when working with the proposal, each with a short answer.
+  a table of the questions a developer would ask when working with the proposal, each with a short answer,
+  so the reader can find their own question without reading the rest.
   Typical lenses are what references what, where each field is stored, routing and shared links,
   how a thing shows up before it fully exists, new versions, a failed write,
   and future cases such as running twice, duplicating or iterating in place.

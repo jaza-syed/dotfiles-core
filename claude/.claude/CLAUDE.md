@@ -14,9 +14,7 @@ Generating code costs you nothing, so you have a natural bias towards over-engin
 - Prefer inlining. A single-use helper SHOULD be inlined into its caller, unless the caller is already very long or deeply nested.
 - Minimize the diff. You SHOULD prefer fewer lines of code where possible, without obfuscation, and reduce boilerplate.
 - Question the threading. If a task requires threading a new signal through multiple layers (types, schemas, pipelines, etc.), you SHOULD use a more direct architectural path where one exists, or state the alternative you considered and why the threading is still needed, then continue.
-- Prime directive: If a human developer would find the code exhausting to maintain, it is a bad solution. You MUST be lazy and stay simple.
-- You MUST NOT assert a diagnosis, or claim something works, builds or passes, unless you ran the relevant command and read the output. Otherwise present the claim as a hypothesis with the check that would confirm it.
-- Verify as much as you can. Do not report back to me saying something is dependent on something that you haven't verified unless it is not possible to verify it with the tools or permissions you have, or it would be too expensive.
+- You MUST NOT assert a diagnosis or a dependency, or claim something works, builds or passes, unless you ran the relevant command and read the output. Where the tools or permissions you have cannot verify the claim, or the check would be too expensive, present the claim as a hypothesis with the check that would confirm it.
 
 ## Communication style
 
@@ -77,20 +75,18 @@ In a Claude Desktop session, whose system prompt says it runs inside the Claude 
 
 ### GNU userland
 
-- On every machine, including the Macs, `sed`, `grep`, `awk`, `find`, `xargs`, `diff`, `patch`, `tar`, `make` and coreutils on PATH are the GNU versions. You MUST use GNU flags, e.g. `sed -i 's/a/b/' file` rather than the BSD `sed -i '' ...`, and MUST NOT call `/usr/bin` tools to get BSD behaviour.
+- On every machine, including the Macs, `sed`, `grep`, `awk`, `find`, `xargs`, `diff`, `patch`, `tar`, `make` and coreutils on PATH are the GNU versions. You MUST use GNU flags, e.g. `grep -P` and `find -printf`, and MUST NOT call `/usr/bin` tools to get BSD behaviour.
 
 ### Searching
 
-- You SHOULD use `rg` and `fd` over `grep` and `find`. You MUST pass `--color never` to `rg`.
-- You MUST NOT pass `-r` to `rg` out of `grep -r` habit. In `rg`, `-r` means `--replace`, so the args shift by one and you get an empty result that reads as "no matches", with no error. `rg` recurses by default, so drop the flag.
+- You SHOULD use `rg` and `fd` over `grep` and `find`.
 - `fd` and `rg` both skip what git ignores, and `-H` only adds dotfiles, so `fd -H '^\.env'` hides an ignored `.env` and reads as "the file does not exist". You MUST pass `-I` to `fd` (`--no-ignore` to `rg`) when a gitignored file would change your answer, for example checking whether a `.env` exists next to a committed `.env-example`.
 
 ### Choosing foreground or background
 
 - Short commands such as `rg`, `fd`, `git status`, `git log` or `git diff` run plainly in the foreground, and you read the output. You MUST NOT apply the log-and-exit-code rules below to them.
-- The shell has `pipefail` on, so `git log | head -1` exits 141 when git dies of SIGPIPE. Use `| tail` or pipe `rg`, `fd` or `cat` to `head`.
-- You MUST background a shell call you expect to run for over 10 seconds, using `run_in_background` rather than a trailing `&`. Backgrounding also keeps the output out of context until you ask for it. You SHOULD run anything shorter in the foreground, so its output arrives in one call.
-- Put scratch files and logs in the scratchpad directory from the system prompt. `$TMPDIR` differs by context (sandboxed commands get `/tmp/claude-*`, unsandboxed commands get the macOS `/var/folders/...` path, and `nix develop` sets a fresh `/tmp/nix-shell.*` per invocation), so you MUST NOT reuse a `$TMPDIR` path across commands.
+- You MUST background a shell call you expect to run for over 10 seconds. Backgrounding also keeps the output out of context until you ask for it. You SHOULD run anything shorter in the foreground, so its output arrives in one call.
+- `$TMPDIR` differs by context (sandboxed commands get `/tmp/claude-*`, unsandboxed commands get the macOS `/var/folders/...` path, and `nix develop` sets a fresh `/tmp/nix-shell.*` per invocation), so you MUST NOT reuse a `$TMPDIR` path across commands.
 
 ### Foreground commands with long output
 
@@ -99,10 +95,8 @@ In a Claude Desktop session, whose system prompt says it runs inside the Claude 
 
 ### Background commands
 
-- A backgrounded command MUST pipe through `tee` so its log can be polled while it runs: `cmd 2>&1 | tee "$log"; echo "exit=$?"`. `pipefail` makes `$?` the command's own status rather than tee's. Reading the command's status directly, with `${pipestatus[1]}` in zsh or `${PIPESTATUS[0]}` in bash, avoids depending on `pipefail`.
-- The pipeline MUST end at `tee`. A filter after it, e.g. `| tee "$log" | tail`, buffers until the command exits, so nothing streams live. Trim the log in a follow-up command instead.
-- You MUST NOT `sleep` to wait for a backgrounded command. A task-completion notification arrives on its own, so read the log when it does.
-- Poll the log before then only to detect a hang. If the log stops growing for much longer than the phase normally takes, kill the command and diagnose. When a test harness's default timeout is long, you SHOULD also pass a short explicit timeout (e.g. `playwright test --timeout=180000`) so a hang fails loudly with artifacts.
+- The harness writes a backgrounded command's stdout and stderr to its own output file and reports the exit code in the completion notification, so run the command bare, without `tee` or a filter after it.
+- Read the output file before the notification only to detect a hang. If the file stops growing for much longer than the phase normally takes, kill the command and diagnose. When a test harness's default timeout is long, you SHOULD also pass a short explicit timeout (e.g. `playwright test --timeout=180000`) so a hang fails loudly with artifacts.
 
 ## Machine-specific instructions
 

@@ -12,37 +12,15 @@ deny() {
 
 has() { grep -qE -e "$1" <<<"$cmd"; }
 
-if [[ $background == true ]]; then
-  if ! has '\|&?[[:space:]]*tee([[:space:]]|$)'; then
-    deny 'A backgrounded command must pipe through tee so its log can be polled while it runs: cmd 2>&1 | tee "$log"; echo "exit=${pipestatus[1]}".'
+if has '\|&?[[:space:]]*tee([[:space:]]|$)'; then
+  if [[ $background == true ]]; then
+    deny 'Run a backgrounded command bare, without tee. The harness writes its stdout and stderr to its own output file and reports the exit code in the completion notification.'
   fi
-  if has '\|&?[[:space:]]*tee[[:space:]]+[^|;&]*\|'; then
-    deny 'The pipeline must end at tee. A filter after it buffers until the command exits, so nothing streams live and polling the log returns nothing. Trim the log in a follow-up command instead.'
-  fi
-  # nix and most build tools write their progress to stderr, not stdout.
-  if ! has '2>'; then
-    deny 'Send stderr somewhere too, with 2>&1 before the pipe or a redirect of its own. Most build tools write their progress to stderr, so a log without it records almost nothing.'
-  fi
-  if has '\|&?[[:space:]]*tee[^|;&]*\$TMPDIR'; then
-    deny '$TMPDIR differs between invocations, so a log written there cannot be read back by a later command. Use the scratchpad directory from the system prompt.'
-  fi
-elif has '\|&?[[:space:]]*tee([[:space:]]|$)'; then
-  deny 'A foreground command must redirect rather than pipe through tee: cmd > "$log" 2>&1; echo "exit=$?"; tail -20 "$log". On a non-zero exit the harness spends its character budget on the start of the stream and drops the end.'
+  deny 'A foreground command must redirect rather than pipe through tee: cmd > "$log" 2>&1; echo "exit=$?"; tail -20 "$log". On a non-zero exit the harness keeps only the start of the stream and drops the end.'
 fi
 
-# pipefail turns the producer's SIGPIPE into exit 141, which reads as a failure.
-# .* rather than [^|]*, since an rg pattern often contains a | of its own.
-if has '\|&?[[:space:]]*head([[:space:]]|$)' && ! has '(rg|fd|cat)[[:space:]].*\|&?[[:space:]]*head([[:space:]]|$)'; then
-  deny 'Piping into head makes the producer die of SIGPIPE, which pipefail reports as exit 141 rather than success. Use | tail, or pipe rg, fd or cat into head.'
-fi
-
-if has '(^|[;&|(]|&&|\|\|)[[:space:]]*rg([[:space:]]|$)'; then
-  if ! has '--color[= ]never'; then
-    deny 'rg must be passed --color never.'
-  fi
-  if has 'rg[[:space:]]([^|;&]*[[:space:]])?-[A-Za-z]*r[A-Za-z]*([[:space:]]|$)'; then
-    deny 'In rg, -r means --replace, so the args shift by one and you get an empty result that reads as "no matches" with no error. rg recurses by default, so drop the flag.'
-  fi
+if has '(^|[;&|(]|&&|\|\|)[[:space:]]*rg[[:space:]]([^|;&]*[[:space:]])?-[A-Za-z]*r[A-Za-z]*([[:space:]]|$)'; then
+  deny 'In rg, -r means --replace, so the args shift by one and you get an empty result that reads as "no matches" with no error. rg recurses by default, so drop the flag.'
 fi
 
 exit 0
