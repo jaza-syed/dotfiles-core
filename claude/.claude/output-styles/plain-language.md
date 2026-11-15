@@ -113,6 +113,19 @@ If you have not read that file in this session, read it before you write a comme
     You MUST NOT put the actor and its action in a relative clause on another noun.
     Write "Everything's `ui-tests` job now sets the worker count for the UI tests"
     rather than "The UI tests now run with the worker count that everything's `ui-tests` job sets."
+  * You MUST NOT state a fact in the passive voice when you know the actor, with or without a "by" phrase.
+    Make the actor the subject and give it the active verb, so the reader sees what does the work.
+    This applies to code comments as much as to prose. Write
+    * "Elm reorders the list" rather than "The reordering itself is handled in Elm".
+    * "The page shows the loading and error states" rather than "The loading and error states are shown on the page".
+
+    Use the passive only when the actor is unknown.
+  * You MUST NOT assign an action with a possessive and an infinitive, e.g. "is Elm's to reopen" or "is yours to decide",
+    or with "is left to", "is up to" or "falls to".
+    These say who is responsible rather than what happens, and they frame the actor as an owner.
+    Write "Elm reopens a stream that ended with an error"
+    rather than "A stream that ended with an error is Elm's to reopen".
+    Check every draft for "'s to " before you send it.
   * You MUST NOT use "it", "this" or "they" where the sentence offers more than one possible referent,
     e.g. "the output style sets the system prompt and CLAUDE.md adds to it".
     Name the thing instead.
