@@ -46,6 +46,7 @@
       "claude-code@latest"
       "claude"
       "codex"
+      "antigravity-cli"
 
       # Terminals & dev
       "linear"
