@@ -1,7 +1,7 @@
 Guidance for Linear tickets
 ===========================
 
-MUST, MUST NOT, SHOULD, SHOULD NOT and MAY carry their RFC 2119 meanings.
+MUST, MUST NOT, SHOULD, SHOULD NOT and MAY have their RFC 2119 meanings.
 
 
 Content
@@ -34,18 +34,18 @@ Dependencies
 * Record dependencies only as Linear relations.
 * Link only direct blockers. A blocker that another blocker already reaches MUST NOT get its own link.
 * "Blocked by" MUST mean the ticket can't be built or tested without the other.
-  Two tickets that change the same file only need an order,
+  Two tickets that change the same file need only an order,
   and a ticket that only an end-to-end test needs blocks the end-to-end ticket.
 
 
 Prompting the Linear agent
 --------------------------
 
-* A prompt MUST name the exact tickets to change and MUST say to change nothing else,
+* A prompt MUST name the exact tickets to change and MUST say not to change anything else,
   including status, assignee, milestone, labels, priority, estimate and cycle.
 * A prompt MUST give each title exactly, and each description verbatim between START and END markers,
   and MUST tell the agent to copy it without rewording.
-* A prompt MUST list each link to add, with its URL, and MUST say to add no others.
+* A prompt MUST list each link to add, with its URL, and MUST say not to add any others.
 * A prompt MUST tell the agent to stop and report when a step fails, and to report the result at the end.
 * A prompt MUST refer to tickets by their Linear identifiers, never by planning numbers such as "T5".
 * Check that a ticket still exists before linking it.

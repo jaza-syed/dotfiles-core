@@ -1,7 +1,7 @@
 Guidance for design proposals
 =============================
 
-MUST, MUST NOT, SHOULD, SHOULD NOT and MAY carry their RFC 2119 meanings.
+MUST, MUST NOT, SHOULD, SHOULD NOT and MAY have their RFC 2119 meanings.
 
 This covers proposals and agreements for an API or data model between services.
 
@@ -9,11 +9,11 @@ This covers proposals and agreements for an API or data model between services.
 Before starting
 ---------------
 
-* When I start working on a design, you MUST ask me, in the light of the context I have given you:
+* When I start working on a design, you MUST ask me:
   1. how I want the document to be structured,
   2. what I am trying to trade off, and
   3. who the audience is, and how the audience affects the structure and the trade-offs.
-* Ask these before you draft anything, and shape the document by my answers.
+* Ask these before you draft anything and shape the document by my answers.
 
 
 Mindset
@@ -47,10 +47,10 @@ Content
 -------
 
 * Prefer the design with the fewest new concepts.
-  Reuse existing structures and special-case them where they show up, rather than add a parallel type.
-* State permissions plainly: who can read each thing, who can act on it, and what other users see.
+  Reuse existing structures and special-case them where they show up, rather than add a parallel type, unless the states have different invariants.
+* State permissions plainly: who can read each thing, who can act on it and what other users see.
 * Give request and response bodies as JSON with JSON5 comments, not prose.
 * Show data model changes as diagrams that show the foreign keys, not as SQL.
-* Check each claim about current behaviour against the code, and mark any claim you have not checked.
+* Check each claim about current behaviour against the code and mark any claim you have not checked.
 * Once the proposal is agreed, the agreement document is the source of truth for the tickets,
   over notes and over code that lags it.

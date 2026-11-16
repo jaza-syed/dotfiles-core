@@ -1,21 +1,23 @@
 # Global instructions
 
-MUST, MUST NOT, SHOULD, SHOULD NOT and MAY carry their RFC 2119 meanings. An instruction with no such verb is a technique for a specific situation rather than a general rule.
+MUST, MUST NOT, SHOULD, SHOULD NOT and MAY have their RFC 2119 meanings. An instruction with no such verb is a technique for a specific situation rather than a general rule.
 
 ## Engineering instincts
 
-Build simple, maintainable systems and avoid complexity unless it is necessary, per Rich Hickey's distinction between ease and simplicity. Communicate the implicit mental model through the code, per Peter Naur's "Programming as theory building". Follow Rob Pike's rules: measure before you optimize, use simple algorithms and data structures, and choose the data structures first since the algorithms then follow from the data structures.
+Build simple, maintainable systems, per Rich Hickey's distinction between ease and simplicity. Show the mental model in the code, per Peter Naur's "Programming as theory building". Follow Rob Pike's rules to measure before you optimise, choose simple algorithms and data structures, and choose the data structures first because the algorithms follow from them.
 
-Generating code costs you nothing, so you have a natural bias towards over-engineering. Judge every solution by the cognitive load it puts on a human maintainer.
+Generating code costs you nothing, so you have a bias towards writing too much of it. Judge every change by how hard it is for a person to read and change.
 
-- Prefer deletion. When asked to refactor or improve, you SHOULD look for what can be removed before suggesting what can be added.
-- Maintain a flat hierarchy. You SHOULD NOT use deep abstractions, and you SHOULD flatten any logic flow that requires tracing through more than 3 files or layers.
-- Consolidate decisions. You MAY consolidate a concept into a single source of truth and carry the result as a simple flag, but only when the concept is checked in multiple places and you are confident the checks are the same concept and not superficially similar.
-- Prefer inlining. A single-use helper SHOULD be inlined into its caller, unless the caller is already very long or deeply nested.
-- Minimize the diff. You SHOULD prefer fewer lines of code where possible, without obfuscation, and reduce boilerplate.
-- Question the threading. If a task requires threading a new signal through multiple layers (types, schemas, pipelines, etc.), you SHOULD use a more direct architectural path where one exists, or state the alternative you considered and why the threading is still needed, then continue.
-- Look for prior art. Before you design a mechanism, e.g. a queue, a lock, a cache or a retry loop, you SHOULD check whether the codebase, a dependency the project already has, the database or the field already solves the problem. Read the source in the session rather than describe it from recall. Tell me the technique's name and link what you read, then say how your design differs or that you found nothing.
-- You MUST NOT assert a diagnosis or a dependency, or claim something works, builds or passes, unless you ran the relevant command and read the output. Where the tools or permissions you have cannot verify the claim, or the check would be too expensive, present the claim as a hypothesis with the check that would confirm it.
+- When I ask you to refactor or improve code, you SHOULD look for what you can delete before you suggest what to add.
+- You SHOULD make invalid states unrepresentable, per Yaron Minsky. Represent mutually exclusive states with a sum type or enum rather than nullable fields or boolean flags, and parse raw input into those types at the boundary rather than checking the same conditions deeper in the call stack, per Alexis King's "Parse, don't validate".
+- You SHOULD keep a functional core and an imperative shell, per Gary Bernhardt's "Boundaries". Put decisions, transformations and domain rules in pure functions over plain data, and keep I/O, database queries, network calls and state mutation in a thin shell at the boundary, without splitting the flow across extra layers.
+- If a reader has to trace a flow through more than three files or layers, you SHOULD flatten it.
+- You MAY consolidate a check into one place and pass the result as a narrower type or flag, but only when several places check the same concept rather than conditions that look alike by coincidence.
+- You SHOULD inline a helper that has only one caller, unless the caller is already long or deeply nested, or a unit test calls the helper directly to test pure decision logic without I/O.
+- You SHOULD write fewer lines of code where you can without making the code harder to read.
+- If a change passes a new parameter or field through several layers of types, schemas or functions, you SHOULD look for a more direct path first, or state the alternative you considered and why passing it through is still needed, then continue.
+- Before you design a mechanism, e.g. a queue, a lock, a cache or a retry loop, you SHOULD check whether the codebase, a dependency the project already has, the database or the field already solves the problem. Read the source in the session rather than describe it from recall. Tell me the technique's name and link what you read, then say how your design differs or that you found nothing.
+- You MUST NOT assert a diagnosis or a dependency, or claim something works, builds or passes, unless you ran the relevant command and read the output. Where your tools or permissions cannot verify the claim, or the check would take too long, state the claim as a hypothesis and say how to check it.
 
 ## Communication style
 
@@ -43,20 +45,20 @@ terminal-notifier -title "Claude Code" -subtitle "<the task that is waiting>" -m
 
 This applies whether you ask in prose or through the AskUserQuestion tool. `terminal-notifier` exists only on the Macs, so skip the notification where the command is absent.
 
-In a Claude Desktop session, whose system prompt says it runs inside the Claude desktop app, you MUST send the notification with the PushNotification tool instead of the script, and load the tool with ToolSearch first if it is deferred. Its message names the waiting task and the decision in one line under 200 characters. The bullets below apply only to the script.
+In a Claude Desktop session, whose system prompt says it runs inside the Claude desktop app, you MUST send the notification with the PushNotification tool instead of the script and load the tool with ToolSearch first if it is not loaded. Its message names the waiting task and the decision in one line under 200 characters. The bullets below apply only to the script.
 
-- `name` MUST be two words you pick at random, joined by a hyphen, whimsical in the style of Anthropic's own naming, for example `velvet-otter` or `copper-wren`. Pick a fresh pair each time you notify. The title stays on the window afterwards, so I can tell my Ghostty windows apart.
+- `name` MUST be two words you pick at random, joined by a hyphen, whimsical in the style of Anthropic's own naming, for example `velvet-otter` or `copper-wren`. Pick a fresh pair each time you notify. The title remains on the window afterwards, so I can tell my Ghostty windows apart.
 - The `printf` writes OSC 0 to the tty of the tmux client, which sets that Ghostty window's title. tmux leaves the title alone because `set-titles` is off, and a random pair means the lookup matches one window. AeroSpace takes about 100ms to see a title change, so the loop retries rather than guessing a delay.
-- `aerospace focus --window-id` raises that exact window. AeroSpace already holds the Accessibility permission this needs, so no grant is required. Ghostty runs all its windows in one process, so `-activate` alone can only raise whichever Ghostty window was frontmost; it stays as the fallback for when AeroSpace is not running.
-- `-execute` runs a shell command when I click. `select-window` and `select-pane` act on the session that contains the pane, so they hold whatever client is attached, unlike `switch-client`, which picks a client itself. The clicked command gets no tmux environment and a minimal PATH, so the double quotes expand `$wid`, `$TMUX_PANE` and both `command -v` lookups as you send rather than on click. Every binary in it MUST be an absolute path. Drop the tmux parts when `$TMUX_PANE` is unset, and the `aerospace` part when the command is absent.
+- `aerospace focus --window-id` raises that exact window. AeroSpace already holds the Accessibility permission this needs. Ghostty runs all its windows in one process, so `-activate` alone raises only whichever Ghostty window was frontmost, and it is there for when AeroSpace is not running.
+- `-execute` runs a shell command when I click. `select-window` and `select-pane` act on the session that contains the pane, so they hold whatever client is attached, unlike `switch-client`, which picks a client itself. The clicked command gets no tmux environment and a minimal PATH, so the double quotes expand `$wid`, `$TMUX_PANE` and both `command -v` lookups as you send rather than on click. Every binary in it MUST be an absolute path. Drop the tmux parts when `$TMUX_PANE` is unset and the `aerospace` part when the command is absent.
 - `-group claude` makes each notification replace the previous one, so I cannot click a stale notification whose `$wid` and pane no longer apply.
-- `-subtitle` names the task that is waiting, so `-message` carries only the decision.
-- `-action "First,Second"` adds buttons and `-reply "<prompt>"` adds a text field. Each prints my answer on stdout and blocks until the answer arrives, so use one only when the turn has nothing to do but wait. Prefer `-action` for a closed choice and `-reply` for free text.
-- `-timeout SECONDS` MUST accompany `-action` or `-reply`, and MUST be shorter than the Bash tool's own timeout. On expiry the command prints `@TIMEOUT` and exits 6, and you then ask me in the session instead.
+- `-subtitle` names the task that is waiting, so `-message` contains only the decision.
+- `-action "First,Second"` adds buttons and `-reply "<prompt>"` adds a text field. Each prints my answer on stdout and blocks until the answer arrives, so pass one only when the turn has nothing to do but wait. Prefer `-action` for a closed choice and `-reply` for free text.
+- You MUST pass `-timeout SECONDS` with `-action` or `-reply`, and the timeout MUST be shorter than the Bash tool's own timeout. On expiry the command prints `@TIMEOUT` and exits 6, and you then ask me in the session instead.
 
 ## Review comments
 
-- You MUST NOT post a comment, reply or thread on a merge request or pull request, through any tool, including `glab`, `gh` or the API. Reading review comments is fine. If a task seems to call for a post, give me the text and stop.
+- You MUST NOT post a comment, reply or thread on a merge request or pull request, through any tool, including `glab`, `gh` or the API. Reading review comments is fine. If a task asks you to post one, give me the text and stop.
 - You MUST NOT draft or suggest a reply to a review comment unless I ask for one. When I ask what a comment means or whether it is right, answer that question only.
 
 ## Writing comments
@@ -76,28 +78,28 @@ In a Claude Desktop session, whose system prompt says it runs inside the Claude 
 
 ### GNU userland
 
-- On every machine, including the Macs, `sed`, `grep`, `awk`, `find`, `xargs`, `diff`, `patch`, `tar`, `make` and coreutils on PATH are the GNU versions. You MUST use GNU flags, e.g. `grep -P` and `find -printf`, and MUST NOT call `/usr/bin` tools to get BSD behaviour.
+- On every machine, including the Macs, `sed`, `grep`, `awk`, `find`, `xargs`, `diff`, `patch`, `tar`, `make` and coreutils on PATH are the GNU versions. You MUST pass GNU flags, e.g. `grep -P` and `find -printf`, and MUST NOT call `/usr/bin` tools to get BSD behaviour.
 
 ### Searching
 
-- You SHOULD use `rg` and `fd` over `grep` and `find`.
-- `fd` and `rg` both skip what git ignores, and `-H` only adds dotfiles, so `fd -H '^\.env'` hides an ignored `.env` and reads as "the file does not exist". You MUST pass `-I` to `fd` (`--no-ignore` to `rg`) when a gitignored file would change your answer, for example checking whether a `.env` exists next to a committed `.env-example`.
+- You SHOULD run `rg` and `fd` rather than `grep` and `find`.
+- `fd` and `rg` both skip what git ignores and `-H` adds only dotfiles, so `fd -H '^\.env'` hides an ignored `.env` and reads as "the file does not exist". You MUST pass `-I` to `fd` (`--no-ignore` to `rg`) when a gitignored file would change your answer, for example checking whether a `.env` exists next to a committed `.env-example`.
 
 ### Choosing foreground or background
 
-- Short commands such as `rg`, `fd`, `git status`, `git log` or `git diff` run plainly in the foreground, and you read the output. You MUST NOT apply the log-and-exit-code rules below to them.
+- Run short commands such as `rg`, `fd`, `git status`, `git log` or `git diff` in the foreground and read the output. You MUST NOT apply the log-and-exit-code rules below to them.
 - You MUST background a shell call you expect to run for over 10 seconds. Backgrounding also keeps the output out of context until you ask for it. You SHOULD run anything shorter in the foreground, so its output arrives in one call.
 - `$TMPDIR` differs by context (sandboxed commands get `/tmp/claude-*`, unsandboxed commands get the macOS `/var/folders/...` path, and `nix develop` sets a fresh `/tmp/nix-shell.*` per invocation), so you MUST NOT reuse a `$TMPDIR` path across commands.
 
 ### Foreground commands with long output
 
 - For builds, tests and anything else with long output, redirect to a log in the scratchpad directory and check the exit code before reading the log: `cmd > "$log" 2>&1; echo "exit=$?"; tail -20 "$log"`.
-- A foreground command MUST redirect rather than pipe through `tee`. On a non-zero exit the harness puts about 30,000 characters into context, taken from the start of the stream, so `tee` on a failing build spends that budget on the start of the log and drops the end. On a zero exit large output is persisted to a file with a 2KB preview, so it is cheap either way.
+- A foreground command MUST redirect rather than pipe through `tee`. On a non-zero exit the harness puts about 30,000 characters into context, taken from the start of the stream, so `tee` on a failing build spends that budget on the start of the log and drops the end. On a zero exit the harness writes large output to a file with a 2KB preview, so it is cheap either way.
 
 ### Background commands
 
 - The harness writes a backgrounded command's stdout and stderr to its own output file and reports the exit code in the completion notification, so run the command bare, without `tee` or a filter after it.
-- Read the output file before the notification only to detect a hang. If the file stops growing for much longer than the phase normally takes, kill the command and diagnose. When a test harness's default timeout is long, you SHOULD also pass a short explicit timeout (e.g. `playwright test --timeout=180000`) so a hang fails loudly with artifacts.
+- Only read the output file before the notification to detect a hang. If the file stops growing for much longer than the phase normally takes, kill the command and diagnose. When a test harness's default timeout is long, you SHOULD also pass a short explicit timeout, e.g. `playwright test --timeout=180000`, so a hang fails loudly with artefacts.
 
 ## Machine-specific instructions
 

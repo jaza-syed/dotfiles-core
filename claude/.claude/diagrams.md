@@ -1,7 +1,7 @@
 Dependency diagrams
 ===================
 
-MUST, MUST NOT, SHOULD, SHOULD NOT and MAY carry their RFC 2119 meanings.
+MUST, MUST NOT, SHOULD, SHOULD NOT and MAY have their RFC 2119 meanings.
 
 A dependency diagram is a graph whose edges mean "depends on", e.g. flake inputs, module imports, service calls or ticket blockers.
 
