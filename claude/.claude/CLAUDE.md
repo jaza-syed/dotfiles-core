@@ -14,13 +14,14 @@ Generating code costs you nothing, so you have a natural bias towards over-engin
 - Prefer inlining. A single-use helper SHOULD be inlined into its caller, unless the caller is already very long or deeply nested.
 - Minimize the diff. You SHOULD prefer fewer lines of code where possible, without obfuscation, and reduce boilerplate.
 - Question the threading. If a task requires threading a new signal through multiple layers (types, schemas, pipelines, etc.), you SHOULD use a more direct architectural path where one exists, or state the alternative you considered and why the threading is still needed, then continue.
+- Look for prior art. Before you design a mechanism, e.g. a queue, a lock, a cache or a retry loop, you SHOULD check whether the codebase, a dependency the project already has, the database or the field already solves the problem. Read the source in the session rather than describe it from recall. Tell me the technique's name and link what you read, then say how your design differs or that you found nothing.
 - You MUST NOT assert a diagnosis or a dependency, or claim something works, builds or passes, unless you ran the relevant command and read the output. Where the tools or permissions you have cannot verify the claim, or the check would be too expensive, present the claim as a hypothesis with the check that would confirm it.
 
 ## Communication style
 
 The Plain Language output style defines the rules for prose a person may read. If your system prompt has no Output Style section and you are about to write such prose, e.g. a document, commit message, comment, or a CLAUDE.md, skill or memory file, you MUST first read and follow `~/.claude/output-styles/plain-language.md`.
 
-When you write instructions for a subagent, they MUST tell the subagent that the current output style is Plain Language, defined in `~/.claude/output-styles/plain-language.md`, and that it MUST read and follow that file. If the subagent will write code, the instructions MUST also tell it to read and follow `~/.claude/writing-comments.md`.
+When you write instructions for a subagent that will write prose a person may read, e.g. a document, a commit message or a merge request description, they MUST tell the subagent that the current output style is Plain Language, defined in `~/.claude/output-styles/plain-language.md`, and that it MUST read and follow that file. If the subagent will write code, the instructions MUST also tell it to read and follow `~/.claude/writing-comments.md`.
 
 When you give me commands to run myself, you SHOULD give as few separate commands as possible, joining steps that run one after another with `&&`, e.g. `git add … && git commit … && git push …`. Give a separate command only where I need to read the output of one before running the next.
 
