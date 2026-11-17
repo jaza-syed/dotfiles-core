@@ -25,6 +25,7 @@ in
     ".claude/linear.md".source = link "claude/.claude/linear.md";
     ".claude/proposals.md".source = link "claude/.claude/proposals.md";
     ".claude/diagrams.md".source = link "claude/.claude/diagrams.md";
+    ".claude/monitoring.md".source = link "claude/.claude/monitoring.md";
     ".claude/commands".source = link "claude/.claude/commands";
     ".claude/hooks".source = link "claude/.claude/hooks";
     ".claude/output-styles".source = link "claude/.claude/output-styles";

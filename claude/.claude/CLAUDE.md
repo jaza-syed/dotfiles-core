@@ -101,6 +101,10 @@ In a Claude Desktop session, whose system prompt says it runs inside the Claude 
 - The harness writes a backgrounded command's stdout and stderr to its own output file and reports the exit code in the completion notification, so run the command bare, without `tee` or a filter after it.
 - Only read the output file before the notification to detect a hang. If the file stops growing for much longer than the phase normally takes, kill the command and diagnose. When a test harness's default timeout is long, you SHOULD also pass a short explicit timeout, e.g. `playwright test --timeout=180000`, so a hang fails loudly with artefacts.
 
+### Waiting and waking up
+
+- Before you wait for something, watch a variable such as the usage limits, or set yourself a wake-up, you MUST read and follow `~/.claude/monitoring.md`.
+
 ## Machine-specific instructions
 
 @~/.claude/machine.md
