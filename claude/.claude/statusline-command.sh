@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 # Claude Code status line, two rows: user@host, dir, branch and model on the first;
 # Ctx, 5h and 7d usage line2 with time to reset on the second.
 
@@ -16,13 +16,14 @@ IFS=$'\t' read -r model ctx five five_at seven seven_at cwd session <<<"$(jq -r 
   ] | @tsv' <<<"$input")"
 
 # persistent-watch.sh and wait-for-usage-reset.sh read these rather than the usage API.
-if [[ $five == <-> || $five == <->.* ]] && [[ $five_at == <-> || $five_at == <->.* ]]; then
+number='^[0-9]+(\..*)?$'
+if [[ $five =~ $number && $five_at =~ $number ]]; then
   mkdir -p "$HOME/.cache/dotfiles/claude"
-  print -r -- "${five%%.*} ${five_at%%.*}" >"$HOME/.cache/dotfiles/claude/usage-5h"
+  printf '%s\n' "${five%%.*} ${five_at%%.*}" >"$HOME/.cache/dotfiles/claude/usage-5h"
 fi
-if [[ $seven == <-> || $seven == <->.* ]] && [[ $seven_at == <-> || $seven_at == <->.* ]]; then
+if [[ $seven =~ $number && $seven_at =~ $number ]]; then
   mkdir -p "$HOME/.cache/dotfiles/claude"
-  print -r -- "${seven%%.*} ${seven_at%%.*}" >"$HOME/.cache/dotfiles/claude/usage-7d"
+  printf '%s\n' "${seven%%.*} ${seven_at%%.*}" >"$HOME/.cache/dotfiles/claude/usage-7d"
 fi
 
 BOLD=$'\033[1m'; DIM=$'\033[2m'; RESET=$'\033[0m'
@@ -81,7 +82,7 @@ seg() {
   if t=$(eta "${5--1}"); then line2+=" ${DIM}·${t}${RESET}"; fi
 }
 
-line1="${BOLD}$(whoami)@$(hostname -s)${RESET}  ${BLUE}${cwd/#$HOME/~}${RESET}"
+line1="${BOLD}$(whoami)@$(hostname -s)${RESET}  ${BLUE}${cwd/#"$HOME"/"~"}${RESET}"
 [[ -n $git_branch ]] && line1+="  ${PURPLE} ${git_branch}${RESET}"
 line1+="  ${DIM}|${RESET}  ${MAGENTA}${model}${RESET}"
 [[ -f $HOME/.cache/dotfiles/claude/persistent/$session ]] && line1+="  ${DIM}|${RESET}  ${YELLOW}📌 persistent${RESET}"
