@@ -12,6 +12,7 @@
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       alias.ci = "commit";
+      alias.pu = "push";
     };
   };
 }
