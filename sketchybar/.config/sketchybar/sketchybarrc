@@ -76,6 +76,7 @@ if [[ "$BAR_HIDDEN" != "on" ]]; then
 fi
 
 create_workspace_observer
+create_wake_restart_item
 
 if [[ "$BAR_HIDDEN" != "on" && "$BAR_VARIANT" != "vertical" ]]; then
   create_status_items

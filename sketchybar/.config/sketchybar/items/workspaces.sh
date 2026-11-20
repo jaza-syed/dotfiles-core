@@ -175,6 +175,14 @@ create_workspace_observer() {
     aerospace_workspace_change \
     aerospace_window_focus_change \
     aerospace_workspace_refresh \
-    display_change \
-    system_woke
+    display_change
+}
+
+create_wake_restart_item() {
+  sb --add item wake_restart left \
+    --set wake_restart \
+    drawing=off \
+    update_freq=0 \
+    script="$PLUGIN_DIR/wake_restart.sh" \
+    --subscribe wake_restart system_woke
 }
