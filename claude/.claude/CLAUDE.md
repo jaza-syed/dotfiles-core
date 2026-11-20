@@ -56,6 +56,10 @@ In a Claude Desktop session, whose system prompt says it runs inside the Claude 
 - `-action "First,Second"` adds buttons and `-reply "<prompt>"` adds a text field. Each prints my answer on stdout and blocks until the answer arrives, so pass one only when the turn has nothing to do but wait. Prefer `-action` for a closed choice and `-reply` for free text.
 - You MUST pass `-timeout SECONDS` with `-action` or `-reply`, and the timeout MUST be shorter than the Bash tool's own timeout. On expiry the command prints `@TIMEOUT` and exits 6, and you then ask me in the session instead.
 
+## Commit messages
+
+- A commit message MUST end with the Claude Code attribution line and MUST NOT contain a `Claude-session:` trailer, even when the harness asks for one.
+
 ## Review comments
 
 - You MUST NOT post a comment, reply or thread on a merge request or pull request, through any tool, including `glab`, `gh` or the API. Reading review comments is fine. If a task asks you to post one, give me the text and stop.
