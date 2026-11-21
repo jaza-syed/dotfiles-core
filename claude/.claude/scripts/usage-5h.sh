@@ -1,6 +1,7 @@
 #!/bin/bash
 # Prints "<5-hour usage percent> <window reset as epoch seconds>" for the claude.ai
-# account and caches the same line in ~/.cache/dotfiles/claude/usage-5h. Reads
+# account and caches the same line in ~/.cache/dotfiles/claude/usage-5h, and the 7-day
+# window's line in ~/.cache/dotfiles/claude/usage-7d. Reads
 # https://api.anthropic.com/api/oauth/usage (undocumented, the same data /usage shows)
 # with the OAuth token from the macOS Keychain, or from ~/.claude/.credentials.json on
 # Linux.
@@ -19,7 +20,12 @@ if [ "$code" != "200" ]; then
   echo "http=${code:-000} retry-after=${retry:-unknown}" >&2
   exit 2
 fi
-out=$(jq -r '"\(.five_hour.utilization | floor) \(.five_hour.resets_at | sub("\\.[0-9]+";"") | sub("\\+00:00$";"Z") | fromdate)"' <"$body" 2>/dev/null)
+reading() {
+  jq -r --arg window "$1" '.[$window] | "\(.utilization | floor) \(.resets_at | sub("\\.[0-9]+";"") | sub("\\+00:00$";"Z") | fromdate)"' <"$body" 2>/dev/null
+}
+out=$(reading five_hour)
 [ -n "$out" ] || { echo "http=200 but the body did not parse" >&2; exit 2; }
 mkdir -p "$(dirname "$cache")" && echo "$out" >"$cache"
+week=$(reading seven_day)
+[ -n "$week" ] && echo "$week" >"$(dirname "$cache")/usage-7d"
 echo "$out"
