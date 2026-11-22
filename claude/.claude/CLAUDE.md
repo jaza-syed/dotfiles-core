@@ -27,7 +27,28 @@ When you write instructions for a subagent that will write prose a person may re
 
 When you give me commands to run myself, you SHOULD give as few separate commands as possible, joining steps that run one after another with `&&`, e.g. `git add … && git commit … && git push …`. Give a separate command only where I need to read the output of one before running the next.
 
-When you stop part-way through a sequence of actions because you need a decision or a go-ahead from me before you can continue, you MUST also send a desktop notification saying what you need:
+When you stop part-way through a sequence of actions because you need a decision or a go-ahead from me before you can continue, you MUST also send a notification saying what you need. This applies whether you ask in prose or through the AskUserQuestion tool. The notification depends on where the session runs:
+
+- In a Claude Desktop session, whose system prompt says it runs inside the Claude desktop app, you MUST send it with the PushNotification tool and load the tool with ToolSearch first if it is not loaded. Its message names the waiting task and the decision in one line under 200 characters.
+- In Rex, where `$TERM_PROGRAM` is `rex`, you MUST send Rex's program status sequence, OSC 7501.
+- Elsewhere, which means Ghostty inside tmux, you MUST send a desktop notification with `terminal-notifier`. `terminal-notifier` exists only on the Macs, so skip the notification where the command is absent.
+
+### Rex
+
+Rex is a terminal multiplexer, so a Rex session does not run inside tmux. Write OSC 7501 ([Rex's program status protocol](https://www.superlogical.com/rex/docs/build/program-status)) to the terminal of the Claude Code process:
+
+```sh
+b64() { printf '%s' "$1" | base64 | tr -d '\n'; }
+printf '\e]7501;state=blocked:kind=question:id=claude:app=claude:title=%s:msg=%s\e\\' \
+  "$(b64 '<the task that is waiting>')" "$(b64 '<the decision you need>')" \
+  > "/dev/$(ps -o tty= -p $PPID | tr -d ' ')"
+```
+
+- The Bash tool's shell has no controlling terminal, so the command writes to the tty of its parent, the Claude Code process. The sandbox blocks that write, so you MUST run the command outside the sandbox.
+- Pass `kind=permission` for a go-ahead and `kind=question` for a decision.
+- Rex shows the state on an unfocused tab header and in the session picker. The `UserPromptSubmit` hook `cancel-notify.sh` clears the record with `id=claude` when I reply.
+
+### Ghostty
 
 ```sh
 name="velvet-otter"   # two words you pick at random, see below
@@ -42,10 +63,6 @@ terminal-notifier -title "Claude Code" -subtitle "<the task that is waiting>" -m
   -group claude -activate com.mitchellh.ghostty \
   -execute "$(command -v aerospace) focus --window-id $wid; $(command -v tmux) select-window -t $TMUX_PANE; $(command -v tmux) select-pane -t $TMUX_PANE"
 ```
-
-This applies whether you ask in prose or through the AskUserQuestion tool. `terminal-notifier` exists only on the Macs, so skip the notification where the command is absent.
-
-In a Claude Desktop session, whose system prompt says it runs inside the Claude desktop app, you MUST send the notification with the PushNotification tool instead of the script and load the tool with ToolSearch first if it is not loaded. Its message names the waiting task and the decision in one line under 200 characters. The bullets below apply only to the script.
 
 - `name` MUST be two words you pick at random, joined by a hyphen, whimsical in the style of Anthropic's own naming, for example `velvet-otter` or `copper-wren`. Pick a fresh pair each time you notify. The title remains on the window afterwards, so I can tell my Ghostty windows apart.
 - The `printf` writes OSC 0 to the tty of the tmux client, which sets that Ghostty window's title. tmux leaves the title alone because `set-titles` is off, and a random pair means the lookup matches one window. AeroSpace takes about 100ms to see a title change, so the loop retries rather than guessing a delay.
