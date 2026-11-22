@@ -21,7 +21,8 @@ if [ "$code" != "200" ]; then
   exit 2
 fi
 reading() {
-  jq -r --arg window "$1" '.[$window] | "\(.utilization | floor) \(.resets_at | sub("\\.[0-9]+";"") | sub("\\+00:00$";"Z") | fromdate)"' <"$body" 2>/dev/null
+  # A window with no usage yet has a null utilization and reset time
+  jq -r --arg window "$1" '(.[$window] // {}) | "\(.utilization // 0 | floor) \(if .resets_at then (.resets_at | sub("\\.[0-9]+";"") | sub("\\+00:00$";"Z") | fromdate) else 0 end)"' <"$body" 2>/dev/null
 }
 out=$(reading five_hour)
 [ -n "$out" ] || { echo "http=200 but the body did not parse" >&2; exit 2; }
