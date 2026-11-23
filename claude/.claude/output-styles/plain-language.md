@@ -189,6 +189,10 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
   * You MUST NOT write "it", "this" or "they" where a reader could take the wrong referent,
     e.g. "the output style sets the system prompt and CLAUDE.md adds to it".
     Name the thing instead.
+  * You MUST put a modifier next to the word it modifies.
+    When a modifier could attach to more than one word, which is a misplaced modifier, move the modifier or split the sentence.
+    Write "The gate cancels the children in this order. The cancellations run as code under test."
+    rather than "The order in which the children are cancelled as code under test".
   * You MUST NOT refer to a thing only by a label, a number or its place in a plan, a list or a document,
     e.g. "change 4", "commit 4", "stage 9", "the plan step", "the question in the box".
     Say what the thing is in the same sentence, e.g. "change 4, which adds a plot response with a cursor".
