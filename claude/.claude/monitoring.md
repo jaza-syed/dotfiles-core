@@ -33,7 +33,7 @@ Choose the mechanism by what you are waiting for.
 | One condition, such as a server answering or a file appearing | `Bash` with `run_in_background` and `until <test>; do sleep <seconds>; done`. It exits once, so you get one notification |
 | A time | `Bash` with `run_in_background` and `sleep <seconds>`, computed from `date +%s`. A foreground `sleep` is blocked |
 | The usage window's reset | `WAIT_THRESHOLD=0 ~/.claude/scripts/wait-for-usage-reset.sh` with `run_in_background`, outside the sandbox. It sleeps until a minute past the reset that the cache records and prints `RESET`. Without `WAIT_THRESHOLD=0` it waits only when a window is at 50% or more |
-| A stream of events, each of which you act on | `Monitor`, with a command that prints one line per event and whose filter also matches every failure. A monitor expires after at most 30 minutes, so re-arm it on expiry while you still need it |
+| A stream of events, each of which you act on | `Monitor`, with a command that prints one line per event. The command's filter also matches every failure. A monitor expires after at most 30 minutes, so re-arm it on expiry while you still need it |
 | Usage crossing thresholds | `Monitor` running `~/.claude/scripts/usage-monitor.sh 80 90 95`, outside the sandbox. It prints a line the first time the 5-hour usage reaches each threshold, polling every `USAGE_POLL` seconds (default 300) |
 | A time I name, while the main chat is idle | `CronCreate`, one-shot. It fires only while the chat is idle and is lost when the session ends |
 | The next step of a `/loop` | `ScheduleWakeup` |

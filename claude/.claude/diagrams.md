@@ -3,7 +3,7 @@ Dependency diagrams
 
 MUST, MUST NOT, SHOULD, SHOULD NOT and MAY have their RFC 2119 meanings.
 
-A dependency diagram is a graph whose edges mean "depends on", e.g. flake inputs, module imports, service calls or ticket blockers.
+In a dependency diagram, each edge means "depends on", e.g. flake inputs, module imports, service calls or ticket blockers.
 
 * You MUST draw a dependency diagram as a Mermaid flowchart with this front matter,
   which lays it out with ELK, draws right-angled edges, keeps each label line on one row and puts each node one layer below

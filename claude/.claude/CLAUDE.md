@@ -29,7 +29,7 @@ When you give me commands to run myself, you SHOULD give as few separate command
 
 When you stop part-way through a sequence of actions because you need a decision or a go-ahead from me before you can continue, you MUST also send a notification saying what you need. This applies whether you ask in prose or through the AskUserQuestion tool. The notification depends on where the session runs:
 
-- In a Claude Desktop session, whose system prompt says it runs inside the Claude desktop app, you MUST send it with the PushNotification tool and load the tool with ToolSearch first if it is not loaded. Its message names the waiting task and the decision in one line under 200 characters.
+- When the system prompt says the session runs inside the Claude desktop app, you MUST send it with the PushNotification tool and load the tool with ToolSearch first if it is not loaded. Its message names the waiting task and the decision in one line under 200 characters.
 - In Rex, where `$TERM_PROGRAM` is `rex`, you MUST send Rex's program status sequence, OSC 7501.
 - Elsewhere, which means Ghostty inside tmux, you MUST send a desktop notification with `terminal-notifier`. `terminal-notifier` exists only on the Macs, so skip the notification where the command is absent.
 
@@ -68,7 +68,7 @@ terminal-notifier -title "Claude Code" -subtitle "<the task that is waiting>" -m
 - The `printf` writes OSC 0 to the tty of the tmux client, which sets that Ghostty window's title. tmux leaves the title alone because `set-titles` is off, and a random pair means the lookup matches one window. AeroSpace takes about 100ms to see a title change, so the loop retries rather than guessing a delay.
 - `aerospace focus --window-id` raises that exact window. AeroSpace already holds the Accessibility permission this needs. Ghostty runs all its windows in one process, so `-activate` alone raises only whichever Ghostty window was frontmost, and it is there for when AeroSpace is not running.
 - `-execute` runs a shell command when I click. `select-window` and `select-pane` act on the session that contains the pane, so they hold whatever client is attached, unlike `switch-client`, which picks a client itself. The clicked command gets no tmux environment and a minimal PATH, so the double quotes expand `$wid`, `$TMUX_PANE` and both `command -v` lookups as you send rather than on click. Every binary in it MUST be an absolute path. Drop the tmux parts when `$TMUX_PANE` is unset and the `aerospace` part when the command is absent.
-- `-group claude` makes each notification replace the previous one, so I cannot click a stale notification whose `$wid` and pane no longer apply.
+- `-group claude` makes each notification replace the previous one, so I cannot click an old notification with a `$wid` and pane that no longer apply.
 - `-subtitle` names the task that is waiting, so `-message` contains only the decision.
 - `-action "First,Second"` adds buttons and `-reply "<prompt>"` adds a text field. Each prints my answer on stdout and blocks until the answer arrives, so pass one only when the turn has nothing to do but wait. Prefer `-action` for a closed choice and `-reply` for free text.
 - You MUST pass `-timeout SECONDS` with `-action` or `-reply`, and the timeout MUST be shorter than the Bash tool's own timeout. On expiry the command prints `@TIMEOUT` and exits 6, and you then ask me in the session instead.

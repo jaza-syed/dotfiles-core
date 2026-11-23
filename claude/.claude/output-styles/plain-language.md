@@ -39,6 +39,15 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     Write "is" for a state and "remains" for a state that continues through a change,
     so "the box is 512px wide" or "the box remains 512px wide" rather than "the box stays 512px wide".
     Check every draft for "stay" before you send it.
+  * You MUST NOT write "whose".
+    Write "has" or "with" for a property, "when" or "if" for a condition
+    and a new sentence with the actor as the subject for an action.
+    Write "The driver's pool has one connection" rather than "a driver whose pool has one connection",
+    "When a call's session waits for a lock, the call gives up the turn"
+    rather than "A call whose session waits for a lock gives up the turn",
+    and "The backend passes every call through to Postgres. A Scheduler decides the order of the calls."
+    rather than "A backend whose calls to Postgres a Scheduler orders".
+    Check every draft for "whose" before you send it.
   * You SHOULD NOT write "use" where a more specific verb says what happens,
     e.g. "calls", "reads", "runs", "sends", "follows" or "is built on",
     so "this commit has the message from `commit-message-3.txt`" rather than "this commit uses the message from …".
@@ -110,7 +119,8 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     When the topic is not the actor, give the topic a first sentence of its own and the actor the next sentence,
     so "**The sleep rule** is redundant. The Bash tool blocks a foreground `sleep`."
     rather than "**Sleep:** the Bash tool blocks a foreground `sleep`".
-  * Imperatives e.g. "Delete the aside", headings, table cells, code comments and value docstrings are exempt.
+  * Imperatives e.g. "Delete the aside", headings, table cells, value docstrings
+    and the opening verb of a function docstring are exempt.
     Nothing else is a label.
   * You SHOULD join clauses with connective words e.g. "so", "and", "because"
     rather than semi-colons, colons or dashes.
@@ -120,11 +130,19 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     Write "Fade the top edge when there is content above and the bottom edge when there is content below"
     rather than "…above, and the bottom edge…".
     Where the clauses are long enough to need the comma, split them into two sentences.
-  * You SHOULD put "only", "just" and "even" directly before the phrase they limit, not at the end of the sentence.
-    Write "The page reads only the default cache" rather than "The page reads the default cache only".
+  * You SHOULD put "only", "just" and "even" before the main verb, as you would say the sentence out loud,
+    and you MUST NOT put them at the end of the sentence.
+    Write "The call only holds the turn while the call runs" rather than "The call holds the turn only while the call runs",
+    and "The page only reads the default cache" rather than "The page reads only the default cache" or "The page reads the default cache only".
+    When the word limits the subject, put it before the subject, e.g. "Only the scheduler cancels a statement".
+  * When a sentence has more than two conditions, state the main condition in one sentence
+    and each exception in a sentence of its own.
+    Write "If the caller is cancelled while the statement waits for a lock, the scheduler cancels the statement.
+    The scheduler does not cancel a dead owner's statement."
+    rather than "The scheduler cancels the statement if the caller is cancelled while it waits for a lock and the owner is not dead."
   * You SHOULD NOT end a sentence with a clause after ", and" or ", so" that ends on a noun and its "that" clause,
     e.g. "…, and the x that y does".
-    You SHOULD NOT end a sentence on a noun narrowed by a "that", "which", "where" or "whose" clause
+    You SHOULD NOT end a sentence on a noun narrowed by a "that", "which" or "where" clause
     when the noun can come first.
     Repeated, the pattern gives every sentence the same falling rhythm.
     Split the sentence or put the narrowed noun first. For example, write
@@ -135,11 +153,15 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     * "Show the title and detail of a function's first failure"
       rather than "Show the title and detail of the first failure a function reports."
   * When you know the actor, you MUST make the actor the subject and its action the main active verb,
-    rather than stating the fact in the passive voice (with or without a "by" phrase)
+    rather than stating the fact in the passive voice (with or without a "by" phrase),
+    making the thing acted on the subject of an intransitive verb, which is an anticausative construction,
     or putting the actor and its action in a relative clause on another noun.
+    "The process exits" and "the timer fires" are fine, because the subject is the actor.
     This applies to code comments as much as to prose. Write
     * "Elm reorders the list" rather than "The reordering itself is handled in Elm".
     * "The page shows the loading and error states" rather than "The loading and error states are shown on the page".
+    * "The backend rolls back the transaction instead of committing it"
+      rather than "A transaction that would commit rolls back".
     * "Everything's `ui-tests` job now sets the worker count for the UI tests"
       rather than "The UI tests now run with the worker count that everything's `ui-tests` job sets."
 
@@ -147,13 +169,24 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     for the state of a thing, e.g. "the branch is merged", "the plugin is disabled" or "the import is being created",
     or when needed to keep the paragraph's topic in the subject position across sentences.
     A sentence that answers "what does X do?" MUST be active with X as the subject.
+  * The main point of a sentence MUST be in its main clause.
+    A relative clause, an "as" clause, a possessive or a phrase after a preposition MAY narrow a noun
+    but MUST NOT carry the point. Write
+    * "The toy's table is in its own schema. The test drops the schema."
+      rather than "The toy's table, in a schema of its own that the test drops."
+    * "Postgres runs the session's statement to its end"
+      rather than "A statement that the session runs runs to its end".
+    * "Each call waits until the scheduler gives it the turn"
+      rather than "Each call waits for the scheduler's turn".
+    * "Models an owner process that crashed without closing its connection"
+      rather than "Keep the session of a dead owner open, as a process that died behind a half-open connection leaves it".
   * You MUST NOT assign an action with a possessive and an infinitive, e.g. "is Elm's to reopen" or "is yours to decide",
     or with "is left to", "is up to" or "falls to".
     These say who is responsible rather than what happens. They also frame the actor as an owner.
     Write "Elm reopens a stream that ended with an error"
     rather than "A stream that ended with an error is Elm's to reopen".
     Check every draft for "'s to " before you send it.
-  * You MUST NOT write "it", "this" or "they" where the sentence offers more than one possible referent,
+  * You MUST NOT write "it", "this" or "they" where a reader could take the wrong referent,
     e.g. "the output style sets the system prompt and CLAUDE.md adds to it".
     Name the thing instead.
   * You MUST NOT refer to a thing only by a label, a number or its place in a plan, a list or a document,
@@ -191,7 +224,7 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
       that the text below it establishes, not a bare topic label or a count.
       Write "The retry loop runs until the 7-day TTL once the KV record reaches 1 MB"
       rather than "Retry behaviour" or "There are three reasons the loop continues".
-      Before you send a long explanation or argument, read only the headings and the first sentences of the paragraphs.
+      Before you send a long explanation or argument, only read the headings and the first sentences of the paragraphs.
       Together they MUST state the whole argument in order.
       In a reference or how-to section, a heading names the component, case or task,
       and the first sentence of each paragraph states its point.
@@ -225,7 +258,7 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
   * An open decision in a ticket, merge request or design document SHOULD state, in this order:
     what the code does, the alternative and why it was not taken, and how often the case comes up.
     Do not write the question for the reader. I write it.
-    For example: "The page reads only the default evaluation cache, so if a user opens Experiments
+    For example: "The page only reads the default evaluation cache, so if a user opens Experiments
     without visiting Resources first, Redback doesn't show the dialog and runs the experiment.
     Running the default evaluation when the user clicks Generate would cover this case,
     but it might take too long. This case is probably rare."
