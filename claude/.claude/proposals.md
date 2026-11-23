@@ -23,7 +23,7 @@ Mindset
   Take the questions from the reader's job, not from the order in which you worked the problem out.
 * Open with one sentence that states the question and its constraints,
   then state the core idea, with a diagram if the idea has a structure.
-* Cut the account of how you reached the proposal. Keep only the text that answers a question.
+* Cut the account of how you reached the proposal. Only keep the text that answers a question.
 
 
 Shape

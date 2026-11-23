@@ -13,7 +13,7 @@ Content
   e.g. "Show the agent panel on an agent's resource" rather than "Agent resource component".
 * A word MUST keep its meaning in the codebase.
   A component is a UI element, so logic with nothing to see is not a component.
-* A ticket MUST contain only what its acceptance criteria need. Cut background, history and restatements.
+* A ticket MUST only contain what its acceptance criteria need. Cut background, history and restatements.
 * A ticket MUST NOT have a Dependencies or Relations section.
 * Check each claim against the code and the agreed design before writing it into a ticket.
   Where the code lags the design, the design decides what the ticket asks for.
@@ -31,10 +31,10 @@ Splitting work
 Dependencies
 ------------
 
-* Record dependencies only as Linear relations.
-* Link only direct blockers. A blocker that another blocker already reaches MUST NOT get its own link.
+* Only record dependencies as Linear relations.
+* Only link direct blockers. A blocker that another blocker already reaches MUST NOT get its own link.
 * "Blocked by" MUST mean the ticket can't be built or tested without the other.
-  Two tickets that change the same file need only an order,
+  Two tickets that change the same file only need an order,
   and a ticket that only an end-to-end test needs blocks the end-to-end ticket.
 
 

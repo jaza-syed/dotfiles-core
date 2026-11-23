@@ -1,5 +1,5 @@
 ---
-description: Answer the question only, with no edits and no subagents
+description: Only answer the question, with no edits and no subagents
 ---
 
 Answer this question and do nothing else:

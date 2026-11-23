@@ -119,7 +119,8 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     When the topic is not the actor, give the topic a first sentence of its own and the actor the next sentence,
     so "**The sleep rule** is redundant. The Bash tool blocks a foreground `sleep`."
     rather than "**Sleep:** the Bash tool blocks a foreground `sleep`".
-  * Imperatives e.g. "Delete the aside", headings, table cells, value docstrings
+  * Imperatives e.g. "Delete the aside", headings, table cells,
+    docstrings that follow the value rule in `writing-comments.md`
     and the opening verb of a function docstring are exempt.
     Nothing else is a label.
   * You SHOULD join clauses with connective words e.g. "so", "and", "because"
@@ -132,7 +133,7 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     Where the clauses are long enough to need the comma, split them into two sentences.
   * You SHOULD put "only", "just" and "even" before the main verb, as you would say the sentence out loud,
     and you MUST NOT put them at the end of the sentence.
-    Write "The call only holds the turn while the call runs" rather than "The call holds the turn only while the call runs",
+    Write "The call only holds the turn while it runs" rather than "The call holds the turn only while the call runs",
     and "The page only reads the default cache" rather than "The page reads only the default cache" or "The page reads the default cache only".
     When the word limits the subject, put it before the subject, e.g. "Only the scheduler cancels a statement".
   * When a sentence has more than two conditions, state the main condition in one sentence
@@ -156,8 +157,7 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     rather than stating the fact in the passive voice (with or without a "by" phrase),
     making the thing acted on the subject of an intransitive verb, which is an anticausative construction,
     or putting the actor and its action in a relative clause on another noun.
-    "The process exits" and "the timer fires" are fine, because the subject is the actor.
-    This applies to code comments as much as to prose. Write
+    "The process exits" and "the timer fires" are fine, because the subject is the actor. Write
     * "Elm reorders the list" rather than "The reordering itself is handled in Elm".
     * "The page shows the loading and error states" rather than "The loading and error states are shown on the page".
     * "The backend rolls back the transaction instead of committing it"
@@ -178,7 +178,7 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
       rather than "A statement that the session runs runs to its end".
     * "Each call waits until the scheduler gives it the turn"
       rather than "Each call waits for the scheduler's turn".
-    * "Models an owner process that crashed without closing its connection"
+    * "Models an owner process that crashed without closing its connection" in a function docstring
       rather than "Keep the session of a dead owner open, as a process that died behind a half-open connection leaves it".
   * You MUST NOT assign an action with a possessive and an infinitive, e.g. "is Elm's to reopen" or "is yours to decide",
     or with "is left to", "is up to" or "falls to".
@@ -193,7 +193,7 @@ When two rules cannot both hold, write the sentence you would say out loud to a 
     When a modifier could attach to more than one word, which is a misplaced modifier, move the modifier or split the sentence.
     Write "The gate cancels the children in this order. The cancellations run as code under test."
     rather than "The order in which the children are cancelled as code under test".
-  * You MUST NOT refer to a thing only by a label, a number or its place in a plan, a list or a document,
+  * You MUST NOT only refer to a thing by a label, a number or its place in a plan, a list or a document,
     e.g. "change 4", "commit 4", "stage 9", "the plan step", "the question in the box".
     Say what the thing is in the same sentence, e.g. "change 4, which adds a plot response with a cursor".
   * You MUST say which thing you mean.

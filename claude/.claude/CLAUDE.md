@@ -13,7 +13,7 @@ Generating code costs you nothing, so you have a bias towards writing too much o
 - You SHOULD keep a functional core and an imperative shell, per Gary Bernhardt's "Boundaries". Put decisions, transformations and domain rules in pure functions over plain data, and keep I/O, database queries, network calls and state mutation in a thin shell at the boundary, without splitting the flow across extra layers.
 - If a reader has to trace a flow through more than three files or layers, you SHOULD flatten it.
 - You MAY consolidate a check into one place and pass the result as a narrower type or flag, but only when several places check the same concept rather than conditions that look alike by coincidence.
-- You SHOULD inline a helper that has only one caller, unless the caller is already long or deeply nested, or a unit test calls the helper directly to test pure decision logic without I/O.
+- You SHOULD inline a helper that only has one caller, unless the caller is already long or deeply nested, or a unit test calls the helper directly to test pure decision logic without I/O.
 - You SHOULD write fewer lines of code where you can without making the code harder to read.
 - If a change passes a new parameter or field through several layers of types, schemas or functions, you SHOULD look for a more direct path first, or state the alternative you considered and why passing it through is still needed, then continue.
 - Before you design a mechanism, e.g. a queue, a lock, a cache or a retry loop, you SHOULD check whether the codebase, a dependency the project already has, the database or the field already solves the problem. Read the source in the session rather than describe it from recall. Tell me the technique's name and link what you read, then say how your design differs or that you found nothing.
@@ -25,13 +25,13 @@ The Plain Language output style defines the rules for prose a person may read. I
 
 When you write instructions for a subagent that will write prose a person may read, e.g. a document, a commit message or a merge request description, they MUST tell the subagent that the current output style is Plain Language, defined in `~/.claude/output-styles/plain-language.md`, and that it MUST read and follow that file. If the subagent will write code, the instructions MUST also tell it to read and follow `~/.claude/writing-comments.md`.
 
-When you give me commands to run myself, you SHOULD give as few separate commands as possible, joining steps that run one after another with `&&`, e.g. `git add … && git commit … && git push …`. Give a separate command only where I need to read the output of one before running the next.
+When you give me commands to run myself, you SHOULD give as few separate commands as possible, joining steps that run one after another with `&&`, e.g. `git add … && git commit … && git push …`. Only give a separate command where I need to read the output of one before running the next.
 
 When you stop part-way through a sequence of actions because you need a decision or a go-ahead from me before you can continue, you MUST also send a notification saying what you need. This applies whether you ask in prose or through the AskUserQuestion tool. The notification depends on where the session runs:
 
 - When the system prompt says the session runs inside the Claude desktop app, you MUST send it with the PushNotification tool and load the tool with ToolSearch first if it is not loaded. Its message names the waiting task and the decision in one line under 200 characters.
 - In Rex, where `$TERM_PROGRAM` is `rex`, you MUST send Rex's program status sequence, OSC 7501.
-- Elsewhere, which means Ghostty inside tmux, you MUST send a desktop notification with `terminal-notifier`. `terminal-notifier` exists only on the Macs, so skip the notification where the command is absent.
+- Elsewhere, which means Ghostty inside tmux, you MUST send a desktop notification with `terminal-notifier`. `terminal-notifier` only exists on the Macs, so skip the notification where the command is absent.
 
 ### Rex
 
@@ -66,11 +66,11 @@ terminal-notifier -title "Claude Code" -subtitle "<the task that is waiting>" -m
 
 - `name` MUST be two words you pick at random, joined by a hyphen, whimsical in the style of Anthropic's own naming, for example `velvet-otter` or `copper-wren`. Pick a fresh pair each time you notify. The title remains on the window afterwards, so I can tell my Ghostty windows apart.
 - The `printf` writes OSC 0 to the tty of the tmux client, which sets that Ghostty window's title. tmux leaves the title alone because `set-titles` is off, and a random pair means the lookup matches one window. AeroSpace takes about 100ms to see a title change, so the loop retries rather than guessing a delay.
-- `aerospace focus --window-id` raises that exact window. AeroSpace already holds the Accessibility permission this needs. Ghostty runs all its windows in one process, so `-activate` alone raises only whichever Ghostty window was frontmost, and it is there for when AeroSpace is not running.
+- `aerospace focus --window-id` raises that exact window. AeroSpace already holds the Accessibility permission this needs. Ghostty runs all its windows in one process, so `-activate` alone only raises whichever Ghostty window was frontmost, and it is there for when AeroSpace is not running.
 - `-execute` runs a shell command when I click. `select-window` and `select-pane` act on the session that contains the pane, so they hold whatever client is attached, unlike `switch-client`, which picks a client itself. The clicked command gets no tmux environment and a minimal PATH, so the double quotes expand `$wid`, `$TMUX_PANE` and both `command -v` lookups as you send rather than on click. Every binary in it MUST be an absolute path. Drop the tmux parts when `$TMUX_PANE` is unset and the `aerospace` part when the command is absent.
 - `-group claude` makes each notification replace the previous one, so I cannot click an old notification with a `$wid` and pane that no longer apply.
-- `-subtitle` names the task that is waiting, so `-message` contains only the decision.
-- `-action "First,Second"` adds buttons and `-reply "<prompt>"` adds a text field. Each prints my answer on stdout and blocks until the answer arrives, so pass one only when the turn has nothing to do but wait. Prefer `-action` for a closed choice and `-reply` for free text.
+- `-subtitle` names the task that is waiting, so `-message` only contains the decision.
+- `-action "First,Second"` adds buttons and `-reply "<prompt>"` adds a text field. Each prints my answer on stdout and blocks until the answer arrives, so only pass one when the turn has nothing to do but wait. Prefer `-action` for a closed choice and `-reply` for free text.
 - You MUST pass `-timeout SECONDS` with `-action` or `-reply`, and the timeout MUST be shorter than the Bash tool's own timeout. On expiry the command prints `@TIMEOUT` and exits 6, and you then ask me in the session instead.
 
 ## Commit messages
@@ -80,7 +80,7 @@ terminal-notifier -title "Claude Code" -subtitle "<the task that is waiting>" -m
 ## Review comments
 
 - You MUST NOT post a comment, reply or thread on a merge request or pull request, through any tool, including `glab`, `gh` or the API. Reading review comments is fine. If a task asks you to post one, give me the text and stop.
-- You MUST NOT draft or suggest a reply to a review comment unless I ask for one. When I ask what a comment means or whether it is right, answer that question only.
+- You MUST NOT draft or suggest a reply to a review comment unless I ask for one. When I ask what a comment means or whether it is right, only answer that question.
 
 ## Writing comments
 
@@ -104,7 +104,7 @@ terminal-notifier -title "Claude Code" -subtitle "<the task that is waiting>" -m
 ### Searching
 
 - You SHOULD run `rg` and `fd` rather than `grep` and `find`.
-- `fd` and `rg` both skip what git ignores and `-H` adds only dotfiles, so `fd -H '^\.env'` hides an ignored `.env` and reads as "the file does not exist". You MUST pass `-I` to `fd` (`--no-ignore` to `rg`) when a gitignored file would change your answer, for example checking whether a `.env` exists next to a committed `.env-example`.
+- `fd` and `rg` both skip what git ignores and `-H` only adds dotfiles, so `fd -H '^\.env'` hides an ignored `.env` and reads as "the file does not exist". You MUST pass `-I` to `fd` (`--no-ignore` to `rg`) when a gitignored file would change your answer, for example checking whether a `.env` exists next to a committed `.env-example`.
 
 ### Choosing foreground or background
 

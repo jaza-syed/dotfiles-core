@@ -28,9 +28,9 @@ yet which maintainers / consumers may care about (e.g. dependency upgrades).
 
 ## Instructions
 
-1. Check the changes against the the branch root commit. Sometimes this will not be main, 
+1. Check the changes against the branch root commit. Sometimes this will not be main,
    if we are on a stacked feature branch.
-2. If not aleady on the feature branch, create a new branch for the feature / bug according to standards and named according to changes.
+2. If not already on the feature branch, create a new branch for the feature / bug according to standards and named according to changes.
 3. Check if `changelog.d/` exists, and has changelog fragments in it.
 4. If required, add a new fragment with `Bash(changeling create)`.
    Prioritise using the CLI's `--fixed` / `--changed` / `--added` etc. flags, as a one-shot flow.

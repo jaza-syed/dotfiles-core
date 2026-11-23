@@ -32,16 +32,16 @@ Choose the mechanism by what you are waiting for.
 | Work the harness tracks: a background command, an agent or a workflow | Nothing. Its notification wakes you. You MUST NOT poll its output or set a timer for it |
 | One condition, such as a server answering or a file appearing | `Bash` with `run_in_background` and `until <test>; do sleep <seconds>; done`. It exits once, so you get one notification |
 | A time | `Bash` with `run_in_background` and `sleep <seconds>`, computed from `date +%s`. A foreground `sleep` is blocked |
-| The usage window's reset | `WAIT_THRESHOLD=0 ~/.claude/scripts/wait-for-usage-reset.sh` with `run_in_background`, outside the sandbox. It sleeps until a minute past the reset that the cache records and prints `RESET`. Without `WAIT_THRESHOLD=0` it waits only when a window is at 50% or more |
+| The usage window's reset | `WAIT_THRESHOLD=0 ~/.claude/scripts/wait-for-usage-reset.sh` with `run_in_background`, outside the sandbox. It sleeps until a minute past the reset that the cache records and prints `RESET`. Without `WAIT_THRESHOLD=0` it only waits when a window is at 50% or more |
 | A stream of events, each of which you act on | `Monitor`, with a command that prints one line per event. The command's filter also matches every failure. A monitor expires after at most 30 minutes, so re-arm it on expiry while you still need it |
 | Usage crossing thresholds | `Monitor` running `~/.claude/scripts/usage-monitor.sh 80 90 95`, outside the sandbox. It prints a line the first time the 5-hour usage reaches each threshold, polling every `USAGE_POLL` seconds (default 300) |
-| A time I name, while the main chat is idle | `CronCreate`, one-shot. It fires only while the chat is idle and is lost when the session ends |
+| A time I name, while the main chat is idle | `CronCreate`, one-shot. It only fires while the chat is idle and is lost when the session ends |
 | The next step of a `/loop` | `ScheduleWakeup` |
 
 * When you set up a wake-up, you MUST tell me in one line what will wake you and roughly when.
 * On waking, you MUST read the variable again before you act, because a reset time can move and a condition can
   change back. For usage, run `usage-5h.sh` rather than trusting the cache.
-* A wait MUST end on failure as well as success: a loop that waits for a server also gives up after a time
+* A wait MUST end on failure as well as success. A loop that waits for a server also gives up after a time
   you state, and prints why.
 * Before you start work that spends many tokens, such as several agents or a workflow, you SHOULD read the
   5-hour usage and tell me the percent and the reset time.
