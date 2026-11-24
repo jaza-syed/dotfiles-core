@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    # For packages that must be newer than the release has.
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -34,6 +36,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-unstable,
       home-manager,
       nix-darwin,
       direnv-instant,
@@ -53,6 +56,15 @@
         { pkgs, ... }:
         {
           home.packages = [ direnv-instant.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+        };
+      # musubi links the jj-lib of its own version, so jj has to match it.
+      jujutsuModule =
+        { pkgs, ... }:
+        {
+          home.packages = [
+            nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.jujutsu
+            (pkgs.callPackage ./nix/pkgs/jj-musubi/package.nix { })
+          ];
         };
       fzfTabCompletionModule = {
         xdg.dataFile."fzf-tab-completion".source = fzf-tab-completion;
@@ -88,6 +100,7 @@
         ./nix/home/tools.nix
         direnvInstantModule
         fzfTabCompletionModule
+        jujutsuModule
       ];
       # nix-homebrew installs Homebrew itself during the darwin switch;
       # nix-homebrew.user is a machine fact that each host file sets.
@@ -132,6 +145,7 @@
     {
       packages = forAllSystems (pkgs: {
         mermaid-cli = pkgs.callPackage ./nix/pkgs/mermaid-cli/package.nix { };
+        jj-musubi = pkgs.callPackage ./nix/pkgs/jj-musubi/package.nix { };
 
         # The repo source with the generated theme artifacts built in, for
         # hosts that set dotfiles.repoDir to a store path instead of a

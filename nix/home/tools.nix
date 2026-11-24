@@ -55,7 +55,6 @@
     pkgs.watch
     pkgs.wget
     pkgs.rsync
-    pkgs.jujutsu
     pkgs.rip2
     pkgs.difftastic
     pkgs.mise
