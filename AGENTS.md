@@ -184,6 +184,10 @@ ordinary primitives (functions, overlays, modules).
   `darwinConfigurations.gen-m5`. It owns all work-specific configuration;
   the core owns ergonomics and stays free of work config.
 
+## Layout awareness
+
+An agent manipulates windows, workspaces and Rex blocks through the CLI, not keybindings. The primary surface is `scripts/layout.sh` (read-only, with `--json`), which prints the AeroSpace monitors/workspaces/windows and the Rex session tree. `usage.md` is the full reference for queries, manipulation commands and the rules for acting on a snapshot. Keyboard bindings in `aerospace.toml` exist for human use only and are not the agent's surface.
+
 ## Repository layout
 
 The top-level directories mirror paths below `$HOME` and are linked
