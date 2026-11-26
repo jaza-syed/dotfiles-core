@@ -41,6 +41,8 @@
     pkgs.fd
     pkgs.ripgrep
     pkgs.ast-grep
+    # Baltig's code search indexes the default branch of each workspace repo with it.
+    pkgs.zoekt
     pkgs.zoxide
     pkgs.fzf
     pkgs.zsh-fzf-tab

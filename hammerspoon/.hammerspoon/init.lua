@@ -133,3 +133,108 @@ screen_watcher = hs.screen.watcher.new(function()
   hs.execute("/opt/homebrew/bin/brew services restart sketchybar", true)
 end)
 screen_watcher:start()
+
+-- Route GitLab repository, MR, code, blame, commit, and pipeline URLs to Baltig
+-- when Baltig.app is installed, forwarding all other URLs to the real browser.
+local baltig_bundle_id = "com.baltig.app"
+local fallback_browser_bundles = {
+  "com.google.Chrome",
+  "org.mozilla.firefox",
+  "com.apple.Safari",
+}
+
+local gitlab_reserved_roots = {
+  ["-"] = true,
+  admin = true,
+  api = true,
+  dashboard = true,
+  explore = true,
+  groups = true,
+  help = true,
+  import = true,
+  oauth = true,
+  profile = true,
+  search = true,
+  snippets = true,
+  users = true,
+}
+
+local function pick_fallback_browser()
+  for _, bundle_id in ipairs(fallback_browser_bundles) do
+    if hs.application.pathForBundleID(bundle_id) ~= nil then
+      return bundle_id
+    end
+  end
+  return "com.apple.Safari"
+end
+
+local function is_baltig_gitlab_url(host, full_url)
+  if type(host) ~= "string" or type(full_url) ~= "string" then
+    return false
+  end
+
+  local lower_host = string.lower(host)
+  if lower_host ~= "gitlab.com" and string.find(lower_host, "gitlab", 1, true) == nil then
+    return false
+  end
+
+  local path = full_url:match("^https?://[^/]+(/[^?#]*)")
+  if not path or path == "/" then
+    return false
+  end
+
+  local trimmed = path:gsub("^/+", ""):gsub("/+$", "")
+  if trimmed == "" then
+    return false
+  end
+
+  local first_seg = string.lower(trimmed:match("^([^/]+)") or "")
+  if gitlab_reserved_roots[first_seg] then
+    return false
+  end
+
+  local project_part, subroute = trimmed:match("^(.+)/%-/(.+)$")
+  if project_part and subroute then
+    if not project_part:find("/", 1, true) then
+      return false
+    end
+    local head = string.lower(subroute:match("^([^/]+)") or "")
+    return head == "merge_requests"
+      or head == "tree"
+      or head == "blob"
+      or head == "blame"
+      or head == "commit"
+      or head == "commits"
+      or head == "pipelines"
+      or head == "branches"
+      or head == "tags"
+  end
+
+  -- Legacy /<group>/<repo>/merge_requests/<iid>
+  if trimmed:match("^.+/.+/merge_requests/%d+") then
+    return true
+  end
+
+  -- Bare repository homepage /<group>/<repo> (at least 2 path segments, no /-/ suffix)
+  if not trimmed:find("/%-") and trimmed:find("/", 1, true) then
+    return true
+  end
+
+  return false
+end
+
+if hs.application.pathForBundleID(baltig_bundle_id) ~= nil then
+  hs.urlevent.httpCallback = function(_, host, _, full_url)
+    if is_baltig_gitlab_url(host, full_url) then
+      if hs.urlevent.openURLWithBundle(full_url, baltig_bundle_id) then
+        return
+      end
+    end
+    hs.urlevent.openURLWithBundle(full_url, pick_fallback_browser())
+  end
+
+  local current_handler = string.lower(tostring(hs.urlevent.getDefaultHandler("https") or ""))
+  if current_handler ~= "org.hammerspoon.hammerspoon" then
+    pcall(hs.urlevent.setDefaultHandler, "http")
+  end
+end
