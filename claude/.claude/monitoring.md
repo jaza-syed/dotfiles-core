@@ -43,6 +43,10 @@ Choose the mechanism by what you are waiting for.
   change back. For usage, run `usage-5h.sh` rather than trusting the cache.
 * A wait MUST end on failure as well as success. A loop that waits for a server also gives up after a time
   you state, and prints why.
+* A loop that waits for a server MUST also test for the server's failure on every pass, so that it ends at the
+  first failure rather than at its time limit. A container with a restart policy hides a crash from a test
+  that it is running, so test `docker inspect --format '{{.RestartCount}}'` and the log for an error line.
+* You SHOULD read the first lines of a slow step's log within a minute or two of starting it, before you wait on it.
 * Before you start work that spends many tokens, such as several agents or a workflow, you SHOULD read the
   5-hour usage and tell me the percent and the reset time.
 
